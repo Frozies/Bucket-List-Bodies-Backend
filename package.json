@@ -4,7 +4,8 @@
   "description": "Backend for bucket-list-bodies",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Davin Young",
@@ -17,6 +18,7 @@
     "stripe": "^8.154.0"
   },
   "devDependencies": {
-    "@apollo/rover": "^0.1.0"
+    "@apollo/rover": "^0.1.0",
+    "nodemon": "^2.0.12"
   }
 }
