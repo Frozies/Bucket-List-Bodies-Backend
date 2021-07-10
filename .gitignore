@@ -1,7 +1,5 @@
 .env
 /node_modules/
-/package-lock.json
 /.idea/
 .env
-package-lock.json
 .run/Start Product Backend.run.xml
