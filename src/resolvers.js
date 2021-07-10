@@ -2,8 +2,8 @@ const productModel  = require('./productModel');
 const {forEach} = require("iterall");
 const stripe  = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-import { GraphQLScalarType } from 'graphql';
-import { Kind } from 'graphql/language';
+const { GraphQLScalarType } = require('graphql');
+const { Kind } = require('graphql/language') ;
 
 
 const resolvers = {
