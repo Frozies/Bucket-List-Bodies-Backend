@@ -1,7 +1,7 @@
 {
-  "name": "petal-patch-product-back",
+  "name": "bucket-list-bodies-backend",
   "version": "1.0.0",
-  "description": "Product backend for the petal-patch",
+  "description": "Backend for bucket-list-bodies",
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon src/index.js",
