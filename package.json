@@ -1,0 +1,22 @@
+{
+  "name": "petal-patch-product-back",
+  "version": "1.0.0",
+  "description": "Product backend for the petal-patch",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Davin Young",
+  "dependencies": {
+    "apollo-datasource-mongodb": "^0.4.0",
+    "apollo-server": "^2.24.0",
+    "dotenv": "^8.2.0",
+    "graphql": "^15.5.0",
+    "mongoose": "^5.12.8",
+    "stripe": "^8.154.0"
+  },
+  "devDependencies": {
+    "@apollo/rover": "^0.1.0"
+  }
+}
