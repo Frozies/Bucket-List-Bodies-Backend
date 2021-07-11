@@ -19,7 +19,6 @@ const server = new ApolloServer({
     ]
 });
 
-//The default port should increment from 4000 (the api gateway), 4001 (Products), etc
 let serverPort = process.env.SERVER_PORT || 4001;
 
 server.listen({ port: serverPort }).then(() => {
