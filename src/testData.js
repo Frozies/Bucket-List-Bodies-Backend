@@ -11,10 +11,10 @@ const orders = [
                 postal: 33914,
                 state: "fl"
             },
+            orders: ["order_1"],
             cards: [
                 "card_1123234"
             ],
-            orders: [],
             notes: "Allergic to tomatoes."
         },
         meals: [
@@ -24,16 +24,16 @@ const orders = [
                 veggie: "Broccoli",
                 carb: "Bread Roll",
                 sauce: "BBQ",
-                deliveryDate: Date,
-                dateTimeMade: Date,
-                status: String,
-                parentOrder: Order,
-                priceID: String,
+                timeMadeEpoch: 1625964073,
+                status: "Made",
+                parentOrder: "order_1",
+                priceID: "price_1",
             }
         ],
-        status: "Made",
+        status: "Delivered",
         total: 45.44,
         coupon: "",
         notes: "This guy is cool, give him free food!"
     }
 ];
+module.exports = orders;

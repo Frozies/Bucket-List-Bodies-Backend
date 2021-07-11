@@ -2,8 +2,6 @@ const {gql} = require("apollo-server");
 
 const typeDefs = gql`
     # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-    scalar Date
-
     type Order {
         id: ID!,
         customer: Customer!
@@ -12,6 +10,7 @@ const typeDefs = gql`
         total: Float
         coupon: String
         notes: String
+        deliveryEpoch: Int
     }
     
     type Meal {
@@ -20,8 +19,7 @@ const typeDefs = gql`
         veggie: String
         carb: String
         sauce: String
-        deliveryDate: Date
-        dateTimeMade: Date
+        timeMadeEpoch: Int
         status: String
         parentOrder: Order
         priceID: String

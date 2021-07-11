@@ -1,9 +1,10 @@
 const productModel  = require('./productModel');
+const orders = require("./testData");
 const {forEach} = require("iterall");
 const stripe  = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const { GraphQLScalarType } = require('graphql');
-const { Kind } = require('graphql/language') ;
+/*const { GraphQLScalarType } = require('graphql');
+const { Kind } = require('graphql/language') ;*/
 
 
 const resolvers = {
@@ -11,7 +12,7 @@ const resolvers = {
         orders: () => orders,
     },
 
-    Date: new GraphQLScalarType({
+    /*Date: new GraphQLScalarType({
         name: 'Date',
         description: 'Date custom scalar type',
         parseValue(value) {
@@ -26,6 +27,6 @@ const resolvers = {
             }
             return null;
         },
-    }),
+    }),*/
 };
 module.exports = resolvers;
