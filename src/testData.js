@@ -20,7 +20,7 @@ const orders = [
         meals: [
             {
                 id: 1,
-                protein: "Turkey",
+                protein: "Chicken",
                 veggie: "Broccoli",
                 carb: "Bread Roll",
                 sauce: "BBQ",

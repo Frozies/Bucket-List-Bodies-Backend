@@ -18,7 +18,6 @@
     "stripe": "^8.154.0"
   },
   "devDependencies": {
-    "@apollo/rover": "^0.1.0",
     "nodemon": "^2.0.12"
   }
 }
