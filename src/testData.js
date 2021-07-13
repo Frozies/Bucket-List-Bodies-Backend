@@ -1,8 +1,8 @@
 const orders = [
     {
-        id: 1,
+        id: "1",
         customer: {
-            id: 1,
+            id: "1",
             name: "Davin Young",
             phone: "239-770-1730",
             address: {
@@ -19,7 +19,7 @@ const orders = [
         },
         meals: [
             {
-                id: 1,
+                id: "1",
                 protein: "Chicken",
                 veggie: "Broccoli",
                 carb: "Bread Roll",

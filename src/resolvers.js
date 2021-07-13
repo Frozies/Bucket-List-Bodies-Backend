@@ -10,6 +10,15 @@ const { Kind } = require('graphql/language') ;*/
 const resolvers = {
     Query: {
         orders: () => orders,
+
+        order(parent, args, context, info) {
+            return orders.find(order => order.id === args.id);
+        },
+
+        //TODO: Search customer database
+        customer(parent, args, context, info) {
+            return orders.find(order => order.customer.id === args.id)
+        }
     },
 
     /*Date: new GraphQLScalarType({
