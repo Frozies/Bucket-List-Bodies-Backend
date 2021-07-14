@@ -2,17 +2,17 @@
 * Lets define the products backend. This is the main microservice for the creation, supplying, editing, and deletion of
  * products. Inventory is NOT included in this program, but may be added slowly until it is migrated.
 * */
+const schema = require('./schemas/schema')
+
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
 const { ApolloServer } = require('apollo-server');
 const mongoose = require('mongoose');
-
-const typeDefs = require('./schema');
-const resolvers = require('./resolvers');
 const queryLogger = require('./plugins/queryLogger');
+const resolvers = require("./resolvers");
 
 const server = new ApolloServer({
-    typeDefs,
+    schema,
     resolvers,
     plugins: [
         queryLogger
