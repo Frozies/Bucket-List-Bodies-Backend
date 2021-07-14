@@ -97,10 +97,57 @@ const typeDefs = gql`
         
         #Iterates through each meal in each order to search for the designated meal status
         getOrdersByMealStatus(status: String): [Order]
+
+        getProteins
+        getVegetables
+        getCarbs
+        getSauces
+        getDonuts
+        getExtras
         
         #TODO: Stripe Queries
         #TODO: Mutations
+        #TODO: Find existing customer for stripe
     }
+    
+    type Mutation {
+        #Create an order and return its order# input customer and order details
+        createOrder(order: OrderInput, customer: CustomerInput): String
+        
+        #Create a new customer to add it to the DB returns true if successful
+        createCustomer(customer: CustomerInput): Boolean
+        
+        #Add or remove food items offered. there should be a generic for this
+        createProtein(food: String): Boolean
+        createVegetable(food: String): Boolean
+        createCarb(food: String): Boolean
+        createSauce(food: String): Boolean
+        createDonut(food: String): Boolean
+        createExtra(food: String): Boolean
+        
+        #taking an index delete the food. there should be a generic for this
+        deleteProtein(index: Int): Boolean
+        deleteVegetable(index: Int): Boolean
+        deleteCarb(index: Int): Boolean
+        deleteSauce(index: Int): Boolean
+        deleteDonut(index: Int): Boolean
+        deleteExtra(index: Int): Boolean
+        
+        updateMealStatus(status: String): Boolean
+        updateOrderStatus(status: String): Boolean
+        
+    }
+    
+    #TODO: Fill out
+    input OrderInput {
+        id: String
+    }
+
+    #TODO: Fill out
+    input CustomerInput {
+        id: String
+    }
+    
 `;
 
 module.exports = typeDefs;
