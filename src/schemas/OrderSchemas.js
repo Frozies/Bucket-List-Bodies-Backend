@@ -11,12 +11,17 @@ const typeDef = gql`
         coupon: String
         notes: String
         deliveryDate: Date
-    }
+    },
+
+    type Meal {
+        
+    },
+    
 
     #TODO: Fill out
     input OrderInput {
         id: String
-    }
+    },
 
     extend type Query {
         #Get every order ever
@@ -34,27 +39,15 @@ const typeDef = gql`
         #Finds an ORDER by its status of whether or not its been seen, preped, or delivered.
         getOrdersByStatus(status: String): [Order]
 
-        #finds orders by their listed proteins
-        getOrdersByProtein(food: FoodInput): [Order]
-
-        #Finds orders by their listed veggies.
-        getOrdersByVegetable(food: FoodInput): [Order]
-
-        #Finds orders with specified carbs
-        getOrdersByCarb(food: FoodInput): [Order]
-
-        #Finds orders with specified sauces
-        getOrdersBySauce(food: FoodInput): [Order]
-
-        #Finds orders with specified Donut
-        getOrdersByDonut(food: FoodInput): [Order]
-
+        #finds orders by their listed Food Type
+        getOrdersByFood(food: FoodInput): [Order]
+        
         #Finds orders that have specified delivery dates
         getOrdersByDelDate(date: Date): [Order]
 
         #Iterates through each meal in each order to search for the designated meal status
         getOrdersByMealStatus(status: String): [Order]
-    }
+    },
 
     extend type Mutation {
         #Create an order and return its order# input customer and order details
@@ -62,7 +55,7 @@ const typeDef = gql`
         
         updateMealStatus(status: String): Boolean
         updateOrderStatus(status: String): Boolean
-    }
+    },
 `;
 
 module.exports = typeDef;

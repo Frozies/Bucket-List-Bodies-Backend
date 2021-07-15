@@ -27,13 +27,13 @@ const typeDef = gql`
         getAllActiveCustomers: [Customer]
 
         #Retrieves all customers that do not have a current subscription
-        getAllUnactiveCustomers: [Customer]
+        getAllInactiveCustomers: [Customer]
 
         #Retrieves all customers
         getAllCustomers(id: ID): [Customer]
 
         #Retrieves all the orders from a specified customer
-        getCustomerOrders(id: ID): [Order]
+        getSingleCustomerOrders(id: ID): [Order]
     }
 
     extend type Mutation {

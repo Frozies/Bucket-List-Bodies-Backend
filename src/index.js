@@ -2,18 +2,20 @@
 * Lets define the products backend. This is the main microservice for the creation, supplying, editing, and deletion of
  * products. Inventory is NOT included in this program, but may be added slowly until it is migrated.
 * */
-const schema = require('./schemas/schema')
+const schema = require('./schemas/RootSchema')
 
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
 const { ApolloServer } = require('apollo-server');
 const mongoose = require('mongoose');
 const queryLogger = require('./plugins/queryLogger');
-const resolvers = require("./resolvers");
+const CustomerResolvers = require("./resolvers/CustomerResolvers");
+const OrderResolvers = require("./resolvers/OrderResolvers");
+const UtilityResolvers = require("./resolvers/UtilityResolvers");
 
 const server = new ApolloServer({
-    schema,
-    resolvers,
+    typeDefs: schema,
+    resolvers: [CustomerResolvers, OrderResolvers, UtilityResolvers],
     plugins: [
         queryLogger
     ]
@@ -29,11 +31,10 @@ server.listen({ port: serverPort }).then(() => {
     `);
 });
 
-/*
 mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true}).then(r => {return r});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     console.log('MongoDB connected successfully')
-});*/
+});
