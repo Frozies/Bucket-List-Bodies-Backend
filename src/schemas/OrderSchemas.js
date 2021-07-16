@@ -14,7 +14,7 @@ const typeDef = gql`
     },
 
     type Meal {
-        
+        id: ID    
     },
     
 
@@ -47,6 +47,8 @@ const typeDef = gql`
 
         #Iterates through each meal in each order to search for the designated meal status
         getOrdersByMealStatus(status: String): [Order]
+        
+        getAllSingleCustomerOrders(customer: ID): [Order]
     },
 
     extend type Mutation {

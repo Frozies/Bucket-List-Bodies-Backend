@@ -17,6 +17,11 @@ const typeDef = gql`
         name: String
     }
     
+    input FoodInput {
+        foodType: FoodTypes
+        name: String
+    }
+    
     extend type Query {
         #Input a food type (Protein, carb, etc) and get a list of its children foods
         getListOfFoodsFromType(foodType: FoodTypes): [Food]

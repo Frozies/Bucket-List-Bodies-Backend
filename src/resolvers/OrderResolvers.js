@@ -8,17 +8,7 @@ const OrderResolvers = {
 
         getAllActiveOrdersByDate(parent, args, context, info){},
 
-        getOrdersByStatus(parent, args, context, info){},
-
-        getOrdersByProtein(parent, args, context, info){},
-
-        getOrdersByVegetable(parent, args, context, info){},
-
-        getOrdersByCarb(parent, args, context, info){},
-
-        getOrdersBySauce(parent, args, context, info){},
-
-        getOrdersByDonut(parent, args, context, info){},
+        getOrdersByFood(parent, args, context, info){},
 
         getOrdersByDelDate(parent, args, context, info){},
 
