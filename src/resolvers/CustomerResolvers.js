@@ -2,9 +2,7 @@ const orders = require("../testData");
 const CustomerResolvers = {
     Query: {
         getCustomerFromOrder(parent, args, context, info) {
-            return {
-                name: "Hello"
-            }
+            return true
         },
 
         getOneCustomer(parent, args, context, info){
