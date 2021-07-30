@@ -40,7 +40,7 @@ const typeDef = gql`
         getOrdersByStatus(status: String): [Order]
 
         #finds orders by their listed Food Type
-        getOrdersByFood(food: FoodInput): [Order]
+#        getOrdersByFood(food: FoodInput): [Order] //TODO: By Meal
         
         #Finds orders that have specified delivery dates
         getOrdersByDelDate(date: Date): [Order]
