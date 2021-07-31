@@ -2,6 +2,7 @@ const Order = require('./OrderSchemas');
 const Customer = require( './CustomerSchema');
 const Util = require('./UtilitySchemas');
 const {gql} = require("apollo-server");
+const Meals = require('./MealSchema')
 
 const typeDefs = gql`
     type Query
@@ -10,6 +11,7 @@ const typeDefs = gql`
     ${Order}
     ${Customer}
     ${Util}
+    ${Meals}
 `;
 
 module.exports = typeDefs
