@@ -1,7 +1,7 @@
-const {GraphQLDateTime} = require("graphql-iso-date/dist");
+// const {GraphQLDateTime} = require("graphql-iso-date/dist");
 
 const UtilityResolvers = {
-    Date: GraphQLDateTime
+    // Date: GraphQLDateTime
 
     /*
     * TODO: Stripe Queries
