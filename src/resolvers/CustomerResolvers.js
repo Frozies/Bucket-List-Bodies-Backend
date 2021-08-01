@@ -1,40 +1,22 @@
 const orders = require("../testData");
 const CustomerResolvers = {
     Query: {
-        getCustomerFromOrder(parent, args, context, info) {
-            return true
-        },
+        getCustomerFromOrder(parent, args, context, info) {},
 
-        getOneCustomer(parent, args, context, info){
-            return true
-        },
+        getOneCustomer(parent, args, context, info){},
 
-        getAllActiveCustomers(parent, args, context, info){
-            return true
-        },
+        getAllActiveCustomers(parent, args, context, info){},
 
-        getAllInactiveCustomers(parent, args, context, info){
-            return true
-        },
+        getAllInactiveCustomers(parent, args, context, info){},
 
-        getAllCustomers(parent, args, context, info){
-            return true
-        },
+        getAllCustomers(parent, args, context, info){},
 
-        getAllSingleCustomerOrders(parent, args, context, info){
-            return true
-        },
+        getAllSingleCustomerOrders(parent, args, context, info){},
     },
 
     Mutation: {
-        createCustomer(parent, args, context, info){
-            return true
-        },
+        createCustomer(parent, args, context, info){},
     }
 };
-
-function findCustomerFromOrder(orderID) {
-
-}
 
 module.exports = CustomerResolvers;

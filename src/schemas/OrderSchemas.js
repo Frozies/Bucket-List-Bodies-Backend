@@ -13,9 +13,6 @@ const typeDef = gql`
         deliveryDate: Date
     },
 
-    type Meal {
-        id: ID    
-    },
     
 
     #TODO: Fill out
@@ -46,7 +43,9 @@ const typeDef = gql`
         getOrdersByDelDate(date: Date): [Order]
 
         #Iterates through each meal in each order to search for the designated meal status
-        getOrdersByMealStatus(status: String): [Order]        
+        getOrdersByMealStatus(status: String): [Order]     
+        
+        #Finds orders based on the Customer
         getAllSingleCustomerOrders(customer: ID): [Order]
     },
 
@@ -54,7 +53,10 @@ const typeDef = gql`
         #Create an order and return its order# input customer and order details
         createOrder(order: OrderInput, customer: CustomerInput): String
         
+        #Updates a specific meal if it has been made
         updateMealStatus(status: String): Boolean
+        
+        #Updates an entire order to if it has been finished being made or if it has been delivered.
         updateOrderStatus(status: String): Boolean
     },
 `;
