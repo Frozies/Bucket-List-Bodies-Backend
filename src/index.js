@@ -11,12 +11,11 @@ const UtilityResolvers = require("./resolvers/UtilityResolvers");
 const schema = require('./schemas/RootSchema')
 const MealResolvers = require("./resolvers/MealResolvers");
 
-
 const server = new ApolloServer({
     typeDefs: schema,
-    resolvers: [CustomerResolvers, OrderResolvers, UtilityResolvers, MealResolvers],
+    resolvers: [UtilityResolvers, MealResolvers, CustomerResolvers, OrderResolvers],
     plugins: [
-        queryLogger
+        // queryLogger
     ]
 });
 

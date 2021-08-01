@@ -6,12 +6,13 @@ const mealSchema = new mongoose.Schema({
     title: String,
     sides: String,
     description: String,
+    photoURL: String,
     price: Number,
     carbs: Number,
     calories: Number,
     allergies: [String],
 });
 
-const mealModel = new mongoose.model('Meal', mealSchema);
+const mealModel = mongoose.model('Meal', mealSchema);
 
 module.exports = mealModel;

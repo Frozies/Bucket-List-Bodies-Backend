@@ -7,11 +7,11 @@ const Meals = require('./MealSchema')
 const typeDefs = gql`
     type Query
     type Mutation
-    
-    ${Order}
-    ${Customer}
+
     ${Util}
     ${Meals}
+    ${Order}
+    ${Customer}
 `;
 
 module.exports = typeDefs

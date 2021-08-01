@@ -1,21 +1,6 @@
 const {gql} = require("apollo-server");
 
 const typeDef = gql`
-    type Customer {
-        id: ID
-        name: String
-        phone: String
-        address: Address
-        cards: [String]
-        orders: [Order]
-        notes: String
-    }
-
-    #TODO: Fill out
-    input CustomerInput {
-        id: String
-    }
-
     extend type Query {
         #Using an order ID, get the customer's information.
         getCustomerFromOrder(id: ID): Customer
@@ -39,6 +24,21 @@ const typeDef = gql`
     extend type Mutation {
         #Create a new customer to add it to the DB returns true if successful
         createCustomer(customer: CustomerInput): Boolean
+    }
+
+    #TODO: Fill out
+    input CustomerInput {
+        id: String
+    }
+
+    type Customer {
+        id: ID
+        name: String
+        phone: String
+        address: Address
+        cards: [String]
+        orders: [Order]
+        notes: String
     }
 `;
 

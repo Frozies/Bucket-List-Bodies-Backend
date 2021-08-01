@@ -1,25 +1,6 @@
 const {gql} = require("apollo-server");
 
 const typeDef = gql`
-    # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-    type Order {
-        id: ID!,
-        customer: Customer!
-        meals: [Meal!]!
-        status: String!
-        total: Float
-        coupon: String
-        notes: String
-        deliveryDate: Date
-    },
-
-    
-
-    #TODO: Fill out
-    input OrderInput {
-        id: String
-    },
-
     extend type Query {
         #Get every order ever
         getAllOrders: [Order]
@@ -59,6 +40,24 @@ const typeDef = gql`
         #Updates an entire order to if it has been finished being made or if it has been delivered.
         updateOrderStatus(status: String): Boolean
     },
+
+    # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
+    type Order {
+        id: ID!,
+        customer: Customer!
+        meals: [Meal!]!
+        status: String!
+        total: Float
+        coupon: String
+        notes: String
+        deliveryDate: Date
+    },
+
+    #TODO: Fill out
+    input OrderInput {
+        id: String
+    },
+
 `;
 
 module.exports = typeDef;

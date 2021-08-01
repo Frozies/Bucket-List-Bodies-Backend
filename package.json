@@ -16,7 +16,7 @@
     "graphql": "^15.5.0",
     "graphql-iso-date": "^3.6.1",
     "mongoose": "^5.12.8",
-    "stripe": "^8.154.0"
+    "stripe": "^8.167.0"
   },
   "devDependencies": {
     "graphql-tools": "^7.0.5",

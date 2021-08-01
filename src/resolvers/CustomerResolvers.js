@@ -1,7 +1,7 @@
 const orders = require("../testData");
 const CustomerResolvers = {
     Query: {
-        getCustomerFromOrder(parent, args, context, info) {},
+/*        getCustomerFromOrder(parent, args, context, info) {},
 
         getOneCustomer(parent, args, context, info){},
 
@@ -11,11 +11,11 @@ const CustomerResolvers = {
 
         getAllCustomers(parent, args, context, info){},
 
-        getAllSingleCustomerOrders(parent, args, context, info){},
+        getAllSingleCustomerOrders(parent, args, context, info){},*/
     },
 
     Mutation: {
-        createCustomer(parent, args, context, info){},
+/*        createCustomer(parent, args, context, info){},*/
     }
 };
 

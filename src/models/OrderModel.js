@@ -15,4 +15,4 @@ const orderSchema = new mongoose.Schema({
 
 const orderModel = mongoose.model('Order', orderSchema);
 
-export default [orderModel, orderSchema, mealSchema, mealModel]
+export default [orderModel, orderSchema, mealSchema]

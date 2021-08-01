@@ -1,6 +1,6 @@
 const OrderResolvers = {
     Query: {
-        getAllOrders(parent, args, context, info){},
+/*        getAllOrders(parent, args, context, info){},
 
         getOneOrder(parent, args, context, info){},
 
@@ -12,15 +12,15 @@ const OrderResolvers = {
 
         getOrdersByDelDate(parent, args, context, info){},
 
-        getOrdersByMealStatus(parent, args, context, info){},
+        getOrdersByMealStatus(parent, args, context, info){},*/
     },
 
     Mutation: {
-        createOrder(parent, args, context, info){},
+/*        createOrder(parent, args, context, info){},
 
         updateMealStatus(parent, args, context, info){},
 
-        updateOrderStatus(parent, args, context, info){},
+        updateOrderStatus(parent, args, context, info){},*/
     },
 };
 
