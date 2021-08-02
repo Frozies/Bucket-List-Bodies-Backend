@@ -12,9 +12,9 @@ const typeDef = gql`
         sides: String
         description: String
         photoURL: String
-        price: Float
-        carbs: Int
-        calories: Int
+        price: String
+        carbs: String
+        calories: String
         allergies: [String]
     },
 

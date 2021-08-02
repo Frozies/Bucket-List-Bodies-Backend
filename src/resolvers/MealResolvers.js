@@ -16,16 +16,18 @@ const MealResolvers = {
                 });
 
                 productID = product.id
+                console.log("Product ID: " + productID)
             }
             catch (err) {
                 return "Error creating Stripe Product: " + err;
             }
+
             //Create Stripe Price
             try {
                 const price = await stripe.prices.create({
                     currency: 'usd',
                     product: productID,
-                    unit_amount: Math.ceil(args.meal.price * 100),
+                    unit_amount: Math.ceil( parseInt(parseFloat(args.meal.price)* 100)),
                 });
 
                 priceID = price.id;
@@ -43,9 +45,9 @@ const MealResolvers = {
                     sides: args.meal.sides,
                     description: args.meal.description,
                     photoURL: args.meal.photoURL,
-                    price: args.meal.price,
-                    carbs: args.meal.carbs,
-                    calories: args.meal.calories,
+                    price: parseFloat(args.meal.price),
+                    carbs: parseInt(args.meal.carbs),
+                    calories: parseInt(args.meal.calories),
                     allergies: [args.meal.allergies],
                 })
             }

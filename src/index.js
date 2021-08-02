@@ -15,7 +15,7 @@ const server = new ApolloServer({
     typeDefs: schema,
     resolvers: [UtilityResolvers, MealResolvers, CustomerResolvers, OrderResolvers],
     plugins: [
-        // queryLogger
+        queryLogger
     ]
 });
 
