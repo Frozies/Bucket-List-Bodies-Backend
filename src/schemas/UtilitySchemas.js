@@ -10,10 +10,6 @@ const typeDef = gql`
         postal: Int
         state: String
     }
-
-    #TODO: Stripe Queries
-    #TODO: Mutations
-    #TODO: Find existing customer for stripe
 `;
 
 module.exports = typeDef;

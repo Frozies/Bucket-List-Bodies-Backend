@@ -1,20 +1,17 @@
 const Order = require('./OrderSchemas');
-const Food = require('./FoodSchema');
 const Customer = require( './CustomerSchema');
 const Util = require('./UtilitySchemas');
 const {gql} = require("apollo-server");
+const Meals = require('./MealSchema')
 
 const typeDefs = gql`
-    type Query{
-        _empty: String
-    }
-    type Mutation {
-        _empty: String
-    }
-    ${Order}
-    ${Food}
-    ${Customer}
+    type Query
+    type Mutation
+
     ${Util}
+    ${Meals}
+    ${Order}
+    ${Customer}
 `;
 
 module.exports = typeDefs
