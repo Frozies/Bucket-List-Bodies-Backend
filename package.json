@@ -2,10 +2,10 @@
   "name": "bucket-list-bodies-backend",
   "version": "1.0.0",
   "description": "Backend for bucket-list-bodies",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node src/index.ts",
+    "dev": "nodemon src/index.ts --trace-warnings",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Davin Young",
@@ -19,7 +19,9 @@
     "stripe": "^8.167.0"
   },
   "devDependencies": {
+    "@types/node": "^16.4.10",
     "graphql-tools": "^7.0.5",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "typescript": "^4.3.5"
   }
 }

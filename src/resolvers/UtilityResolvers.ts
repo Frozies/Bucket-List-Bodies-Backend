@@ -1,6 +1,6 @@
 // const {GraphQLDateTime} = require("graphql-iso-date/dist");
 
-const UtilityResolvers = {
+export const UtilityResolvers = {
     // Date: GraphQLDateTime
 
     /*

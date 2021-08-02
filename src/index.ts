@@ -2,18 +2,18 @@ require('dotenv').config(); // Allows use of environmental variables from the .e
 
 const { ApolloServer } = require('apollo-server');
 const mongoose = require('mongoose');
-
 const queryLogger = require('./plugins/queryLogger');
-
-const CustomerResolvers = require("./resolvers/CustomerResolvers");
-const OrderResolvers = require("./resolvers/OrderResolvers");
-const UtilityResolvers = require("./resolvers/UtilityResolvers");
 const schema = require('./schemas/RootSchema')
-const MealResolvers = require("./resolvers/MealResolvers");
+
+const OrderResolvers = require('./resolvers/OrderResolvers')
+const CustomerResolvers = require('./resolvers/CustomerResolvers')
+const MealResolvers = require('./resolvers/MealResolvers')
+const UtilityResolvers = require('./resolvers/UtilityResolvers')
+
 
 const server = new ApolloServer({
     typeDefs: schema,
-    resolvers: [UtilityResolvers, MealResolvers, CustomerResolvers, OrderResolvers],
+    resolvers: [UtilityResolvers, MealResolvers, OrderResolvers, CustomerResolvers],
     plugins: [
         queryLogger
     ]
@@ -29,7 +29,7 @@ server.listen({ port: serverPort }).then(() => {
     `);
 });
 
-mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true}).then(r => {return r});
+mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true}).then((r: any) => {return r});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

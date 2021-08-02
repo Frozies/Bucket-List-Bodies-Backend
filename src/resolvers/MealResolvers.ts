@@ -1,9 +1,9 @@
 const mealModel = require('../models/MealModel')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const MealResolvers = {
+export const MealResolvers = {
     Mutation: {
-        createMeal: async(parent, args, context, info) => {
+        createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: any; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
             let priceID = '';
             let productID = '';
 
@@ -27,7 +27,7 @@ const MealResolvers = {
                 const price = await stripe.prices.create({
                     currency: 'usd',
                     product: productID,
-                    unit_amount: Math.ceil( parseInt(parseFloat(args.meal.price)* 100)),
+                    unit_amount: Math.ceil( parseInt(String(parseFloat(args.meal.price) * 100))),
                 });
 
                 priceID = price.id;

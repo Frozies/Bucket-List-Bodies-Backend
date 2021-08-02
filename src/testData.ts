@@ -36,4 +36,4 @@ const orders = [
         notes: "This guy is cool, give him free food!"
     }
 ];
-module.exports = orders;
+export default orders;

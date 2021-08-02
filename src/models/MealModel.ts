@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const mealSchema = new mongoose.Schema({
     productID: String,
