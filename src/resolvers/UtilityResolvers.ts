@@ -1,6 +1,6 @@
 // const {GraphQLDateTime} = require("graphql-iso-date/dist");
 import { AWSS3Uploader } from '../lib/uploaders/s3';
-require('dotenv').config(); // Allows use of environmental variables from the .env file
+import { GraphQLUpload } from 'graphql-upload';
 
 const s3Uploader = new AWSS3Uploader({
     accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -10,6 +10,7 @@ const s3Uploader = new AWSS3Uploader({
 
 export const UtilityResolvers = {
     // Date: GraphQLDateTime
+    Upload: GraphQLUpload,
 
     Mutation: {
         singleUpload: s3Uploader.singleFileUploadResolver.bind(s3Uploader),

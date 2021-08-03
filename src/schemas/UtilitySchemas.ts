@@ -1,8 +1,9 @@
-import { ApolloServer, gql } from 'apollo-server'
+import { gql } from "apollo-server-express";
 
 const typeDef = gql`
     scalar Date
-
+    scalar Upload
+    
     type UploadedFileResponse {
         filename: String!
         mimetype: String!

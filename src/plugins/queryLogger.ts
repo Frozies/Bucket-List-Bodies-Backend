@@ -1,4 +1,4 @@
-const queryLogger = {
+export const queryLogger = {
 
     // Fires whenever a GraphQL request is received from a client.
     requestDidStart(requestContext: { request: { query: string; }; }) {
@@ -23,4 +23,4 @@ const queryLogger = {
     },
 };
 
-export default queryLogger;
+module.exports = queryLogger;

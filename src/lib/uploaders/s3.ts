@@ -3,8 +3,8 @@ import stream from "stream";
 import { ApolloServerFileUploads } from "../index";
 
 type S3UploadConfig = {
-  accessKeyId: string | undefined;
-  secretAccessKey: string | undefined;
+  accessKeyId: string;
+  secretAccessKey: string;
   region?: string;
   destinationBucketName: string;
 };
@@ -21,7 +21,7 @@ export class AWSS3Uploader implements ApolloServerFileUploads.IUploader {
   constructor(config: S3UploadConfig) {
     AWS.config = new AWS.Config();
     AWS.config.update({
-      region: config.region || "ca-central-1",
+      region: config.region || "us-east-1",
       accessKeyId: config.accessKeyId,
       secretAccessKey: config.secretAccessKey
     });
@@ -32,15 +32,21 @@ export class AWSS3Uploader implements ApolloServerFileUploads.IUploader {
 
   private createUploadStream(key: string): S3UploadStream {
     const pass = new stream.PassThrough();
+
     return {
       writeStream: pass,
       promise: this.s3
-        .upload({
+          .upload({
           Bucket: this.config.destinationBucketName,
           Key: key,
           Body: pass
-        })
-        .promise()
+        },function (err, data) {
+          if (err) {
+            console.log("Error", err);
+          } else {
+            console.log("Success", data.Bucket);
+          }
+        } ).promise()
     };
   }
 
@@ -56,12 +62,16 @@ export class AWSS3Uploader implements ApolloServerFileUploads.IUploader {
     parent: any,
     { file }: { file: ApolloServerFileUploads.File }
   ): Promise<ApolloServerFileUploads.UploadedFileResponse> {
-    const { stream, filename, mimetype, encoding } = await file;
+    const { createReadStream, filename, mimetype, encoding }: any = await file;
+
+    const stream = createReadStream();
+
     const filePath = this.createDestinationFilePath(
       filename,
       mimetype,
       encoding
     );
+
     const uploadStream = this.createUploadStream(filePath);
 
     // @ts-ignore
@@ -72,8 +82,8 @@ export class AWSS3Uploader implements ApolloServerFileUploads.IUploader {
   }
 
   async multipleUploadsResolver(
-      // @ts-ignore
-    parent,
+
+    parent: any,
     { files }: { files: ApolloServerFileUploads.File[] }
   ): Promise<ApolloServerFileUploads.UploadedFileResponse[]> {
     return Promise.all(
