@@ -3,8 +3,8 @@ import stream from "stream";
 import { ApolloServerFileUploads } from "../index";
 
 type S3UploadConfig = {
-  accessKeyId: string;
-  secretAccessKey: string;
+  accessKeyId: string | undefined;
+  secretAccessKey: string | undefined;
   region?: string;
   destinationBucketName: string;
 };
