@@ -48,7 +48,7 @@ export const MealResolvers = {
                     price: parseFloat(args.meal.price),
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
-                    allergies: [args.meal.allergies],
+                    allergies: args.meal.allergies,
                 })
             }
             catch (err) {

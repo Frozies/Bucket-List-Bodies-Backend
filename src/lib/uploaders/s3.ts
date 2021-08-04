@@ -37,9 +37,10 @@ export class AWSS3Uploader implements ApolloServerFileUploads.IUploader {
       writeStream: pass,
       promise: this.s3
           .upload({
-          Bucket: this.config.destinationBucketName,
-          Key: key,
-          Body: pass
+            Bucket: this.config.destinationBucketName,
+            Key: key,
+            Body: pass,
+            ACL :'public-read',
         },function (err, data) {
           if (err) {
             console.log("Error", err);

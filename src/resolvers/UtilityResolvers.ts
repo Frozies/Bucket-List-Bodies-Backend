@@ -2,10 +2,10 @@
 import { AWSS3Uploader } from '../lib/uploaders/s3';
 import { GraphQLUpload } from 'graphql-upload';
 
-const s3Uploader = new AWSS3Uploader({
+const s3MealPhotoUploader = new AWSS3Uploader({
     accessKeyId: process.env.S3_ACCESS_KEY_ID,
     secretAccessKey: process.env.S3_ACCESS_SECRET_KEY,
-    destinationBucketName: 'bucket-list-bodies'
+    destinationBucketName: 'bucket-list-bodies/meals'
 });
 
 export const UtilityResolvers = {
@@ -13,8 +13,8 @@ export const UtilityResolvers = {
     Upload: GraphQLUpload,
 
     Mutation: {
-        singleUpload: s3Uploader.singleFileUploadResolver.bind(s3Uploader),
-        multipleUpload: s3Uploader.multipleUploadsResolver.bind(s3Uploader)
+        singleUpload: s3MealPhotoUploader.singleFileUploadResolver.bind(s3MealPhotoUploader),
+        multipleUpload: s3MealPhotoUploader.multipleUploadsResolver.bind(s3MealPhotoUploader)
     }
 
     /*
