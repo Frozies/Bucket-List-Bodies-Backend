@@ -1,6 +1,6 @@
 import {gql} from "apollo-server";
 
-const typeDef = gql`
+export const typeDef = gql`
     extend type Query {
         #Using an order ID, get the customer's information.
         getCustomerFromOrder(id: ID): Customer

@@ -4,7 +4,7 @@ const Util = require('./UtilitySchemas');
 import {gql} from "apollo-server";
 const Meals = require('./MealSchema')
 
-export const typeDefs = gql`
+export const RootSchema = gql`
     type Query
     type Mutation
 
@@ -14,4 +14,4 @@ export const typeDefs = gql`
     ${Customer}
 `;
 
-module.exports = typeDefs
+module.exports = RootSchema

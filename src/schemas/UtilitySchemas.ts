@@ -1,6 +1,6 @@
 import { gql } from "apollo-server-express";
 
-const typeDef = gql`
+export const typeDef = gql`
     scalar Date
     scalar Upload
     

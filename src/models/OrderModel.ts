@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const customerSchema = require('./CustomerModel')
 const mealSchema = require('./MealModel')
 
-const orderSchema = new mongoose.Schema({
+export const orderSchema = new mongoose.Schema({
     id: Number,
     customer: customerSchema,
     meals: [mealSchema],
@@ -13,6 +13,6 @@ const orderSchema = new mongoose.Schema({
     deliveryDate: Date
 });
 
-const orderModel = mongoose.model('Order', orderSchema);
+export const orderModel = mongoose.model('Order', orderSchema);
 
-export default [orderModel, orderSchema, mealSchema]
+export default [orderModel, orderSchema]
