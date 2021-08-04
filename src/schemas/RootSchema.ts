@@ -1,7 +1,7 @@
 const Order = require('./OrderSchemas');
 const Customer = require( './CustomerSchema');
 const Util = require('./UtilitySchemas');
-const {gql} = require("apollo-server");
+import {gql} from "apollo-server";
 const Meals = require('./MealSchema')
 
 const typeDefs = gql`

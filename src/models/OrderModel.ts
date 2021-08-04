@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const customerSchema = require('./CustomerModel')
 const mealSchema = require('./MealModel')
 

@@ -1,4 +1,4 @@
-const OrderResolvers = {
+export const OrderResolvers = {
     Query: {
 /*        getAllOrders(parent, args, context, info){},
 

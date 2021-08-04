@@ -2,24 +2,36 @@
   "name": "bucket-list-bodies-backend",
   "version": "1.0.0",
   "description": "Backend for bucket-list-bodies",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "npx npm-force-resolutions"
   },
   "author": "Davin Young",
   "dependencies": {
     "apollo-datasource-mongodb": "^0.4.0",
     "apollo-server": "^2.24.0",
+    "apollo-server-express": "^3.1.2",
+    "aws-sdk": "^2.959.0",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "graphql": "^15.5.0",
+    "graphql-upload": "^11.0.0",
     "mocha": "^9.0.3",
     "mongoose": "^5.12.8",
     "stripe": "^8.167.0"
   },
   "devDependencies": {
+    "@types/graphql-upload": "^8.0.6",
+    "@types/node": "^16.4.10",
     "graphql-tools": "^7.0.5",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "typescript": "^4.3.5"
+  },
+  "resolutions": {
+    "fs-capacitor": "^6.2.0",
+    "graphql-upload": "^11.0.0"
   }
 }
