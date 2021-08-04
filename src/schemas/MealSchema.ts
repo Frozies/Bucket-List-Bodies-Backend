@@ -1,6 +1,9 @@
 import {gql} from "apollo-server";
 
 const typeDef = gql`
+    extend type Query {
+        retrieveAllMeals: [Meal]
+    }
     
     extend type Mutation {
         #Creates a new meal and adds it to the database

@@ -2,6 +2,12 @@ const mealModel = require('../models/MealModel')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export const MealResolvers = {
+    Query: {
+        retrieveAllMeals: async() => {
+            const all = await mealModel.find()
+            return all
+        },
+    },
     Mutation: {
         createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: any; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
             let priceID = '';
