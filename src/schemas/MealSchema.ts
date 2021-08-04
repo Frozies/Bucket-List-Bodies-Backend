@@ -1,6 +1,6 @@
 import {gql} from "apollo-server";
 
-const typeDef = gql`
+export const typeDef = gql`
     extend type Query {
         retrieveAllMeals: [Meal]
     }
