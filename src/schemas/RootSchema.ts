@@ -4,7 +4,7 @@ const Util = require('./UtilitySchemas');
 import {gql} from "apollo-server";
 const Meals = require('./MealSchema')
 
-const typeDefs = gql`
+export const typeDefs = gql`
     type Query
     type Mutation
 
