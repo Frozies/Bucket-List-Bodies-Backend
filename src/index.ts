@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 const queryLogger = require('./plugins/queryLogger');
 
-const rootSchema = require('./schemas/RootSchema')
+const rootSchema = require('./schemas/rootSchema')
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')
