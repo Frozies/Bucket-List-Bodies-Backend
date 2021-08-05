@@ -4,9 +4,10 @@ const { ApolloServer } = require("apollo-server-express");
 const express = require("express");
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
-const schema = require('./schemas/RootSchema')
 
 const queryLogger = require('./plugins/queryLogger');
+
+const rootSchema = require('./schemas/RootSchema')
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')
@@ -30,8 +31,15 @@ async function startExpressApolloServer() {
         const server = new ApolloServer({
             // @ts-ignore
             uploads: false,
-            typeDefs: schema,
-            resolvers: [UtilityResolvers, MealResolvers, OrderResolvers, CustomerResolvers],
+            typeDefs: [
+                rootSchema
+            ],
+            resolvers: [
+                UtilityResolvers,
+                MealResolvers,
+                OrderResolvers,
+                CustomerResolvers
+            ],
             plugins: [
                 queryLogger
             ],

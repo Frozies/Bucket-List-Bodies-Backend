@@ -1,6 +1,6 @@
 import {gql} from "apollo-server";
 
-export const typeDef = gql`
+export const mealSchema = gql`
     extend type Query {
         retrieveAllMeals: [Meal]
     }
@@ -35,4 +35,4 @@ export const typeDef = gql`
     },
 `;
 
-module.exports = typeDef;
+module.exports = mealSchema;

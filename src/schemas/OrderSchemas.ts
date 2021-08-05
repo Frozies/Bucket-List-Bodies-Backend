@@ -1,6 +1,6 @@
 import {gql} from "apollo-server";
 
-export const typeDef = gql`
+export const orderSchema = gql`
     extend type Query {
         #Get every order ever
         getAllOrders: [Order]
@@ -60,4 +60,4 @@ export const typeDef = gql`
 
 `;
 
-module.exports = typeDef;
+module.exports = orderSchema;

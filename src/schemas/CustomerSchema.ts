@@ -1,6 +1,6 @@
 import {gql} from "apollo-server";
 
-export const typeDef = gql`
+export const customerSchema = gql`
     extend type Query {
         #Using an order ID, get the customer's information.
         getCustomerFromOrder(id: ID): Customer
@@ -42,4 +42,4 @@ export const typeDef = gql`
     }
 `;
 
-module.exports = typeDef;
+module.exports = customerSchema;
