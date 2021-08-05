@@ -21,14 +21,18 @@
     "graphql-upload": "^11.0.0",
     "mocha": "^9.0.3",
     "mongoose": "^5.12.8",
-    "stripe": "^8.167.0"
+    "stripe": "^8.167.0",
+    "webpack-merge": "^5.8.0"
   },
   "devDependencies": {
     "@types/graphql-upload": "^8.0.6",
     "@types/node": "^16.4.10",
+    "awesome-typescript-loader": "^5.2.1",
+    "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "graphql-tools": "^7.0.5",
     "nodemon": "^2.0.12",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "webpack": "^5.48.0"
   },
   "resolutions": {
     "fs-capacitor": "^6.2.0",
