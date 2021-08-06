@@ -5,14 +5,15 @@ const express = require("express");
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
 
-const queryLogger = require('./plugins/queryLogger');
-
 const rootSchema = require('./schemas/rootSchema')
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')
 const MealResolvers = require('./resolvers/MealResolvers')
 const UtilityResolvers = require('./resolvers/UtilityResolvers')
+/*
+import {queryLogger} from "./plugins/queryLogger";*/
+
 
 async function startExpressApolloServer() {
     try {
@@ -41,7 +42,7 @@ async function startExpressApolloServer() {
                 CustomerResolvers
             ],
             plugins: [
-                queryLogger
+                /*queryLogger*/
             ],
 
         });
