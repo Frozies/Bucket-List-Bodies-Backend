@@ -1,3 +1,4 @@
+// @ts-ignore
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
 const {ApolloServer} = require('apollo-server-express');
