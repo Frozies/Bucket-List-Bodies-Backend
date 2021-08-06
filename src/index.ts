@@ -1,16 +1,16 @@
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
-const {ApolloServer} = require("apollo-server-express");
-import express from "express";
-import {graphqlUploadExpress} from "graphql-upload";
-import mongoose from 'mongoose';
+const {ApolloServer} = require('apollo-server-express');
+const express = require('express');
+const {graphqlUploadExpress} = require('graphql-upload');
+const mongoose = require('mongoose');
 
-import {rootSchema} from './schemas/rootSchema';
+const {rootSchema} = require('./schemas/rootSchema');
 
-const OrderResolvers = require('./resolvers/OrderResolvers')
-const CustomerResolvers = require('./resolvers/CustomerResolvers')
-const MealResolvers = require('./resolvers/MealResolvers')
-const UtilityResolvers = require('./resolvers/UtilityResolvers')
+const OrderResolvers = require('./resolvers/OrderResolvers');
+const CustomerResolvers = require('./resolvers/CustomerResolvers');
+const MealResolvers = require('./resolvers/MealResolvers');
+const UtilityResolvers = require('./resolvers/UtilityResolvers');
 
 import {queryLogger} from "./plugins/queryLogger";
 
