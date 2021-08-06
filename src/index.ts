@@ -1,18 +1,18 @@
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
-const { ApolloServer } = require("apollo-server-express");
-const express = require("express");
-const { graphqlUploadExpress } = require("graphql-upload");
-const mongoose = require('mongoose');
+import {ApolloServer} from "apollo-server-express";
+import express from "express";
+import {graphqlUploadExpress} from "graphql-upload";
+import mongoose from 'mongoose';
 
-const rootSchema = require('./schemas/rootSchema')
+import {rootSchema} from './schemas/rootSchema';
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')
 const MealResolvers = require('./resolvers/MealResolvers')
 const UtilityResolvers = require('./resolvers/UtilityResolvers')
-/*
-import {queryLogger} from "./plugins/queryLogger";*/
+
+import {queryLogger} from "./plugins/queryLogger";
 
 
 async function startExpressApolloServer() {
@@ -21,6 +21,7 @@ async function startExpressApolloServer() {
             console.log("Connected 🚀 To MongoDB Successfully");
         });*/
 
+        // @ts-ignore
         mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true});
 
         const db = mongoose.connection;
@@ -28,6 +29,7 @@ async function startExpressApolloServer() {
         db.once('open', function() {
             console.log('MongoDB connected successfully')
         });
+
 
         const server = new ApolloServer({
             // @ts-ignore
@@ -42,19 +44,21 @@ async function startExpressApolloServer() {
                 CustomerResolvers
             ],
             plugins: [
-                /*queryLogger*/
+                // @ts-ignore
+                queryLogger
             ],
 
         });
 
         await server.start();
-
         const app = express();
+
         app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
         server.applyMiddleware({ app });
 
         let serverPort = process.env.SERVER_PORT || 4001;
 
+        // @ts-ignore
         await new Promise((resolve) => app.listen({port: serverPort}, resolve));
         console.log(`
             🚀  Products Server is running!

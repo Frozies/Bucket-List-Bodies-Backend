@@ -12,7 +12,6 @@
   "author": "Davin Young",
   "dependencies": {
     "apollo-datasource-mongodb": "^0.4.0",
-    "apollo-server": "^2.24.0",
     "apollo-server-express": "^3.1.2",
     "aws-sdk": "^2.959.0",
     "dotenv": "^8.2.0",

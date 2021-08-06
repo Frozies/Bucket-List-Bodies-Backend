@@ -1,10 +1,10 @@
 const orderSchema = require('./orderSchema');
 const customerSchema = require( './customerSchema');
 const utilSchema = require('./utilSchema');
-import {gql} from "apollo-server";
+import {gql} from "apollo-server-express";
 const mealSchema = require('./mealSchema')
 
-export const rootSchema = gql`
+const rootSchema = gql`
     type Query
     type Mutation
 
@@ -14,4 +14,4 @@ export const rootSchema = gql`
     ${customerSchema}
 `;
 
-module.exports = rootSchema;
+export { rootSchema };
