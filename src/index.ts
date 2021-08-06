@@ -1,6 +1,6 @@
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
-const ApolloServer = require("apollo-server-express");
+const {ApolloServer} = require("apollo-server-express");
 import express from "express";
 import {graphqlUploadExpress} from "graphql-upload";
 import mongoose from 'mongoose';
