@@ -12,7 +12,7 @@ const CustomerResolvers = require('./resolvers/CustomerResolvers');
 const MealResolvers = require('./resolvers/MealResolvers');
 const UtilityResolvers = require('./resolvers/UtilityResolvers');
 
-import {queryLogger} from "./plugins/queryLogger";
+const {queryLogger} = require('./plugins/queryLogger')
 
 
 async function startExpressApolloServer() {
