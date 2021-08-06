@@ -1,3 +1,5 @@
+import {gql} from "@apollo/client";
+
 require('dotenv').config(); // Allows use of environmental variables from the .env file
 
 const {ApolloServer} = require('apollo-server-express');
@@ -38,10 +40,11 @@ async function startExpressApolloServer() {
                 rootSchema
             ],
             resolvers: [
-                UtilityResolvers,
+                UtilityResolvers
+/*                UtilityResolvers,
                 MealResolvers,
                 OrderResolvers,
-                CustomerResolvers
+                CustomerResolvers*/
             ],
             plugins: [
                 // @ts-ignore
