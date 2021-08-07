@@ -8,7 +8,7 @@
     "start": "npm run build && ts-node src/index.js",
     "build": "npm install --only=dev && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npx npm-force-resolutions"
+
   },
   "author": "Davin Young",
   "dependencies": {
@@ -31,9 +31,5 @@
     "nodemon": "^2.0.12",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
-  },
-  "resolutions": {
-    "fs-capacitor": "6.2.0",
-    "graphql-upload": "12.0.0"
   }
 }
