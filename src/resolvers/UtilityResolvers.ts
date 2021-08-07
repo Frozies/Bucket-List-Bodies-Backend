@@ -10,17 +10,11 @@ const s3MealPhotoUploader = new AWSS3Uploader({
 
 export const UtilityResolvers = {
     // Date: GraphQLDateTime
-    /*Upload: GraphQLUpload,
+    Upload: GraphQLUpload,
 
     Mutation: {
         singleUpload: s3MealPhotoUploader.singleFileUploadResolver.bind(s3MealPhotoUploader),
         multipleUpload: s3MealPhotoUploader.multipleUploadsResolver.bind(s3MealPhotoUploader)
-    }*/
-
-    Query: {
-        helloWorld() {
-            return "Hello World!"
-        }
     }
 
     /*
