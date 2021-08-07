@@ -1,4 +1,3 @@
-import orders from "../testData";
 
 export const CustomerResolvers = {
     Query: {

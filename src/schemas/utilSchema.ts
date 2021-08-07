@@ -1,6 +1,7 @@
-import { gql } from "apollo-server-express";
+// @ts-ignore
+const {gql} = require('apollo-server-express');
 
-export const utilSchema = gql`
+const utilitySchema = gql`
     scalar Date
     scalar Upload
     
@@ -25,4 +26,4 @@ export const utilSchema = gql`
     }
 `;
 
-module.exports = utilSchema;
+module.exports = utilitySchema;

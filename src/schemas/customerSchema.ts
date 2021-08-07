@@ -1,6 +1,7 @@
-import {gql} from "apollo-server-express";
+// @ts-ignore
+const {gql} = require('apollo-server-express');
 
-export const customerSchema = gql`
+const customerSchema = gql`
     extend type Query {
         #Using an order ID, get the customer's information.
         getCustomerFromOrder(id: ID): Customer

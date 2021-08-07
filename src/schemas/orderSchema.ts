@@ -1,6 +1,7 @@
-import {gql} from "apollo-server-express";
+// @ts-ignore
+const {gql} = require('apollo-server-express');
 
-export const orderSchema = gql`
+const orderSchema = gql`
     extend type Query {
         #Get every order ever
         getAllOrders: [Order]

@@ -3,3 +3,20 @@
 /.idea/
 .env
 .run/Start Product Backend.run.xml
+/src/models/CustomerModel.js
+/src/resolvers/CustomerResolvers.js
+/src/schemas/CustomerSchema.js
+/src/lib/index.js
+/src/index.js
+/src/models/MealModel.js
+/src/resolvers/MealResolvers.js
+/src/schemas/MealSchema.js
+/src/models/OrderModel.js
+/src/resolvers/OrderResolvers.js
+/src/schemas/OrderSchemas.js
+/src/plugins/queryLogger.js
+/src/schemas/RootSchema.js
+/src/lib/uploaders/s3.js
+/src/models/UtilityModel.js
+/src/resolvers/UtilityResolvers.js
+/src/schemas/UtilitySchemas.js

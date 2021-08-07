@@ -1,6 +1,7 @@
-import {gql} from "apollo-server-express";
+// @ts-ignore
+const {gql} = require('apollo-server-express');
 
-export const mealSchema = gql`
+const mealSchema = gql`
     extend type Query {
         retrieveAllMeals: [Meal]
     }
