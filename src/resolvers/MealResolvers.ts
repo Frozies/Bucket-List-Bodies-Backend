@@ -1,11 +1,11 @@
-const mealModel = require('../models/MealModel')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const mealModel = require('../models/MealModel');
+
 
 export const MealResolvers = {
     Query: {
         retrieveAllMeals: async() => {
-            const all = await mealModel.find()
-            return all
+            return mealModel.find()
         },
     },
     Mutation: {

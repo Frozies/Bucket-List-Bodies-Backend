@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const mealSchema = new mongoose.Schema({
+const mealSchema = new mongoose.Schema({
     productID: String,
     priceID: String,
     title: String,
@@ -13,6 +13,6 @@ export const mealSchema = new mongoose.Schema({
     allergies: [String],
 });
 
-export const mealModel = mongoose.model('Meal', mealSchema);
+const mealModel = mongoose.model('Meal', mealSchema);
 
-export default [mealModel, mealSchema]
+module.exports = mealModel;

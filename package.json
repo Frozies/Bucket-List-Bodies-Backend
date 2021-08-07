@@ -4,7 +4,7 @@
   "description": "Backend for bucket-list-bodies",
   "main": "src/index.js",
   "scripts": {
-    "dev": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
     "start": "npm run build && ts-node src/index.js",
     "build": "npm install --only=dev && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
