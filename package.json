@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node src/index.ts",
     "start": "npm run build && ts-node src/index.js",
-    "build": "tsc -p .",
+    "build": "npm install --only=dev && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "npx npm-force-resolutions"
   },

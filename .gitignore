@@ -20,3 +20,5 @@
 /src/models/UtilityModel.js
 /src/resolvers/UtilityResolvers.js
 /src/schemas/UtilitySchemas.js
+/src/schemas/orderSchema.js
+/src/schemas/utilSchema.js
