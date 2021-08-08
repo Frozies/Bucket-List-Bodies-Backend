@@ -22,3 +22,4 @@
 /src/schemas/UtilitySchemas.js
 /src/schemas/orderSchema.js
 /src/schemas/utilSchema.js
+/src/utility/envValidator.js
