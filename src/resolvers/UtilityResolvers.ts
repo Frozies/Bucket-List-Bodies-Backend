@@ -1,20 +1,74 @@
 // const {GraphQLDateTime} = require("graphql-iso-date/dist");
-import { AWSS3Uploader } from '../lib/uploaders/s3';
 import { GraphQLUpload } from 'graphql-upload';
+// @ts-ignore
+import promisesAll from 'promises-all';
 
-const s3MealPhotoUploader = new AWSS3Uploader({
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_ACCESS_SECRET_KEY,
-    destinationBucketName: 'bucket-list-bodies/meals'
-});
+const processUpload = async (upload: PromiseLike<any>) => {
+    const { filename, mimetype, createReadStream } = await upload;
+    const stream = createReadStream();
+    console.log("STREAM" + stream)
+
+    const cloudinary = require('cloudinary');
+    cloudinary.config(
+        {
+            cloud_name:  process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        }
+    );
+
+    let resultUrl = '', resultSecureUrl = '';
+    const cloudinaryUpload = async ({stream}: any) => {
+        try {
+            await new Promise((resolve, reject) => {
+                console.log("Promise " + stream)
+
+                const streamLoad = cloudinary.v2.uploader.upload_stream(function (error: any, result: { secure_url: string; }) {
+                    if (result) {
+                        resultUrl = result.secure_url;
+                        resultSecureUrl = result.secure_url;
+                        resolve(resultUrl)
+                    } else {
+                        reject(error);
+                    }
+                });
+
+                stream.pipe(streamLoad);
+            });
+        }
+        catch (err) {
+            throw new Error(`Failed to upload profile picture ! Err:${err.message}`);
+        }
+    };
+
+    await cloudinaryUpload({stream});
+
+    return(resultUrl)
+};
 
 export const UtilityResolvers = {
     // Date: GraphQLDateTime
     Upload: GraphQLUpload,
 
     Mutation: {
-        singleUpload: s3MealPhotoUploader.singleFileUploadResolver.bind(s3MealPhotoUploader),
-        multipleUpload: s3MealPhotoUploader.multipleUploadsResolver.bind(s3MealPhotoUploader)
+        async singleFileUpload(parent: any, {file}: any) {
+            return(processUpload(file))
+
+        },
+        async multipleFileUpload(parent: any, {files}: any) {
+            const {resolve, reject} = await promisesAll.all(
+                files.map(processUpload)
+            );
+
+            if (reject.length) {
+                reject.forEach(
+                    ({name, message}: any) => {
+                        console.error(`${name}:${message}`)
+                    }
+                )
+            }
+            return resolve;
+        },
     }
 
     /*

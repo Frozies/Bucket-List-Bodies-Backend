@@ -1,6 +1,6 @@
 FROM node:14-alpine
 
-EXPOSE 4001
+EXPOSE 4001:4001/tcp
 
 WORKDIR /server
 ADD . /server

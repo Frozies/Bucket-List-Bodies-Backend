@@ -6,7 +6,6 @@ const { ApolloServer} = require('apollo-server-express');
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
 import {rootSchema} from "./schemas/rootSchema";
-import {queryLogger} from "./plugins/queryLogger";
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')

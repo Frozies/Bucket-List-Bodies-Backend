@@ -4,17 +4,10 @@ const {gql} = require('apollo-server-express');
 const utilitySchema = gql`
     scalar Date
     scalar Upload
-    
-    type UploadedFileResponse {
-        filename: String!
-        mimetype: String!
-        encoding: String!
-        url: String!
-    }
 
     extend type Mutation {
-        singleUpload(file: Upload!): UploadedFileResponse!
-        multipleUpload (files: [Upload!]!): UploadedFileResponse!
+        singleFileUpload(file: Upload!): String
+        multipleFileUpload(file: [Upload!]!): String
     }
     
     type Address {

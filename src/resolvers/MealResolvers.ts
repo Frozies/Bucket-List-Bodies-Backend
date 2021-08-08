@@ -9,16 +9,19 @@ export const MealResolvers = {
         },
     },
     Mutation: {
-        createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: any; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
+        createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: String; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
             let priceID = '';
             let productID = '';
+            let photoURL = args.meal.photoURL
+            console.log("Meal Photo: " + photoURL)
+            console.log("Meal Photo: " + args.meal.photoURL)
 
             //Create Stripe Product
             try {
                 const product = await stripe.products.create({
                     name: args.meal.title,
                     description: args.meal.description,
-                    images: [args.meal.photoURL]
+                    images: [photoURL]
                 });
 
                 productID = product.id
@@ -50,7 +53,7 @@ export const MealResolvers = {
                     title: args.meal.title,
                     sides: args.meal.sides,
                     description: args.meal.description,
-                    photoURL: args.meal.photoURL,
+                    photoURL: photoURL,
                     price: parseFloat(args.meal.price),
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
@@ -62,6 +65,19 @@ export const MealResolvers = {
             }
 
             return true
+        },
+
+        deleteMeal: async (parent: any, args: any, context: any, info: any) => {
+            console.log(args)
+
+            return mealModel.findByIdAndDelete(args.meal._id, (err: any, docs: any) => {
+                if (err){
+                    console.log(err)
+                }
+                else{
+                    console.log("Deleted : ", docs);
+                }
+            })
         },
     }
 }
