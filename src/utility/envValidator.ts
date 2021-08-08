@@ -1,4 +1,4 @@
-export const envChecker = (variables: Array<string>) => {
+export const envChecker = (variables: string[]) => {
     if (Array.isArray(variables) === false) {
         throw (new Error('ENV File must be a array.'))
     }
@@ -8,10 +8,13 @@ export const envChecker = (variables: Array<string>) => {
 
     const env = process.env
     const lostItems: string[] = []
+    const validItems: string[] = []
 
     variables.forEach((variable: string) => {
         if (!(variable in env)) {
             lostItems.push(variable)
+        } else {
+            validItems.push(variable)
         }
     })
 
@@ -19,6 +22,13 @@ export const envChecker = (variables: Array<string>) => {
         console.error(lostItems)
         throw (new Error('These variables are required.'))
     }
+
+    validItems.forEach((variable: string) => {
+        const envVar = process.env[variable]
+        if (envVar == '') {
+            throw (new Error('Environmental variable value required: ' + variable))
+        }
+    })
 
     return true
 }

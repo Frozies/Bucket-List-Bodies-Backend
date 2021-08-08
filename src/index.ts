@@ -8,6 +8,7 @@ const { ApolloServer} = require('apollo-server-express');
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
 import {rootSchema} from "./schemas/rootSchema";
+import {rejects} from "assert";
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')
@@ -17,65 +18,51 @@ const UtilityResolvers = require('./resolvers/UtilityResolvers')
 
 async function startExpressApolloServer() {
 
-        /*Check first if we have all of the required envVariables before starting*/
-        try {
-            const envVars = [
-                'MONGODB',
-                'STRIPE_SECRET_KEY',
-                'CLOUDINARY_CLOUD_NAME',
-                'CLOUDINARY_API_KEY',
-                'CLOUDINARY_API_SECRET',
-            ]
-            envChecker(envVars)
-        } catch (e) {
-            throw (new Error('Error with your environmental variables. Please check the template or your configuration.'))
-        }
+    /*Check first if we have all of the required envVariables before starting*/
+    const envVars = [
+        'MONGODB',
+        'STRIPE_SECRET_KEY',
+        'CLOUDINARY_CLOUD_NAME',
+        'CLOUDINARY_API_KEY',
+        'CLOUDINARY_API_SECRET',
+    ]
+    console.log("Checking envVars")
+    envChecker(envVars)
 
-        /*Connect to the database*/
-        try {
-            await mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true});
+    /*Connect to the database*/
+    console.log("Connecting to MongoDB")
+    await mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true});
 
-            const db = mongoose.connection;
-            db.on('error', console.error.bind(console, 'connection error:'));
-            db.once('open', function() {
-                console.log('MongoDB connected successfully')
-            });
-        } catch (e) {
-            throw (new Error('Error connecting to the database: ' + e));
-        }
+    const db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.once('open', function() {
+        console.log('MongoDB connected successfully')
+    });
 
-        /*Spin up an apollo server instance*/
-        let server;
-        try {
-            server = new ApolloServer({
-                // @ts-ignore
-                uploads: false,
-                typeDefs: rootSchema,
-                resolvers: [UtilityResolvers, MealResolvers, OrderResolvers, CustomerResolvers],
-            });
+    /*Spin up an apollo server instance*/
+    console.log("Starting Apollo")
+    let server = new ApolloServer({
+        // @ts-ignore
+        uploads: false,
+        typeDefs: rootSchema,
+        resolvers: [UtilityResolvers, MealResolvers, OrderResolvers, CustomerResolvers],
+    });
 
-            await server.start();
-        } catch (e) {
-            throw (new Error('Error starting Graphql server: ' + e))
-        }
+    await server.start();
 
-        /*Start the express server and apply middleware on the designated port*/
-        try {
-            const app = express();
-            app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
-            server.applyMiddleware({ app });
 
-            let serverPort = process.env.SERVER_PORT || 4001;
-            new Promise((resolve) => app.listen({port: serverPort}, resolve));
-            console.log(`
-            🚀  Products Server is running!
-            🔉  Listening on port ${serverPort}
-            📭  Query at https://studio.apollographql.com
+    /*Start the express server and apply middleware on the designated port*/
+    console.log("Starting Express")
+    const app = express();
+    app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
+    server.applyMiddleware({ app });
+    let serverPort = process.env.SERVER_PORT || 4001;
+    new Promise((resolve) => app.listen({port: serverPort}, resolve));
+    console.log(`
+        🚀  Products Server is running!
+        🔉  Listening on port ${serverPort}
+        📭  Query at https://studio.apollographql.com
         `);
-        } catch (e) {
-            throw (new Error('Error starting express server: ' + e));
-        }
-
 }
 
 /*Run the app*/
