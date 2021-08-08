@@ -16,9 +16,6 @@ const UtilityResolvers = require('./resolvers/UtilityResolvers')
 
 
 async function startExpressApolloServer() {
-    require('dns').lookup(require('os').hostname(), function (err: any, add: string, fam: any) {
-        console.log('addr: ' + add);
-    })
 
     /*Check first if we have all of the required envVariables before starting*/
     const envVars = [
