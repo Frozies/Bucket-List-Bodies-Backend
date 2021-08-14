@@ -30,13 +30,17 @@ async function startExpressApolloServer() {
 
     /*Connect to the database*/
     console.log("Connecting to MongoDB")
-    await mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true});
+    try {
+        await mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true});
 
-    const db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', function() {
-        console.log('MongoDB connected successfully')
-    });
+        const db = mongoose.connection;
+        db.on('error', console.error.bind(console, 'connection error:'));
+        db.once('open', function() {
+            console.log('MongoDB connected successfully')
+        });
+    } catch (e) {
+        console.log(e)
+    }
 
     /*Spin up an apollo server instance*/
     console.log("Starting Apollo")

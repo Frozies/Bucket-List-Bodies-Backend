@@ -27,9 +27,12 @@ const customerSchema = gql`
         createCustomer(customer: CustomerInput): Boolean
     }
 
-    #TODO: Fill out
     input CustomerInput {
         id: String
+        name: String!
+        phone: String
+        address: AddressInput!
+        notes: String
     }
 
     type Customer {

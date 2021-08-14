@@ -17,6 +17,14 @@ const utilitySchema = gql`
         postal: Int
         state: String
     }
+    
+    input AddressInput {
+        city: String
+        line1: String
+        line2: String
+        postal: Int
+        state: String
+    }
 `;
 
 module.exports = utilitySchema;

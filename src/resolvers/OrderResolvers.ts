@@ -16,9 +16,15 @@ export const OrderResolvers = {
     },
 
     Mutation: {
-/*        createOrder(parent, args, context, info){},
+        createOrder(parent: any, args: any, context: any, info: any){
+            //calculate total price
+            for (args.meals in args) {
+                console.log("Meals: " + args.meals.title)
+            }
+            //save to db
+        },
 
-        updateMealStatus(parent, args, context, info){},
+        /*updateMealStatus(parent, args, context, info){},
 
         updateOrderStatus(parent, args, context, info){},*/
     },

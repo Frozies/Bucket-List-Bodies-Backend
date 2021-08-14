@@ -33,7 +33,7 @@ const orderSchema = gql`
 
     extend type Mutation {
         #Create an order and return its order# input customer and order details
-        createOrder(order: OrderInput, customer: CustomerInput): String
+        createOrder(order: OrderInput): Order
         
         #Updates a specific meal if it has been made
         updateMealStatus(status: String): Boolean
@@ -57,6 +57,12 @@ const orderSchema = gql`
     #TODO: Fill out
     input OrderInput {
         id: String
+        customer: CustomerInput
+        meals: [MealInput]
+        status: String
+        coupon: String
+        notes: String
+        deliveryDate: String
     },
 
 `;
