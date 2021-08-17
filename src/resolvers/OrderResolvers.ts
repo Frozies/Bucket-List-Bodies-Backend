@@ -1,3 +1,5 @@
+import {orderModel} from "../models/OrderModel";
+
 export const OrderResolvers = {
     Query: {
 /*        getAllOrders(parent, args, context, info){},
@@ -16,12 +18,36 @@ export const OrderResolvers = {
     },
 
     Mutation: {
-        createOrder(parent: any, args: any, context: any, info: any){
-            //calculate total price
-            console.table(args.customer)
+        async createOrder(parent: any, args: any, context: any, info: any) {
+            /*TODO: Pricing*/
+            let total = args.order.meals.length * 9.99
 
-            /*TODO: The args.customer is undefined... i believe the data is all there, but its not getting passed properly
-            *  After that, send the data to the database.*/
+
+            //Create Mongoose Model
+            try {
+                await orderModel.create({
+                    customer: {
+                        name: args.order.customer.name,
+                        phone: args.order.customer.phone,
+                        address: {
+                            city: args.order.customer.address.city,
+                            line1: args.order.customer.address.line1,
+                            line2: args.order.customer.address.line2,
+                            postal: args.order.customer.address.postal,
+                            state: args.order.customer.address.state,
+                        }
+                    },
+
+                    status: "Unmade",
+                    total: total,
+                    coupon: args.order.coupon,
+                    notes: args.order.notes,
+                    meals: {...args.order.meals},
+                    deliveryDate: args.order.deliveryDate.toDateString()
+                })
+            } catch (err) {
+                return "Error pushing meal to MongoDB: " + err;
+            }
 
             //save to db
         },

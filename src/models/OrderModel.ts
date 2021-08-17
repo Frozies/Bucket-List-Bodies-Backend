@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
-const customerSchema = require('./CustomerModel')
+// const customerSchema = require('./CustomerModel')
 const mealSchema = require('./MealModel')
 
 export const orderSchema = new mongoose.Schema({
     id: Number,
-    customer: customerSchema,
-    meals: [mealSchema],
+    // customer: customerSchema,
+    // meals: [mealSchema],
+    meals: [String],
     status: String,
     total: Number,
     coupon: String,
@@ -15,4 +16,4 @@ export const orderSchema = new mongoose.Schema({
 
 export const orderModel = mongoose.model('Order', orderSchema);
 
-export default [orderModel, orderSchema]
+module.exports = orderModel;

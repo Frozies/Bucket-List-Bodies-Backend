@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
+import {addressSchema} from "./UtilityModel";
+
 
 export const CustomerSchema = new mongoose.Schema({
     id: Number,
     name: String,
     phone: String,
-    // address: AddressSchema,
+    address: addressSchema,
     cards: [String],
     orders: [String],
     notes: String,
@@ -12,4 +14,4 @@ export const CustomerSchema = new mongoose.Schema({
 
 export const CustomerModel = mongoose.model('Customer', CustomerSchema);
 
-export default [CustomerModel, CustomerSchema];
+module.exports = CustomerModel;
