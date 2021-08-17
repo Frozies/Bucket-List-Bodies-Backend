@@ -30,6 +30,7 @@ const customerSchema = gql`
     input CustomerInput {
         id: String
         name: String!
+        email: String
         phone: String
         address: AddressInput!
         notes: String
@@ -38,6 +39,7 @@ const customerSchema = gql`
     type Customer {
         id: ID
         name: String
+        email: String
         phone: String
         address: Address
         cards: [String]

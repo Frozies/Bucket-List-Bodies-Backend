@@ -18,9 +18,11 @@ export const OrderResolvers = {
     Mutation: {
         createOrder(parent: any, args: any, context: any, info: any){
             //calculate total price
-            for (args.meals in args) {
-                console.log("Meals: " + args.meals.title)
-            }
+            console.table(args.customer)
+
+            /*TODO: The args.customer is undefined... i believe the data is all there, but its not getting passed properly
+            *  After that, send the data to the database.*/
+
             //save to db
         },
 

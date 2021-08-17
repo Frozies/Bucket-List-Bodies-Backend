@@ -58,8 +58,7 @@ const orderSchema = gql`
     input OrderInput {
         id: String
         customer: CustomerInput
-        meals: [MealInput]
-        status: String
+        meals: [String]
         coupon: String
         notes: String
         deliveryDate: String
