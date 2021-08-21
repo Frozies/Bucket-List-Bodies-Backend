@@ -34,6 +34,7 @@ const customerSchema = gql`
         phone: String
         address: AddressInput!
         notes: String
+        #        TODO: Need to put allergies here...
     }
 
     type Customer {
@@ -45,6 +46,8 @@ const customerSchema = gql`
         cards: [String]
         orders: [Order]
         notes: String
+        #        TODO: Need to put allergies here...
+
     }
 `;
 

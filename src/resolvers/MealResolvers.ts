@@ -58,6 +58,7 @@ export const MealResolvers = {
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
                     allergies: args.meal.allergies,
+                    /*todo: Why tf does a meal have allergies*/
                 })
             }
             catch (err) {

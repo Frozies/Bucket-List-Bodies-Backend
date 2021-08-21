@@ -24,6 +24,7 @@ const mealSchema = gql`
         carbs: String
         calories: String
         allergies: [String]
+#        todo: why does a meal have allergies????
     },
 
     type Meal {
@@ -38,6 +39,8 @@ const mealSchema = gql`
         carbs: Int
         calories: Int
         allergies: [String]
+        #        todo: why does a meal have allergies????
+
     },
 `;
 

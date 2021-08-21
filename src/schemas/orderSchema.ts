@@ -54,7 +54,7 @@ const orderSchema = gql`
         deliveryDate: Date
     },
 
-    #TODO: Fill out
+
     input OrderInput {
         id: String
         customer: CustomerInput

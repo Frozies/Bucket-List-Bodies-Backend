@@ -1,4 +1,4 @@
-import mongoose, {mongo} from "mongoose";
+import mongoose from "mongoose";
 
 export const addressSchema = new mongoose.Schema({
     city: String,
