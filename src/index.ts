@@ -5,6 +5,13 @@ require('dotenv').config(); // Allows use of environmental variables from the .e
 const express = require('express');
 const { ApolloServer} = require('apollo-server-express');
 
+import Stripe from "stripe";
+// @ts-ignore
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2020-08-27",
+    typescript: true
+});
+
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
 import {rootSchema} from "./schemas/rootSchema";

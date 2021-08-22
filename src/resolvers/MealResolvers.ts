@@ -1,4 +1,5 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+import {stripe} from "../index";
+
 const mealModel = require('../models/mealModel');
 
 
@@ -9,7 +10,7 @@ export const MealResolvers = {
         },
     },
     Mutation: {
-        createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: String; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
+        createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: string; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
             let priceID = '';
             let productID = '';
             let photoURL = args.meal.photoURL
@@ -57,8 +58,6 @@ export const MealResolvers = {
                     price: parseFloat(args.meal.price),
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
-                    allergies: args.meal.allergies,
-                    /*todo: Why tf does a meal have allergies*/
                 })
             }
             catch (err) {
