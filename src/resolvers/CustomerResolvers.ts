@@ -4,15 +4,38 @@ import {Stripe} from "stripe";
 
 export const CustomerResolvers = {
     Query: {
-        /*        getCustomerFromOrder(parent, args, context, info) {},
+        async getCustomer(parent: any, args: any, context: any, info: any) {
+            let customer;
+            try {
+                const getCustomer = async () => {
+                    const customer: Stripe.Customer | Stripe.DeletedCustomer = await stripe.customers.retrieve(args.id);
 
-                getOneCustomer(parent, args, context, info){},
+                    console.log("Retrieved customer: " + customer.id)
+                    return customer
+                };
+
+                customer = await getCustomer();
+                return customer;
+            } catch (err) {
+                console.log("Error getCustomer: " + err)
+            }
+            finally {
+                return {
+                    ...customer
+                }
+            }
+        },
+
+        getAllCustomers(parent: any, args: any, context: any, info: any){
+
+        },
+
+
+        /*      getCustomerFromOrder(parent, args, context, info) {},
 
                 getAllActiveCustomers(parent, args, context, info){},
 
                 getAllInactiveCustomers(parent, args, context, info){},
-
-                getAllCustomers(parent, args, context, info){},
 
                 getAllSingleCustomerOrders(parent, args, context, info){},*/
     },
@@ -128,6 +151,19 @@ export const CustomerResolvers = {
                 return {...args.customer}
             }
         },
+    },
+
+    Customer: {
+        async orders(parent: any) {
+            const orders = await stripe.orders.list({
+                limit: 3,
+                customer: parent.id
+            });
+
+            return orders.data
+        }
+
+        //Eventually ill need to put cards and stuff for the user side to edit their profile.
     }
 };
 

@@ -10,6 +10,16 @@ const utilitySchema = gql`
         multipleFileUpload(file: [Upload!]!): String
     }
     
+    type Shipping {
+        name: String
+        address: Address
+    }
+
+    input ShippingInput {
+        name: String
+        address: AddressInput
+    }
+    
     type Address {
         city: String
         line1: String
