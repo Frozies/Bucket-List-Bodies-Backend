@@ -18,12 +18,12 @@ export const OrderResolvers = {
     },
 
     Mutation: {
-        async createOrder(parent: any, args: any, context: any, info: any) {
+        async manualOrderCreation(parent: any, args: any, context: any, info: any) {
             /*TODO: Pricing*/
             let total = args.order.meals.length * 9.99
 
-
-            //Create Mongoose Model
+            //TODO: This model is not complete. This will crash as it does not match the schema...
+            /*//Create Mongoose Model
             try {
                 await orderModel.create({
                     customer: {
@@ -47,7 +47,7 @@ export const OrderResolvers = {
                 })
             } catch (err) {
                 return "Error pushing meal to MongoDB: " + err;
-            }
+            }*/
 
             //save to db
         },

@@ -25,7 +25,7 @@ export const MealResolvers = {
                 });
 
                 productID = product.id
-                console.log("Product ID: " + productID)
+                console.log("Product ID: " + product.id)
             }
             catch (err) {
                 return "Error creating Stripe Product: " + err;
