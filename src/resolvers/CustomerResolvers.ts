@@ -15,7 +15,9 @@ export const CustomerResolvers = {
     },
 
     Mutation: {
-        /*        createCustomer(parent, args, context, info){},*/
+                createCustomer(parent: any, args: any, context: any, info: any){
+
+                },
     }
 };
 

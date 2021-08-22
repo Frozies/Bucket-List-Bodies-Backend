@@ -4,12 +4,12 @@ const mealModel = require('../models/mealModel');
 
 export const MealResolvers = {
     Query: {
-        retrieveAllMeals: async() => {
+        /*retrieveAllMeals: async() => {
             return productsModel.find()
-        },
+        },*/
     },
     Mutation: {
-        createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: String; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
+        /*createMeal: async(parent: any, args: { meal: { title: any; description: any; photoURL: String; price: string; sides: any; carbs: string; calories: string; allergies: any; }; }, context: any, info: any) => {
             let priceID = '';
             let productID = '';
             let photoURL = args.meal.photoURL
@@ -58,7 +58,7 @@ export const MealResolvers = {
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
                     allergies: args.meal.allergies,
-                    /*todo: Why tf does a meal have allergies*/
+                    /!*todo: Why tf does a meal have allergies*!/
                 })
             }
             catch (err) {
@@ -66,8 +66,8 @@ export const MealResolvers = {
             }
 
             return true
-        },
-
+        },*/
+/*
         deleteMeal: async (parent: any, args: any, context: any, info: any) => {
             console.log(args)
 
@@ -79,7 +79,7 @@ export const MealResolvers = {
                     console.log("Deleted : ", docs);
                 }
             })
-        },
+        },*/
     }
 }
 module.exports = MealResolvers;

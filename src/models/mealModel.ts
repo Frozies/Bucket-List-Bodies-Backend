@@ -17,7 +17,7 @@ export const mealSchema = new mongoose.Schema({
     productID: String,
     priceID: String,
     title: String,
-    sides: String,
+    vegetables: [String],
     description: String,
     photoURL: String,
     price: Number,

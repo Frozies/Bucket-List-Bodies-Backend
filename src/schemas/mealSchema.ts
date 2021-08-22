@@ -8,32 +8,34 @@ const mealSchema = gql`
     
     extend type Mutation {
         #Creates a new meal and adds it to the database
-        createMeal(meal: MealInput): Boolean
+        createMeal(meal: createMealInput): Boolean
 
         #Using the ID from a meal, delete it.
-        deleteMeal(meal: MealInput): String
+        deleteMeal(productID: String): String
     },
 
-    input MealInput {
-        _id: String
+    input createMealInput {
         title: String
-        sides: String
+        vegetables: [String]
         description: String
         photoURL: String
-        price: String
+        pretaxPrice: String
+        proteinWeight: String
+        fatWeight: String
         carbs: String
         calories: String
     },
 
     type Meal {
-        _id: String
         productID: String
         priceID: String
         title: String
-        sides: String
+        vegetables: [String]
         description: String
         photoURL: String
-        price: Float
+        pretaxPrice: Float
+        proteinWeight: Int
+        fatWeight: Int
         carbs: Int
         calories: Int
     },
