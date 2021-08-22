@@ -14,7 +14,7 @@ const utilitySchema = gql`
         city: String
         line1: String
         line2: String
-        postal: String
+        postal_code: String
         state: String
     }
     
@@ -22,7 +22,7 @@ const utilitySchema = gql`
         city: String
         line1: String
         line2: String
-        postal: String
+        postal_code: String
         state: String
     }
 `;

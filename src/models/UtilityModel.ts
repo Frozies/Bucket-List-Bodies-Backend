@@ -7,7 +7,7 @@ export const addressSchema = new mongoose.Schema({
     city: String,
     line1: String,
     line2: String,
-    postal: String,
+    postal_Code: String,
     state: String,
 });
 

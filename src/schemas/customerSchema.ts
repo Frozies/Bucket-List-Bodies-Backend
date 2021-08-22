@@ -34,8 +34,7 @@ const customerSchema = gql`
     }
 
     input createNewCustomerInput {
-        firstName: String!
-        lastName: String!
+        name: String!
         email: String!
         phone: String!
         shippingAddress: AddressInput
@@ -45,8 +44,7 @@ const customerSchema = gql`
 
     input updateCustomerInput{
         id: String!
-        firstName: String
-        lastName: String
+        name: String
         email: String
         phone: String
         shippingAddress: AddressInput
@@ -56,8 +54,7 @@ const customerSchema = gql`
 
     type Customer {
         id: String
-        firstName: String
-        lastName: String
+        name: String
         email: String
         phone: String
         shippingAddress: Address
