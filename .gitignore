@@ -8,7 +8,7 @@
 /src/schemas/CustomerSchema.js
 /src/lib/index.js
 /src/index.js
-/src/models/MealModel.js
+/src/models/mealModel.js
 /src/resolvers/MealResolvers.js
 /src/schemas/MealSchema.js
 /src/models/OrderModel.js

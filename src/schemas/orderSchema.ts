@@ -32,8 +32,8 @@ const orderSchema = gql`
     },
 
     extend type Mutation {
-        #Create an order and return its order# input customer and order details
-        createOrder(order: OrderInput): Order
+        #On the administration dashboard, create a new order manually.
+        manualOrderCreation(order: manualOrderCreationInput): Order
         
         #Updates a specific meal if it has been made
         updateMealStatus(status: String): Boolean
@@ -44,24 +44,56 @@ const orderSchema = gql`
 
     # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
     type Order {
-        id: ID!,
+        id: String!
         customer: Customer!
-        meals: [Meal!]!
+        products: orderedProducts!
         status: String!
-        total: Float
+        pretaxPrice: Float!
+        postTaxPrice: Float
         coupon: String
         notes: String
-        deliveryDate: Date
+        deliveredDate: Date
+        creationDate: Date!
+    },
+    
+    type orderedProducts {
+        meals: [orderedMeal!]!
+        extras: [orderedExtra]
+    },
+    
+    type orderedMeal {
+        proteinID: String!
+        vegetable: String!
+        carbohydrate: String!
+        sauce: String!
     },
 
+    type orderedExtra {
+        extraID: String!
+    },
 
-    input OrderInput {
-        id: String
-        customer: CustomerInput
-        meals: [String]
+    input manualOrderCreationInput {
+        customerID: String!
+        products: manualOrderedProductsInput!
+        pretaxPrice: Float!
         coupon: String
         notes: String
-        deliveryDate: String
+    },
+
+    input manualOrderedProductsInput {
+        meals: [manualOrderedMealInput!]!
+        extras: [manualOrderedExtraInput]
+    },
+
+    input manualOrderedMealInput {
+        proteinID: String!
+        vegetable: String!
+        carbohydrate: String!
+        sauce: String!
+    },
+
+    input manualOrderedExtraInput {
+        extraID: String!
     },
 
 `;

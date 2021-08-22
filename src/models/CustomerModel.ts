@@ -13,7 +13,8 @@ import {addressSchema} from "./UtilityModel";
 * */
 export const CustomerSchema = new mongoose.Schema({
     id: Number,
-    name: String,
+    firstName: String,
+    lastName: String,
     phone: String,
     address: addressSchema,
     cards: [String],

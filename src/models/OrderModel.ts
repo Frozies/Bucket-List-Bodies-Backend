@@ -1,27 +1,48 @@
 import mongoose from "mongoose";
-// const customerSchema = require('./CustomerModel')
-const mealSchema = require('./MealModel')
+const customerSchema = require('./CustomerModel')
+
+/*
+* An orderProducts schema has: (the products included in an order)
+* meals: an array of meal ids and the sides to go with that product.
+* extras: an array of product ids that are individual items.
+* */
+
+export const orderProductsSchema = new mongoose.Schema({
+    meals: [{
+        proteinID: String,
+        vegetable: String,
+        carbohydrate: String,
+        sauce: String,
+    }],
+    extras: [{
+        extraID: String,
+    }]
+});
+
+
+export const orderProductsModel = mongoose.model('Order Products', orderProductsSchema);
 
 /*An order has:
 * id: the Stripe ID generated when an order is created.
 * customer: a customer's ID number. This is used to retrieve the customer when needed.
-* meals: a string array of meal IDs.
+* products: a schema based on either an array of meals, or extras.
 * status: The string status of an order, whether its been created, cooked, delivered, or something else.
-* total: the total calculated price of the order after taxes.
+* totalPrice: the total calculated price of the order after taxes.
 * coupon: the coupon used to create the order
 * notes: any notes on the order itself.
-* deliveryDate: the date and time a delivery was delivered.
+* deliveredDate: the date and time a delivery was delivered.
 * */
 export const orderSchema = new mongoose.Schema({
-    id: Number,
-    // customer: customerSchema,
-    // meals: [mealSchema],
-    meals: [String],
+    id: String,
+    customer: customerSchema,
+    products: orderProductsSchema,
     status: String,
-    total: Number,
+    pretaxPrice: Number,
+    postTaxPrice: Number,
     coupon: String,
     notes: String,
-    deliveryDate: Date
+    deliveredDate: Date,
+    creationDate: Date,
 });
 
 export const orderModel = mongoose.model('Order', orderSchema);

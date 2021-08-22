@@ -23,8 +23,6 @@ const mealSchema = gql`
         price: String
         carbs: String
         calories: String
-        allergies: [String]
-#        todo: why does a meal have allergies????
     },
 
     type Meal {
@@ -38,9 +36,6 @@ const mealSchema = gql`
         price: Float
         carbs: Int
         calories: Int
-        allergies: [String]
-        #        todo: why does a meal have allergies????
-
     },
 `;
 

@@ -1,11 +1,11 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const mealModel = require('../models/MealModel');
+const mealModel = require('../models/mealModel');
 
 
 export const MealResolvers = {
     Query: {
         retrieveAllMeals: async() => {
-            return mealModel.find()
+            return productsModel.find()
         },
     },
     Mutation: {
@@ -47,7 +47,7 @@ export const MealResolvers = {
 
             //Create Mongoose Model
             try {
-                await mealModel.create({
+                await productsModel.create({
                     productID: productID,
                     priceID: priceID,
                     title: args.meal.title,
@@ -71,7 +71,7 @@ export const MealResolvers = {
         deleteMeal: async (parent: any, args: any, context: any, info: any) => {
             console.log(args)
 
-            return mealModel.findByIdAndDelete(args.meal._id, (err: any, docs: any) => {
+            return productsModel.findByIdAndDelete(args.meal._id, (err: any, docs: any) => {
                 if (err){
                     console.log(err)
                 }

@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 
+/*
+* A simple address schema modeled after stripe.
+* */
 export const addressSchema = new mongoose.Schema({
     city: String,
     line1: String,

@@ -21,6 +21,8 @@ export const mealSchema = new mongoose.Schema({
     description: String,
     photoURL: String,
     price: Number,
+    proteinWeight: Number,
+    fatWeight: Number,
     carbs: Number,
     calories: Number,
 });
