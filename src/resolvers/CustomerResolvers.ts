@@ -67,32 +67,32 @@ export const CustomerResolvers = {
                     try {
                         const createCustomer = async () => {
                             //Check if the shipping address has been supplied. if false => use billing address
-                            if (!args.customer.shippingAddress) {
-                                args.customer.shippingAddress = args.customer.billingAddress;
+                            if (!args.customer.shipping.address) {
+                                args.customer.shipping.address = args.customer.address;
                             }
 
                             const params: Stripe.CustomerCreateParams = {
                                 address: {
-                                    city: args.customer.billingAddress.city,
+                                    city: args.customer.address.city,
                                     country: "US",
-                                    line1: args.customer.billingAddress.line1,
-                                    line2: args.customer.billingAddress.line2,
-                                    postal_code: args.customer.billingAddress.postal,
-                                    state: args.customer.billingAddress.state,
+                                    line1: args.customer.address.line1,
+                                    line2: args.customer.address.line2,
+                                    postal_code: args.customer.address.postal_code,
+                                    state: args.customer.address.state,
                                 },
                                 description: args.customer.notes,
                                 email: args.customer.email,
-                                name: args.customer.firstName + " " + args.customer.lastName,
+                                name: args.customer.name,
                                 phone: args.customer.phone,
                                 shipping: {
-                                    name: args.customer.firstName + " " + args.customer.lastName,
+                                    name: args.customer.name,
                                     address: {
-                                        city: args.customer.shippingAddress.city,
+                                        city: args.customer.shipping.address.city,
                                         country: "US",
-                                        line1: args.customer.shippingAddress.line1,
-                                        line2: args.customer.shippingAddress.line2,
-                                        postal_code: args.customer.shippingAddress.postal,
-                                        state: args.customer.shippingAddress.state,
+                                        line1: args.customer.shipping.address.line1,
+                                        line2: args.customer.shipping.address.line2,
+                                        postal_code: args.customer.shipping.address.postal_code,
+                                        state: args.customer.shipping.address.state,
                                     },
                                 }
                             };
@@ -155,16 +155,25 @@ export const CustomerResolvers = {
 
     Customer: {
         async orders(parent: any) {
-            const orders = await stripe.orders.list({
-                limit: 3,
-                customer: parent.id
-            });
+            let retrievedOrders;
+            try {
+                const orders = await stripe.orders.list({
+                    limit: 3,
+                    customer: parent.id
+                });
 
-            return orders.data
+                retrievedOrders = orders.data
+            }
+            catch (err) {
+                return "Error retrieving orders: " + err
+            }
+            finally {
+                return retrievedOrders
+            }
         }
 
         //Eventually ill need to put cards and stuff for the user side to edit their profile.
-    }
+    },
 };
 
 module.exports = CustomerResolvers;
