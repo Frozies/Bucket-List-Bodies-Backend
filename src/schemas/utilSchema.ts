@@ -1,28 +1,40 @@
-import { gql } from "apollo-server-express";
+// @ts-ignore
+const {gql} = require('apollo-server-express');
 
-export const utilSchema = gql`
+const utilitySchema = gql`
     scalar Date
     scalar Upload
-    
-    type UploadedFileResponse {
-        filename: String!
-        mimetype: String!
-        encoding: String!
-        url: String!
-    }
 
     extend type Mutation {
-        singleUpload(file: Upload!): UploadedFileResponse!
-        multipleUpload (files: [Upload!]!): UploadedFileResponse!
+        singleFileUpload(file: Upload!): String
+        multipleFileUpload(file: [Upload!]!): String
+    }
+    
+    type Shipping {
+        name: String
+        address: Address
+    }
+
+    input ShippingInput {
+        name: String
+        address: AddressInput
     }
     
     type Address {
         city: String
         line1: String
         line2: String
-        postal: Int
+        postal_code: String
+        state: String
+    }
+    
+    input AddressInput {
+        city: String
+        line1: String
+        line2: String
+        postal_code: String
         state: String
     }
 `;
 
-module.exports = utilSchema;
+module.exports = utilitySchema;

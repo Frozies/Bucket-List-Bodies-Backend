@@ -5,7 +5,7 @@ declare global {
             NODE_ENV: 'development' | 'production';
             PORT?: string;
             PWD: string;
-            MONGODB: string;
+            MONGODB: string | undefined;
             STRIPE_SECRET_KEY: string;
             S3_ACCESS_KEY_ID: string;
             S3_ACCESS_SECRET_KEY: string;

@@ -22,5 +22,3 @@ export const queryLogger = {
         }
     },
 };
-
-module.exports = queryLogger;

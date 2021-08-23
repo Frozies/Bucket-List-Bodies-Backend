@@ -1,37 +1,43 @@
-import {gql} from "apollo-server";
+// @ts-ignore
+const {gql} = require('apollo-server-express');
 
-export const mealSchema = gql`
+const mealSchema = gql`
     extend type Query {
         retrieveAllMeals: [Meal]
     }
     
     extend type Mutation {
         #Creates a new meal and adds it to the database
-        createMeal(meal: MealInput): Boolean
+        createMeal(meal: createMealInput): Boolean
+
+        #Using the ID from a meal, delete it.
+        deleteMeal(productID: String): String
     },
 
-    input MealInput {
+    input createMealInput {
         title: String
-        sides: String
+        vegetables: [String]
         description: String
         photoURL: String
-        price: String
+        pretaxPrice: String
+        proteinWeight: String
+        fatWeight: String
         carbs: String
         calories: String
-        allergies: [String]
     },
 
     type Meal {
         productID: String
         priceID: String
         title: String
-        sides: String
+        vegetables: [String]
         description: String
         photoURL: String
-        price: Float
+        pretaxPrice: Float
+        proteinWeight: Int
+        fatWeight: Int
         carbs: Int
         calories: Int
-        allergies: [String]
     },
 `;
 
