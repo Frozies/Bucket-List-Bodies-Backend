@@ -1,7 +1,6 @@
 import {stripe} from "../index";
 import {Stripe} from "stripe";
 
-
 export const CustomerResolvers = {
     Query: {
         async getCustomer(parent: any, args: any, context: any, info: any) {
@@ -26,8 +25,25 @@ export const CustomerResolvers = {
             }
         },
 
-        getAllCustomers(parent: any, args: any, context: any, info: any){
+        async getAllCustomers(parent: any, args: any, context: any, info: any) {
+            let retrievedCustomers;
+            try {
+                const getAllCustomers = async () => {
+                    const params: Stripe.CustomerListParams = {
+                        limit: 10,
+                    }
 
+                    const customers = await stripe.customers.list(params);
+                    retrievedCustomers = customers.data
+                };
+
+                await getAllCustomers()
+            } catch (err) {
+                console.log( "Error getCustomer: " + err )
+            }
+            finally {
+                return retrievedCustomers
+            }
         },
 
 

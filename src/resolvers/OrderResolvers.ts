@@ -21,26 +21,49 @@ export const OrderResolvers = {
 
     Mutation: {
         async manualOrderCreation(parent: any, args: any, context: any, info: any) {
-            let customer = args.order.customer;
             let invoiceID;
-
             //Create invoice on customer in stripe
             try {
                 const params: Stripe.InvoiceCreateParams = {
-                    customer: customer.id,
+                    customer: args.order.customerID,
                     collection_method: "send_invoice",
                 }
 
-                await invoice = stripe.invoices.create({
+                const invoice: Stripe.Invoice = await stripe.invoices.create(params)
+                let invoiceID = invoice.id
 
-                })
+                console.log("Created invoice: " + invoiceID)
             }
             catch (err) {
-                return "Error creating invoice: " + err
+                console.log("Error creating invoice: " + err)
             }
 
-            //add line items to the invoice
+            /*//add line items to the invoice
+            try {
+                for (let item in args.order.products.meals) {
+                    const priceParams: Stripe.PriceListParams = {
+                        product: item.proteinID,
+                        limit: 1,
+                    }
 
+                    let price = await stripe.prices.list(priceParams)
+
+                    const invoiceItemParams: Stripe.InvoiceItemCreateParams = {
+                        customer: args.order.customer.id,
+                        currency: "us",
+                        invoice: invoiceID,
+                        quantity: 1,
+                        price: price.data[0].id,
+                    }
+
+                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(invoiceItemParams);
+
+                    console.log("Adding line_item to invoice: " + invoiceItem.id)
+                }
+            }
+            catch (err) {
+                return "Error adding invoice item: " + err
+            }*/
 
 
 

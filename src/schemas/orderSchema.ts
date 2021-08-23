@@ -75,7 +75,6 @@ const orderSchema = gql`
     input manualOrderCreationInput {
         customerID: String!
         products: manualOrderedProductsInput!
-        pretaxPrice: Float!
         coupon: String
         notes: String
     },
