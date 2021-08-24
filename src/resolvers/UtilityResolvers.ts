@@ -6,7 +6,6 @@ import promisesAll from 'promises-all';
 const processUpload = async (upload: PromiseLike<any>) => {
     const { filename, mimetype, createReadStream } = await upload;
     const stream = createReadStream();
-    console.log("STREAM" + stream)
 
     const cloudinary = require('cloudinary');
     cloudinary.config(
