@@ -4,7 +4,7 @@ const {gql} = require('apollo-server-express');
 const mealSchema = gql`
     extend type Query {
         retrieveAllMeals: [Meal]
-    }
+    },
     
     extend type Mutation {
         #Creates a new meal and adds it to the database
@@ -44,6 +44,7 @@ const mealSchema = gql`
         fatWeight: Int
         carbs: Int
         calories: Int
+        mealStatus: StatusCode
     },
     
     input updateMealInput {
@@ -57,13 +58,14 @@ const mealSchema = gql`
         carbs: Int
         calories: Int
         active: Boolean
-    }
+        mealStatus: StatusCode
+    },
     
     input updateMealPriceInput {
         pretaxPrice: String
         priceID: String
         productID: String
-    }
+    },
 `;
 
 module.exports = mealSchema;

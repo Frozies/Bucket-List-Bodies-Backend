@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import {StatusCode} from "../resolvers/UtilityResolvers";
 
 /*A meal has:
 * productID: the product ID created from the stripe api.
@@ -11,7 +12,9 @@ import mongoose from "mongoose";
 * proteinWeight: how many grams of protein the meal has.
 * fatWeight: how many grams of fat the meal has.
 * carbs: How many grams of carbohydrates a meal has.
-* calories: how many calories a meal has.*/
+* calories: how many calories a meal has.
+* status: An enum of status codes
+* */
 
 export const mealSchema = new mongoose.Schema({
     productID: String,
@@ -20,11 +23,12 @@ export const mealSchema = new mongoose.Schema({
     vegetables: [String],
     description: String,
     photoURL: String,
-    price: Number,
+    pretaxPrice: Number,
     proteinWeight: Number,
     fatWeight: Number,
     carbs: Number,
     calories: Number,
+    mealStatus: String,
 });
 
 

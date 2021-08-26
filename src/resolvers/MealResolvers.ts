@@ -1,6 +1,7 @@
 import {stripe} from "../index";
 import {Stripe} from "stripe";
 import _ from "lodash";
+import {StatusCode} from "./UtilityResolvers";
 
 const mealModel = require('../models/mealModel');
 
@@ -66,6 +67,7 @@ export const MealResolvers = {
                     fatWeight: parseInt(args.meal.fatWeight),
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
+                    status: StatusCode.UNMADE,
                 })
             }
             catch (err) {
@@ -125,6 +127,7 @@ export const MealResolvers = {
                     fatWeight: args.meal.fatWeight ? args.meal.fatWeight : undefined,
                     carbs: args.meal.carbs ? args.meal.carbs : undefined,
                     calories: args.meal.calories ? args.meal.calories : undefined,
+                    mealStatus: args.meal.mealStatus ? args.meal.mealStatus : undefined,
                 }
 
                 await mealModel.updateOne(filter, _.pickBy(update, (param: any) => {
@@ -143,53 +146,69 @@ export const MealResolvers = {
         },
 
         updateMealPrice: async(parent: any, args: any, context: any, info: any) => {
-            /*//Update Stripe Price
+            //Update Stripe Price
             //Price is not updatable. If there is a change, we need to deactivate the old one and
-            //create a new one
+            //create a new one.
             try {
-                mealModel.findOne({productID: args.meal.productID}, async (err: any, meal: any) => {
-                    if (err) throw err;
-                    else {
-                        priceID = meal.priceID
+                let oldPrice = await stripe.prices.retrieve(args.meal.priceID);
+                let newPriceID;
+                let updatedMeal;
+                // const floatPrice = price.unit_amount ? price.unit_amount / 100 : undefined
+
+                //create a new price
+                try {
+                    const price = await stripe.prices.create({
+                        currency: 'usd',
+                        product: args.meal.productID,
+                        unit_amount: calculateMealPrice(args.meal.pretaxPrice)
+                    });
+                    newPriceID = price.id
+                }
+                catch (err) {
+                    console.log("Error updateMealPrice - Creating a new price: " + err)
+                    return ("Error updateMealPrice - Creating a new price: " + err)
+                }
+
+                //deactivate old price
+                try {
+                    await stripe.prices.update(oldPrice.id, {
+                        active: false,
+                    })
+                }
+                catch (err) {
+                    console.log("Error updateMealPrice - Deleting old price: " + err)
+                    return ("Error updateMealPrice - Deleting old price: " + err)
+                }
+
+                //update the mongoose model
+                try {
+                    const filter = {
+                        productID: args.meal.productID
                     }
 
-                    let price = await stripe.prices.retrieve(<string>priceID);
-
-                    console.table(price)
-
-                    const floatPrice = price.unit_amount ? price.unit_amount / 100 : undefined
-
-                    if (floatPrice == undefined) {
-                        const price = await stripe.prices.create({
-                            currency: 'usd',
-                            product: args.meal.productID,
-                            unit_amount: calculateMealPrice(args.meal.pretaxPrice)
-                        });
-
-                        priceID = price.id;
+                    const update = {
+                        priceID: newPriceID,
+                        pretaxPrice: args.meal.pretaxPrice
                     }
-                    if (floatPrice != undefined && args.meal.pretaxPrice != floatPrice) {
-                        //deactivate old price
-                        const oldPrice = await stripe.prices.update(args.meal.priceID, {
-                            active: false,
-                        })
 
-                        //create a new price
-                        const price = await stripe.prices.create({
-                            currency: 'usd',
-                            product: args.meal.productID,
-                            unit_amount: calculateMealPrice(args.meal.pretaxPrice)
-                        });
-                        priceID = price.id;
-                    } else {
-                        priceID = undefined;
-                    }
-                });
+                    await mealModel.updateOne(filter, _.pickBy(update, (param: any) => {
+                        if (param !== undefined) return param
+                    }))
+
+                    updatedMeal = mealModel.findOne(filter)
+                }
+                catch (err) {
+                    console.log("Error updateMealPrice - Updating Mongoose Model: " + err)
+                    return ("Error updateMealPrice - Updating Mongoose Model: " + err)
+                }
+
+                return updatedMeal;
+
             }
             catch (err) {
-                console.log("Error updating stripe price: " + err)
-                return "Error updating stripe price: " + err
-            }*/
+                console.log("Error updatingMealPrice: " + err)
+                return "Error updatingMealPrice: " + err
+            }
         }
     },
 }

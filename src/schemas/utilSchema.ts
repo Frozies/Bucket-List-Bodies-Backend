@@ -35,6 +35,15 @@ const utilitySchema = gql`
         postal_code: String
         state: String
     }
+    
+    enum StatusCode {
+        UNMADE
+        MADE
+        DELIVERED
+        CANCELED
+        REFUNDED
+    }
+    
 `;
 
 module.exports = utilitySchema;

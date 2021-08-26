@@ -45,9 +45,25 @@ const processUpload = async (upload: PromiseLike<any>) => {
     return(resultUrl)
 };
 
+export enum StatusCode {
+    UNMADE = "UNMADE",
+    MADE = "MADE",
+    DELIVERED = "DELIVERED",
+    CANCELED = "CANCELED",
+    REFUNDED = "REFUNDED",
+}
+
 export const UtilityResolvers = {
     // Date: GraphQLDateTime
     Upload: GraphQLUpload,
+
+    StatusCode: {
+        UNMADE: StatusCode.UNMADE,
+        MADE: StatusCode.MADE,
+        DELIVERED: StatusCode.DELIVERED,
+        CANCELED: StatusCode.CANCELED,
+        REFUNDED: StatusCode.REFUNDED,
+    },
 
     Mutation: {
         async singleFileUpload(parent: any, {file}: any) {
