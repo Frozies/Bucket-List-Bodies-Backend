@@ -1,5 +1,6 @@
 import {stripe} from "../index";
 import {Stripe} from "stripe";
+import _ from "lodash";
 
 const mealModel = require('../models/mealModel');
 
@@ -60,7 +61,7 @@ export const MealResolvers = {
                     sides: args.meal.sides,
                     description: args.meal.description,
                     photoURL: photoURL,
-                    price: parseFloat(args.meal.pretaxPrice),
+                    pretaxPrice: parseFloat(args.meal.pretaxPrice),
                     proteinWeight: parseInt(args.meal.proteinWeight),
                     fatWeight: parseInt(args.meal.fatWeight),
                     carbs: parseInt(args.meal.carbs),
@@ -76,6 +77,7 @@ export const MealResolvers = {
             }
         },
 
+        //TODO: Started on this, need to check if it is finished and working.
         deleteMeal: async(parent: any, args: any, context: any, info: any) => {
             console.log(args)
 
@@ -84,13 +86,13 @@ export const MealResolvers = {
                     console.log(err)
                 }
                 else{
-                    console.log("Deleted : ", docs);
+                    console.log("Deleted: ", docs);
                 }
             })
         },
 
+
         updateMeal: async(parent: any, args: any, context: any, info: any) => {
-            let priceID: string | undefined;
             let updatedMeal;
 
             //Update Stripe Product
@@ -98,7 +100,7 @@ export const MealResolvers = {
                 const params: Stripe.ProductUpdateParams = {
                     active: args.meal.active ? args.meal.active : undefined,
                     description: args.meal.description ? args.meal.description : undefined,
-                    images: args.meal.photoURL ? args.meal.photoURL : undefined,
+                    images: [args.meal.photoURL ? args.meal.photoURL : undefined],
                     name: args.meal.title ? args.meal.title : undefined,
                 }
                 await stripe.products.update(args.meal.productID, params)
@@ -108,6 +110,39 @@ export const MealResolvers = {
                 return "Error updating stripe product: " + err
             }
 
+            //Update Mongoose Model
+            try {
+                const filter = {
+                    productID: args.meal.productID
+                }
+
+                const update = {
+                    title: args.meal.title ? args.meal.title : undefined,
+                    vegetables: args.meal.vegetables ? args.meal.vegetables : undefined,
+                    description: args.meal.description ? args.meal.description : undefined,
+                    photoURL: args.meal.photoURL ? args.meal.photoURL : undefined,
+                    proteinWeight: args.meal.proteinWeight ? args.meal.proteinWeight : undefined,
+                    fatWeight: args.meal.fatWeight ? args.meal.fatWeight : undefined,
+                    carbs: args.meal.carbs ? args.meal.carbs : undefined,
+                    calories: args.meal.calories ? args.meal.calories : undefined,
+                }
+
+                await mealModel.updateOne(filter, _.pickBy(update, (param: any) => {
+                    if (param !== undefined) return param
+                }))
+
+                updatedMeal = mealModel.findOne(filter)
+            }
+            catch (err) {
+                console.log("Error updating meal in database: " + err);
+                return "Error updating meal in database: " + err;
+            }
+            finally {
+                return updatedMeal
+            }
+        },
+
+        updateMealPrice: async(parent: any, args: any, context: any, info: any) => {
             /*//Update Stripe Price
             //Price is not updatable. If there is a change, we need to deactivate the old one and
             //create a new one
@@ -155,36 +190,7 @@ export const MealResolvers = {
                 console.log("Error updating stripe price: " + err)
                 return "Error updating stripe price: " + err
             }*/
-
-            //Update Mongoose Model
-            try {
-                const filter = {
-                    productID: args.meal.productID
-                }
-
-                const update = {
-                    title: args.meal.title ? args.meal.title : undefined,
-                    priceID: priceID,
-                    vegetables: args.meal.vegetables ? args.meal.vegetables : undefined,
-                    description: args.meal.description ? args.meal.description : undefined,
-                    photoURL: args.meal.photoURL ? args.meal.photoURL : undefined,
-                    proteinWeight: args.meal.proteinWeight ? args.meal.proteinWeight : undefined,
-                    fatWeight: args.meal.fatWeight ? args.meal.fatWeight : undefined,
-                    carbs: args.meal.carbs ? args.meal.carbs : undefined,
-                    calories: args.meal.calories ? args.meal.calories : undefined,
-                }
-
-                await mealModel.updateOne(filter, update)
-                updatedMeal = mealModel.findOne(filter)
-            }
-            catch (err) {
-                console.log("Error updating meal in database: " + err);
-                return "Error updating meal in database: " + err;
-            }
-            finally {
-                return updatedMeal
-            }
-        },
+        }
     },
 }
 module.exports = MealResolvers;

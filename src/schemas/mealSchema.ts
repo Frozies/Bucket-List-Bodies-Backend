@@ -15,6 +15,9 @@ const mealSchema = gql`
         
         #Using the ID from a meal, update it.
         updateMeal(meal: updateMealInput): Meal
+        
+        #Create a new price in stripe and disable the old one.
+        updateMealPrice(meal: updateMealPriceInput): Meal
     },
 
     input createMealInput {
@@ -54,7 +57,12 @@ const mealSchema = gql`
         carbs: Int
         calories: Int
         active: Boolean
+    }
+    
+    input updateMealPriceInput {
         pretaxPrice: String
+        priceID: String
+        productID: String
     }
 `;
 
