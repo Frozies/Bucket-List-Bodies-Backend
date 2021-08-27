@@ -33,12 +33,12 @@ export const orderProductsModel = mongoose.model('Order Products', orderProducts
 * deliveredDate: the date and time a delivery was delivered.
 * */
 export const orderSchema = new mongoose.Schema({
-    id: String,
-    customer: customerSchema,
+    invoiceID: String,
+    invoiceItemIDs: [String],
+    customerID: String,
     products: orderProductsSchema,
     status: String,
     pretaxPrice: Number,
-    postTaxPrice: Number,
     coupon: String,
     notes: String,
     deliveredDate: Date,

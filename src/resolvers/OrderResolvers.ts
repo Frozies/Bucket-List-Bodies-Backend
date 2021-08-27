@@ -25,6 +25,8 @@ export const OrderResolvers = {
             //  create one line item, then create the invoice, then add the rest of the line
             // items to the invoice. or something similar.
 
+            let invoiceItemIDs: any = [];
+
             //Add each line item to the invoice
             try {
                 for (const meal of args.order.products.meals) {
@@ -37,6 +39,7 @@ export const OrderResolvers = {
 
                     const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
                     console.log("Adding invoice item to invoice: " + invoiceItem.id)
+                    invoiceItemIDs.push(invoiceItem.id)
                 }
             }
             catch (err) {
@@ -65,24 +68,16 @@ export const OrderResolvers = {
             //Create Mongoose Model
             try {
                 await orderModel.create({
-                    customer: {
-                        name: args.order.customer.name,
-                        phone: args.order.customer.phone,
-                        address: {
-                            city: args.order.customer.address.city,
-                            line1: args.order.customer.address.line1,
-                            line2: args.order.customer.address.line2,
-                            postal: args.order.customer.address.postal,
-                            state: args.order.customer.address.state,
-                        }
-                    },
-                    status: "Unmade",
-                    total: total,
+                    invoiceID: invoiceID,
+                    invoiceItemIDs: invoiceItemIDs,
+                    customerID: args.order.customerID,
+                    products: args.order.products,
+                    status: "UNMADE",
+                    pretaxPrice: args.order.pretaxPrice,
                     coupon: args.order.coupon,
                     notes: args.order.notes,
-                    meals: {...args.order.meals},
-                    deliveryDate: args.order.deliveryDate.toDateString()
-
+                    deliveryDate: args.order.deliveryDate.toDateString(),
+                    creationDate: new Date(),
                 })
             } catch (err) {
                 return "Error pushing meal to MongoDB: " + err;
@@ -98,18 +93,18 @@ export const OrderResolvers = {
 
 
     Order: {
-        async customer(parent: any) {
+        async customer(parent: any, args: any, context: any, info: any) {
             let retrievedCustomer;
             try {
-                const customer = await stripe.customers.retrieve(parent.customer.id)
-                console.table(customer)
+                console.log(parent.data)
+                const customer = await stripe.customers.retrieve(parent.data.customerID)
                 retrievedCustomer = customer
             }
             catch (err) {
                 return "Error retrieving customer: " + err
             }
             finally {
-                return retrievedCustomer
+                return {...retrievedCustomer};
             }
         },
 

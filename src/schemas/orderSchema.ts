@@ -50,7 +50,6 @@ const orderSchema = gql`
         products: orderedProducts!
         status: String!
         pretaxPrice: Float!
-        tax: Float!
         coupon: String
         notes: String
         deliveredDate: Date
