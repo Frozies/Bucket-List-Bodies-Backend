@@ -21,57 +21,51 @@ export const OrderResolvers = {
 
     Mutation: {
         async manualOrderCreation(parent: any, args: any, context: any, info: any) {
-            let invoiceID;
+            // Note to self: It might be a smart move to pull the first item out of the order,
+            //  create one line item, then create the invoice, then add the rest of the line
+            // items to the invoice. or something similar.
+
+            //Add each line item to the invoice
+            try {
+                for (const meal of args.order.products.meals) {
+                    const params: Stripe.InvoiceItemCreateParams = {
+                        customer: args.order.customerID,
+                        description: "", //TODO: Set a description
+                        price: meal.priceID,
+                        quantity: 1,//TODO: Count quantity
+                    }
+
+                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
+                    console.log("Adding invoice item to invoice: " + invoiceItem.id)
+                }
+            }
+            catch (err) {
+                console.log("Error creating invoice item: " + err);
+                return ("Error creating invoice item: " + err);
+            }
+
+            let invoiceID: any;
+
             //Create invoice on customer in stripe
             try {
                 const params: Stripe.InvoiceCreateParams = {
                     customer: args.order.customerID,
-                    collection_method: "send_invoice",
                 }
 
                 const invoice: Stripe.Invoice = await stripe.invoices.create(params)
-                let invoiceID = invoice.id
 
+                invoiceID = invoice.id
                 console.log("Created invoice: " + invoiceID)
             }
             catch (err) {
                 console.log("Error creating invoice: " + err)
             }
 
-            /*//add line items to the invoice
-            try {
-                for (let item in args.order.products.meals) {
-                    const priceParams: Stripe.PriceListParams = {
-                        product: item.proteinID,
-                        limit: 1,
-                    }
 
-                    let price = await stripe.prices.list(priceParams)
-
-                    const invoiceItemParams: Stripe.InvoiceItemCreateParams = {
-                        customer: args.order.customer.id,
-                        currency: "us",
-                        invoice: invoiceID,
-                        quantity: 1,
-                        price: price.data[0].id,
-                    }
-
-                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(invoiceItemParams);
-
-                    console.log("Adding line_item to invoice: " + invoiceItem.id)
-                }
-            }
-            catch (err) {
-                return "Error adding invoice item: " + err
-            }*/
-
-
-
-            //TODO: This model is not complete. This will crash as it does not match the schema...
             //Create Mongoose Model
-           /* try {
+            try {
                 await orderModel.create({
-                    /!*customer: {
+                    customer: {
                         name: args.order.customer.name,
                         phone: args.order.customer.phone,
                         address: {
@@ -81,19 +75,18 @@ export const OrderResolvers = {
                             postal: args.order.customer.address.postal,
                             state: args.order.customer.address.state,
                         }
-                    },*!/
-/!*
+                    },
                     status: "Unmade",
                     total: total,
                     coupon: args.order.coupon,
                     notes: args.order.notes,
                     meals: {...args.order.meals},
-                    deliveryDate: args.order.deliveryDate.toDateString()*!/
+                    deliveryDate: args.order.deliveryDate.toDateString()
 
                 })
             } catch (err) {
                 return "Error pushing meal to MongoDB: " + err;
-            }*/
+            }
 
             //save to db
         },
@@ -117,6 +110,21 @@ export const OrderResolvers = {
             }
             finally {
                 return retrievedCustomer
+            }
+        },
+
+        //TODO: Check to see if this actually works.
+        //Retrieve the productIDs inside an order for the meals.
+        async products(parent: any) {
+            for(let proteinID in parent.meals) {
+                try {
+                    console.log("FINDING MEAL: " + proteinID)
+                    return await stripe.products.retrieve(proteinID)
+                }
+                catch (err) {
+                    console.log("Error retrieving meal from order: " + err)
+                    return ("Error retrieving meal from order: " + err)
+                }
             }
         }
     }
