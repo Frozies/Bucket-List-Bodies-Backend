@@ -11,8 +11,7 @@ import mongoose from "mongoose";
 * * */
 export const CustomerSchema = new mongoose.Schema({
     id: String,
-    firstName: String,
-    lastName: String,
+    name: String,
     cards: [String],
     orders: [String],
     notes: String,

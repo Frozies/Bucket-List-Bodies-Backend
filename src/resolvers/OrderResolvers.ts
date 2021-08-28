@@ -1,6 +1,7 @@
-import {orderModel} from "../models/OrderModel";
+
 import {stripe} from "../index";
 import {Stripe} from "stripe";
+const orderModel = require('../models/OrderModel');
 
 export const OrderResolvers = {
     Query: {
@@ -63,27 +64,30 @@ export const OrderResolvers = {
             catch (err) {
                 console.log("Error creating invoice: " + err)
             }
-
-
             //Create Mongoose Model
             try {
-                await orderModel.create({
-                    invoiceID: invoiceID,
-                    invoiceItemIDs: invoiceItemIDs,
-                    customerID: args.order.customerID,
-                    products: args.order.products,
-                    status: "UNMADE",
-                    pretaxPrice: args.order.pretaxPrice,
-                    coupon: args.order.coupon,
-                    notes: args.order.notes,
-                    deliveryDate: args.order.deliveryDate.toDateString(),
-                    creationDate: new Date(),
-                })
+
+
             } catch (err) {
                 return "Error pushing meal to MongoDB: " + err;
             }
 
-            //save to db
+            console.log("Sent order to DB")
+
+            const order = await orderModel.create({
+                invoiceID: invoiceID,
+                invoiceItemIDs: invoiceItemIDs,
+                customerID: args.order.customerID,
+                products: args.order.products,
+                status: "UNMADE",
+                pretaxPrice: args.order.pretaxPrice,
+                coupon: args.order.coupon,
+                notes: args.order.notes,
+                // deliveryDate: args.order.deliveryDate.toDateString, //TODO Fix date input
+                deliveryDate: new Date(),
+                creationDate: new Date(),
+            })
+            return orderModel.findOne({invoiceID: invoiceID})
         },
 
         /*updateMealStatus(parent, args, context, info){},
@@ -94,32 +98,48 @@ export const OrderResolvers = {
 
     Order: {
         async customer(parent: any, args: any, context: any, info: any) {
-            let retrievedCustomer;
-            try {
-                console.log(parent.data)
-                const customer = await stripe.customers.retrieve(parent.data.customerID)
-                retrievedCustomer = customer
-            }
-            catch (err) {
-                return "Error retrieving customer: " + err
-            }
-            finally {
-                return {...retrievedCustomer};
+            console.log("Retrieving Customer Data: " + parent.customerID)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(parent.customerID)
+            return {
+                id:  customer.id,
+                name: "name" in customer ? customer.name : undefined,
+                email: "email" in customer ? customer.email : undefined,
+                phone: "phone" in customer ? customer.email : undefined,
+                address: "address" in customer ? customer.address : undefined,
+                shipping: "shipping" in customer ? customer.shipping : undefined,
+                default_source: "default_source" in customer ? customer.default_source : undefined,
+                //todo: ORDERS
+                notes: "description" in customer ? customer.description : undefined
             }
         },
 
-        //TODO: Check to see if this actually works.
         //Retrieve the productIDs inside an order for the meals.
         async products(parent: any) {
-            for(let proteinID in parent.meals) {
-                try {
-                    console.log("FINDING MEAL: " + proteinID)
-                    return await stripe.products.retrieve(proteinID)
-                }
-                catch (err) {
-                    console.log("Error retrieving meal from order: " + err)
-                    return ("Error retrieving meal from order: " + err)
-                }
+            console.log("Retrieving Products")
+            let meals: any[] = []
+            let extras: any[] = []
+
+            //make an array of meals
+            parent.products.meals.forEach((meal: any) => {
+                meals.push({
+                    proteinID: meal.proteinID,
+                    vegetable: meal.vegetable,
+                    carbohydrate: meal.carbohydrate,
+                    sauce: meal.sauce,
+                    priceID: meal.priceID,
+                })
+            })
+
+            //make an array of extras
+            parent.products.extras.forEach((extra: any) => {
+                extra.push({
+                    extraID: extra.extraID,
+                })
+            })
+
+            return {
+                meals: meals,
+                extras: extras
             }
         }
     }
