@@ -1,5 +1,6 @@
 import {stripe} from "../index";
 import {Stripe} from "stripe";
+import {customerModel} from "../models/CustomerModel";
 
 export const CustomerResolvers = {
     Query: {
@@ -119,7 +120,14 @@ export const CustomerResolvers = {
                             console.log("Created a new customer: " + customer.id)
                         };
 
-                        await createCustomer();
+                        await createCustomer().then(async () => {
+                            //Send customer data to DB.
+                            const customer = await customerModel.create({
+                                id: customerID,
+                                name: args.customer.name,
+                                notes: args.customer.notes,
+                            })
+                        });
                     } catch (err) {
                         console.log(err)
                         return "Error createCustomer: " + err;
@@ -175,7 +183,7 @@ export const CustomerResolvers = {
             try {
                 const orders = await stripe.orders.list({
                     limit: 3,
-                    customer: parent.id
+                    customer: parent.id //todo check this ID
                 });
 
                 retrievedOrders = orders.data

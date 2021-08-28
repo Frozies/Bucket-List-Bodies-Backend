@@ -66,10 +66,12 @@ const orderSchema = gql`
         vegetable: String!
         carbohydrate: String!
         sauce: String!
+        status: StatusCode!
     },
 
     type orderedExtra {
         extraID: String!
+        status: StatusCode!
     },
 
     input manualOrderCreationInput {

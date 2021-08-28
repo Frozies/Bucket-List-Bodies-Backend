@@ -4,6 +4,8 @@ const {gql} = require('apollo-server-express');
 const mealSchema = gql`
     extend type Query {
         retrieveAllMeals: [Meal]
+        
+        retrieveMeal(meal: String): Meal
     },
     
     extend type Mutation {
@@ -44,7 +46,6 @@ const mealSchema = gql`
         fatWeight: Int
         carbs: Int
         calories: Int
-        mealStatus: StatusCode
     },
     
     input updateMealInput {
@@ -58,7 +59,6 @@ const mealSchema = gql`
         carbs: Int
         calories: Int
         active: Boolean
-        mealStatus: StatusCode
     },
     
     input updateMealPriceInput {

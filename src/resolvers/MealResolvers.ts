@@ -15,6 +15,11 @@ export const MealResolvers = {
         retrieveAllMeals: async() => {
             return mealModel.find()
         },
+
+        retrieveMeal: (parent: any, args: any, context: any, info: any) => {
+            const foundMeal = mealModel.findOne({productID: args.meal})
+          return foundMeal;
+        },
     },
     Mutation: {
         createMeal: async(parent: any, args: any, context: any, info: any) => {
@@ -67,7 +72,6 @@ export const MealResolvers = {
                     fatWeight: parseInt(args.meal.fatWeight),
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
-                    status: StatusCode.UNMADE,
                 })
             }
             catch (err) {
@@ -81,7 +85,6 @@ export const MealResolvers = {
 
         //TODO: Started on this, need to check if it is finished and working.
         deleteMeal: async(parent: any, args: any, context: any, info: any) => {
-            console.log(args)
 
             return mealModel.findByIdAndDelete(args.meal._id, (err: any, docs: any) => {
                 if (err){
@@ -211,5 +214,9 @@ export const MealResolvers = {
             }
         }
     },
+
+    Meal: {
+
+    }
 }
 module.exports = MealResolvers;

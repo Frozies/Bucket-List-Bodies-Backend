@@ -9,17 +9,12 @@ const customerSchema = gql`
             #Retrieves all customers
             getAllCustomers(id: String): [Customer]
             
-#            #Using an order ID, get the customer's information.
-#            getCustomerFromOrder(id: ID): Customer
-#            
 #            #Retrieves all customers that do have a current subscription or order that has yet been completed.
 #            getAllActiveCustomers: [Customer]
 #
 #            #Retrieves all customers that do not have a current subscription
 #            getAllInactiveCustomers: [Customer]
-#            
-#            #Retrieves all the orders from a specified customer
-#            getSingleCustomerOrders(id: ID): [Order]
+#
         }
 
     extend type Mutation {
@@ -40,6 +35,7 @@ const customerSchema = gql`
         address: AddressInput!
         shipping: ShippingInput
         notes: String
+        #todo allergies => CustomerResolvers.ts line 128 too
     }
 
     input updateCustomerInput{
@@ -50,6 +46,7 @@ const customerSchema = gql`
         address: AddressInput
         shipping: ShippingInput
         notes: String
+        #todo allergies
     }
 
     type Customer {
