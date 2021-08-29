@@ -83,10 +83,8 @@ export const MealResolvers = {
             }
         },
 
-        //TODO: Started on this, need to check if it is finished and working.
         deleteMeal: async(parent: any, args: any, context: any, info: any) => {
-
-            return mealModel.findByIdAndDelete(args.meal._id, (err: any, docs: any) => {
+            return mealModel.findByIdAndDelete(args.meal, (err: any, docs: any) => {
                 if (err){
                     console.log(err)
                 }

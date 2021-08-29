@@ -181,9 +181,10 @@ export const CustomerResolvers = {
         async orders(parent: any) {
             let retrievedOrders;
             try {
+                console.log("LOOKING FOR CUSTOMER FROM ORDER")
                 const orders = await stripe.orders.list({
                     limit: 3,
-                    customer: parent.id //todo check this ID
+                    customer: parent.customer.id
                 });
 
                 retrievedOrders = orders.data

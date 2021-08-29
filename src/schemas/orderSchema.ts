@@ -5,6 +5,8 @@ const orderSchema = gql`
     extend type Query {
         #Get every order ever
         getAllOrders: [Order]
+        
+        getOrder(order: String): Order
 
 #        #Get one order by its ID
 #        getOneOrder(id: ID): Order

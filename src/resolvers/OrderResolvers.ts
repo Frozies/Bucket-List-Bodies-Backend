@@ -5,19 +5,26 @@ const orderModel = require('../models/OrderModel');
 
 export const OrderResolvers = {
     Query: {
-/*        getAllOrders(parent, args, context, info){},
+        getAllOrders(){
+            return orderModel.find()
+        },
 
-        getOneOrder(parent, args, context, info){},
+        getOrder(args: any){
+            const order = orderModel.findOne({invoiceID: args.order});
+            return order
+        },
 
-        getAllActiveOrders(parent, args, context, info){},
 
-        getAllActiveOrdersByDate(parent, args, context, info){},
+        /*
+                getAllActiveOrders(parent, args, context, info){},
 
-        getOrdersByFood(parent, args, context, info){},
+                getAllActiveOrdersByDate(parent, args, context, info){},
 
-        getOrdersByDelDate(parent, args, context, info){},
+                getOrdersByFood(parent, args, context, info){},
 
-        getOrdersByMealStatus(parent, args, context, info){},*/
+                getOrdersByDelDate(parent, args, context, info){},
+
+                getOrdersByMealStatus(parent, args, context, info){},*/
     },
 
     Mutation: {
