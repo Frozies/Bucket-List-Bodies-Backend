@@ -7,7 +7,7 @@
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts\"",
     "start": "npm run build && ts-node src/index.js",
     "build": "npm install --only=dev && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc --reporter=html mocha"
   },
   "author": "Davin Young",
   "dependencies": {
@@ -34,5 +34,8 @@
     "nodemon": "^2.0.12",
     "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
+  },
+  "nyc": {
+    "include": "src"
   }
 }

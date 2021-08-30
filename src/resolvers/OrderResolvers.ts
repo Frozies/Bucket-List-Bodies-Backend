@@ -85,7 +85,15 @@ export const OrderResolvers = {
                 invoiceID: invoiceID,
                 invoiceItemIDs: invoiceItemIDs,
                 customerID: args.order.customerID,
-                products: args.order.products,
+                products: {
+                    ...args.order.products,
+                    meals: {
+                        status: "UNMADE"
+                    },
+                    extras: {
+                        status: "UNMADE"
+                    }
+                },
                 status: "UNMADE",
                 pretaxPrice: args.order.pretaxPrice,
                 coupon: args.order.coupon,
