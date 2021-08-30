@@ -57,7 +57,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error creating Stripe Product: " + err)
-                return "Error creating Stripe Product: " + err;
+                throw new Error("Error creating Stripe Product: " + err);
             }
 
             //Create Stripe Price
@@ -72,7 +72,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error creating Stripe Price: " + err);
-                return "Error creating Stripe Price: " + err;
+                throw new Error("Error creating Stripe Price: " + err);
             }
 
             //Create Mongoose Model
@@ -94,7 +94,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error pushing meal to MongoDB: " + err);
-                return "Error pushing meal to MongoDB: " + err;
+                throw new Error("Error pushing meal to MongoDB: " + err);
             }
             finally {
                 return newMeal
@@ -127,7 +127,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error updating stripe product: " + err)
-                return "Error updating stripe product: " + err
+                throw new Error("Error updating stripe product: " + err);
             }
 
             //Update Mongoose Model
@@ -156,7 +156,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error updating meal in database: " + err);
-                return "Error updating meal in database: " + err;
+                throw new Error("Error updating meal in database: " + err);
             }
             finally {
                 return updatedMeal
@@ -184,7 +184,7 @@ export const productResolvers = {
                 }
                 catch (err) {
                     console.log("Error updateMealPrice - Creating a new price: " + err)
-                    return ("Error updateMealPrice - Creating a new price: " + err)
+                    throw new Error("Error updateMealPrice - Creating a new price: " + err)
                 }
 
                 //deactivate old price
@@ -195,7 +195,7 @@ export const productResolvers = {
                 }
                 catch (err) {
                     console.log("Error updateMealPrice - Deleting old price: " + err)
-                    return ("Error updateMealPrice - Deleting old price: " + err)
+                    throw new Error("Error updateMealPrice - Deleting old price: " + err)
                 }
 
                 //update the mongoose model
@@ -217,7 +217,7 @@ export const productResolvers = {
                 }
                 catch (err) {
                     console.log("Error updateMealPrice - Updating Mongoose Model: " + err)
-                    return ("Error updateMealPrice - Updating Mongoose Model: " + err)
+                    throw new Error("Error updateMealPrice - Updating Mongoose Model: " + err)
                 }
 
                 return updatedMeal;
@@ -225,7 +225,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error updatingMealPrice: " + err)
-                return "Error updatingMealPrice: " + err
+                throw new Error("Error updatingMealPrice: " + err);
             }
         },
 
@@ -251,7 +251,8 @@ export const productResolvers = {
                 console.log("Product ID: " + product.id)
             }
             catch (err) {
-                return "Error creating Stripe Product: " + err;
+                console.log("Error creating Stripe Product: " + err)
+                throw new Error("Error creating Stripe Product: " + err);
             }
 
             //Create Stripe Price
@@ -266,7 +267,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error creating Stripe Price: " + err);
-                return "Error creating Stripe Price: " + err;
+                throw new Error("Error creating Stripe Price: " + err);
             }
 
             //Create Mongoose Model
@@ -286,7 +287,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error pushing extra to MongoDB: " + err);
-                return "Error pushing extra to MongoDB: " + err;
+                throw new Error("Error pushing extra to MongoDB: " + err);
             }
             finally {
                 return newExtra
@@ -321,7 +322,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error updating stripe product: " + err)
-                return "Error updating stripe product: " + err
+                throw new Error("Error updating stripe product: " + err)
             }
 
             //Update Mongoose Model
@@ -350,7 +351,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error updating extra in database: " + err);
-                return "Error updating extra in database: " + err;
+                throw new Error("Error updating extra in database: " + err);
             }
             finally {
                 return updatedExtra
@@ -378,7 +379,7 @@ export const productResolvers = {
                 }
                 catch (err) {
                     console.log("Error updateExtraPrice - Creating a new price: " + err)
-                    return ("Error updateExtraPrice - Creating a new price: " + err)
+                    throw new Error("Error updateExtraPrice - Creating a new price: " + err)
                 }
 
                 //deactivate old price
@@ -389,7 +390,7 @@ export const productResolvers = {
                 }
                 catch (err) {
                     console.log("Error updateExtraPrice - Deleting old price: " + err)
-                    return ("Error updateExtraPrice - Deleting old price: " + err)
+                    throw new Error("Error updateExtraPrice - Deleting old price: " + err)
                 }
 
                 //update the mongoose model
@@ -411,7 +412,7 @@ export const productResolvers = {
                 }
                 catch (err) {
                     console.log("Error updateExtraPrice - Updating Mongoose Model: " + err)
-                    return ("Error updateExtraPrice - Updating Mongoose Model: " + err)
+                    throw new Error("Error updateExtraPrice - Updating Mongoose Model: " + err)
                 }
 
                 return updatedExtra;
@@ -419,7 +420,7 @@ export const productResolvers = {
             }
             catch (err) {
                 console.log("Error updatingExtraPrice: " + err)
-                return "Error updatingExtraPrice: " + err
+                throw new Error("Error updatingExtraPrice: " + err)
             }
         },
     }

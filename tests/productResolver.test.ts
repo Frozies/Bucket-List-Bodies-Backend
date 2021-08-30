@@ -17,7 +17,8 @@ before(async () => {
 
 describe('Product Resolvers Unit Testing', () => {
     describe('Mutations', () => {
-        it('createMeal', async () => {
+        describe('Create Meal Mutation', () => {
+
             const CREATE_MEAL = gql`
                 mutation CreateMealMutation($createMealMeal: createMealInput) {
                     createMeal(meal: $createMealMeal) {
@@ -35,36 +36,48 @@ describe('Product Resolvers Unit Testing', () => {
                     }
                 }`
 
-            const result = await mockDB.executeOperation({
-                query: CREATE_MEAL,
-                variables: {
-                    "createMealMeal": {
-                        title: "Blackened Chicken",
-                        vegetables: ["Broccoli", "Green Beans"],
-                        description: "A fresh cooked chicken and veggie.",
-                        photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg",
-                        pretaxPrice: "9.99",
-                        proteinWeight: "5",
-                        fatWeight: "10",
-                        carbs: "15",
-                        calories: "20",
+            it('Successfully Create a meal', async () => {
+                const result = await mockDB.executeOperation({
+                    query: CREATE_MEAL,
+                    variables: {
+                        "createMealMeal": {
+                            title: "Blackened Chicken",
+                            vegetables: ["Broccoli", "Green Beans"],
+                            description: "A fresh cooked chicken and veggie.",
+                            photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg",
+                            pretaxPrice: "9.99",
+                            proteinWeight: "5",
+                            fatWeight: "10",
+                            carbs: "15",
+                            calories: "20",
+                        }
                     }
-                }
-            });
-            if (result.errors != undefined) console.log(result.errors);
-            expect(result.errors).to.undefined;
+                });
+                if (result.errors != undefined) console.log(result.errors);
+                expect(result.errors).to.undefined;
 
-            expect(result.data.createMeal.productID).not.equal('' || undefined);
-            expect(result.data.createMeal.priceID).not.equal('' || undefined);
-            expect(result.data.createMeal.title).to.equal("Blackened Chicken");
-            expect(result.data.createMeal.vegetables).to.members(['Broccoli', 'Green Beans'])
-            expect(result.data.createMeal.description).to.equal('A fresh cooked chicken and veggie.');
-            expect(result.data.createMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg')
-            expect(result.data.createMeal.pretaxPrice).to.equal(9.99);
-            expect(result.data.createMeal.proteinWeight).to.equal(5);
-            expect(result.data.createMeal.fatWeight).to.equal(10);
-            expect(result.data.createMeal.carbs).to.equal(15);
-            expect(result.data.createMeal.calories).to.equal(20);
+                expect(result.data.createMeal.productID).not.equal('' || undefined);
+                expect(result.data.createMeal.priceID).not.equal('' || undefined);
+                expect(result.data.createMeal.title).to.equal("Blackened Chicken");
+                expect(result.data.createMeal.vegetables).to.members(['Broccoli', 'Green Beans'])
+                expect(result.data.createMeal.description).to.equal('A fresh cooked chicken and veggie.');
+                expect(result.data.createMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg')
+                expect(result.data.createMeal.pretaxPrice).to.equal(9.99);
+                expect(result.data.createMeal.proteinWeight).to.equal(5);
+                expect(result.data.createMeal.fatWeight).to.equal(10);
+                expect(result.data.createMeal.carbs).to.equal(15);
+                expect(result.data.createMeal.calories).to.equal(20);
+            });
+
+            it('Throw Error creating stripe product', async () => {
+                const result = await mockDB.executeOperation({
+                    query: CREATE_MEAL,
+                    variables: {
+                        "createMealMeal": {}
+                    }
+                });
+                expect(result.errors[0].message).to.equal('Error creating Stripe Product: Error: Missing required param: name.')
+            });
         });
 
     });
