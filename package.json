@@ -7,7 +7,7 @@
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts\"",
     "start": "npm run build && ts-node src/index.js",
     "build": "npm install --only=dev && tsc",
-    "test": "mocha -r ts-node/register"
+    "test": "mocha"
   },
   "author": "Davin Young",
   "dependencies": {
@@ -45,6 +45,9 @@
     "watch-files": [
       "tests/**/*.ts"
     ],
-    "timeout": 60000
+    "timeout": 60000,
+    "extension": ["ts"],
+    "exit": true,
+    "require": "ts-node/register"
   }
 }

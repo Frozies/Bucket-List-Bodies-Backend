@@ -7,9 +7,8 @@ import {rootSchema} from "../src/schemas/rootSchema";
 import {mongooseOpts} from "../src/utility/mongooseOpts";
 
 
-
 let mongoServer: MongoMemoryServer;
-let apolloServer: any;
+export let apolloServer: ApolloServer;
 
 //todo: this can be its own utility file
 let apolloConfig = {
@@ -29,8 +28,6 @@ before(async () => {
 
 module.exports.connect = async () => {
     const uri = mongoServer.getUri();
-
-
     await mongoose.connect(uri, mongooseOpts);
 }
 

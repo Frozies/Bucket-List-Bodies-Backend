@@ -1,10 +1,13 @@
 import {mealSchema} from "../src/models/mealModel";
 import * as mongoose from "mongoose";
 import {expect} from "chai";
+import { gql } from "apollo-server-express";
+const {apolloServer} = require('./mockDB');
 
 const mockDB = require('./mockDB');
 
 let mealModel: any;
+
 
 //Connect to the mock database before testing
 before(async () => {
@@ -13,22 +16,46 @@ before(async () => {
 });
 
 describe('Product Resolvers Unit Testing', () => {
-    it('1 = 1', async () => {
-        /*const meal = await mealModel.create({
-            productID: "productID",
-            priceID: "priceID",
-            title: "args.meal.title",
-            sides: "args.meal.sides",
-            description: "args.meal.description",
-            photoURL: "photoURL",
-            pretaxPrice: 3,
-            proteinWeight: 4,
-            fatWeight: 5,
-            carbs: 6,
-            calories: 7,
-        })*/
+    describe('createMeal', async () => {
+        it('create Meal 2', async () => {
+            const CREATE_MEAL = gql`
+                mutation CreateMealMutation($createMealMeal: createMealInput) {
+                    createMeal(meal: $createMealMeal) {
+                        productID
+                        priceID
+                        title
+                        vegetables
+                        photoURL
+                        description
+                        pretaxPrice
+                        proteinWeight
+                        fatWeight
+                        carbs
+                        calories
+                    }
+                }`
 
-        expect(1).to.equal(1);
+            const result = await apolloServer.executeOperation({
+                query: CREATE_MEAL,
+                variables: {
+                    "createMealMeal": {
+                        title: "Blackened Chicken",
+                        vegetables: ["Broccoli", "Green Beans"],
+                        description: "A fresh cooked chicken and veggie.",
+                        photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg",
+                        pretaxPrice: "9.99",
+                        proteinWeight: "5",
+                        fatWeight: "10",
+                        carbs: "15",
+                        calories: "20",
+                    }
+                }
+            });
+
+            expect(result.errors).to.undefined;
+            expect(result.data.productID).to.not.undefined
+            expect(result.data.priceID).to.not.undefined
+        });
     });
 
     /*describe('Queries', () => {
