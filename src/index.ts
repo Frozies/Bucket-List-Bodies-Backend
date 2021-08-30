@@ -5,22 +5,12 @@ require('dotenv').config(); // Allows use of environmental variables from the .e
 const express = require('express');
 const { ApolloServer} = require('apollo-server-express');
 
-import Stripe from "stripe";
-// @ts-ignore
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2020-08-27",
-    typescript: true
-});
 
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
 import {rootSchema} from "./schemas/rootSchema";
-
-const OrderResolvers = require('./resolvers/OrderResolvers')
-const CustomerResolvers = require('./resolvers/CustomerResolvers')
-const ProductResolvers = require('./resolvers/productResolvers')
-const UtilityResolvers = require('./resolvers/UtilityResolvers')
-
+import {rootResolvers} from "./resolvers/rootResolvers";
+import {mongooseOpts} from "./utility/mongooseOpts";
 
 async function startExpressApolloServer() {
 
@@ -38,7 +28,7 @@ async function startExpressApolloServer() {
     /*Connect to the database*/
     console.log("Connecting to MongoDB")
     try {
-        await mongoose.connect(process.env.MONGODB, {useNewUrlParser: true, useUnifiedTopology: true});
+        await mongoose.connect(process.env.MONGODB, mongooseOpts);
 
         const db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));
@@ -55,7 +45,7 @@ async function startExpressApolloServer() {
         // @ts-ignore
         uploads: false,
         typeDefs: rootSchema,
-        resolvers: [UtilityResolvers, ProductResolvers, OrderResolvers, CustomerResolvers],
+        resolvers: rootResolvers,
     });
 
     await server.start();

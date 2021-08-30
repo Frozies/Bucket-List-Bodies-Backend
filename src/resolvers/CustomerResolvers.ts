@@ -1,4 +1,4 @@
-import {stripe} from "../index";
+import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
 import {customerModel} from "../models/CustomerModel";
 
@@ -126,6 +126,7 @@ export const CustomerResolvers = {
                                 id: customerID,
                                 name: args.customer.name,
                                 notes: args.customer.notes,
+                                allergies: args.customer.allergies ? args.customer.allergies : undefined,
                             })
                         });
                     } catch (err) {

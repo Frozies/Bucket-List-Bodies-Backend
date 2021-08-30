@@ -38,7 +38,7 @@ const orderSchema = gql`
         manualOrderCreation(order: manualOrderCreationInput): Order
 
         #Update an order's information.
-        updateOrder(order: orderUpdateInput): Order
+#        updateOrder(order: orderUpdateInput): Order
 
         #        #Updates a specific meal if it has been made
         #        updateMealStatus(status: String): Boolean
@@ -104,18 +104,33 @@ const orderSchema = gql`
         extrasPriceID: String!
     },
 
-    input orderUpdateInput {
-        invoiceID: String!
-        products: orderedProductsUpdateInput
-        status: String
-        pretaxPrice: Float
-        notes: String
-        deliveredDate: Date
-    },
-    
-    input orderedProductsUpdateInput {
-        
-    } 
+    #todo: Update an invoice. I believe i need to break this down more.
+#    input orderUpdateInput {
+#        invoiceID: String!
+#        products: orderedProductsUpdateInput
+#        status: String
+#        pretaxPrice: Float
+#        notes: String
+#        deliveredDate: Date
+#    },
+#    
+#    input orderedProductsUpdateInput {
+#        meals: [orderedMealUpdateInput]
+#        extras: [orderedExtraUpdateInput]
+#    },
+#
+#    input orderedMealUpdateInput {
+#        proteinID: String!
+#        priceID: String
+#        vegetable: String
+#        carbohydrate: String
+#        sauce: String
+#    },
+#
+#    input orderedExtraUpdateInput {
+#        extraID: String!
+#        extrasPriceID: String
+#    },
 
 `;
 

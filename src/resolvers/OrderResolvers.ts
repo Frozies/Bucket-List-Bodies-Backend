@@ -1,6 +1,7 @@
 
-import {stripe} from "../index";
+import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
+import {customerModel, customerSchema} from "../models/CustomerModel";
 const orderModel = require('../models/OrderModel');
 
 export const OrderResolvers = {
@@ -100,16 +101,41 @@ export const OrderResolvers = {
                 deliveryDate: args.order.deliveryDate,
                 creationDate: new Date(),
             })
+
+            //Add order to customer ledger.
+            try {
+                await customerModel.findOneAndUpdate({id: args.order.customerID}, {
+                    $push: {
+                        orders: invoiceID
+                    }
+                })
+            }
+            catch (err) {
+                console.log("Error adding order to customer ledger: " + err);
+                return ("Error adding order to customer ledger: " + err);
+            }
+
             return orderModel.findOne({invoiceID: invoiceID})
         },
 
+        /*async updateOrder(args: any) {
+            try {
+                const params: Stripe.InvoiceUpdateParams = {
 
+                }
+            }
+            catch (err) {
+                console.log("Error: " + err);
+                return ("Error: " + err);
+            }
+          //update mongodb
+        },*/
 
         /*updateMealStatus(parent, args, context, info){},
 
         updateOrderStatus(parent, args, context, info){},*/
-    },
 
+    },
 
     /** Resolver Chains **/
 

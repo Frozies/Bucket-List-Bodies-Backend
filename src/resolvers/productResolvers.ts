@@ -1,4 +1,4 @@
-import {stripe} from "../index";
+import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
 import _ from "lodash";
 import {StatusCode} from "./UtilityResolvers";

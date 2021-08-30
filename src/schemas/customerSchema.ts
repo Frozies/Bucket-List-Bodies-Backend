@@ -35,7 +35,7 @@ const customerSchema = gql`
         address: AddressInput!
         shipping: ShippingInput
         notes: String
-        #todo allergies => CustomerResolvers.ts line 128 too
+        allergies: [String]
     }
 
     input updateCustomerInput{
@@ -46,7 +46,7 @@ const customerSchema = gql`
         address: AddressInput
         shipping: ShippingInput
         notes: String
-        #todo allergies
+        allergies: [String]
     }
 
     type Customer {
