@@ -40,9 +40,8 @@ export const OrderResolvers = {
                 for (const meal of args.order.products.meals) {
                     const params: Stripe.InvoiceItemCreateParams = {
                         customer: args.order.customerID,
-                        description: "", //TODO: Set a description
                         price: meal.priceID,
-                        quantity: 1,//TODO: Count quantity
+                        quantity: 1,
                     }
 
                     const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
@@ -90,8 +89,7 @@ export const OrderResolvers = {
                 pretaxPrice: args.order.pretaxPrice,
                 coupon: args.order.coupon,
                 notes: args.order.notes,
-                // deliveryDate: args.order.deliveryDate.toDateString, //TODO Fix date input
-                deliveryDate: new Date(),
+                deliveryDate: args.order.deliveryDate,
                 creationDate: new Date(),
             })
             return orderModel.findOne({invoiceID: invoiceID})
@@ -115,7 +113,6 @@ export const OrderResolvers = {
                 address: "address" in customer ? customer.address : undefined,
                 shipping: "shipping" in customer ? customer.shipping : undefined,
                 default_source: "default_source" in customer ? customer.default_source : undefined,
-                //todo: ORDERS
                 notes: "description" in customer ? customer.description : undefined
             }
         },
