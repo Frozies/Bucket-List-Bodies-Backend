@@ -95,11 +95,15 @@ export const OrderResolvers = {
             return orderModel.findOne({invoiceID: invoiceID})
         },
 
+
+
         /*updateMealStatus(parent, args, context, info){},
 
         updateOrderStatus(parent, args, context, info){},*/
     },
 
+
+    /** Resolver Chains **/
 
     Order: {
         async customer(parent: any, args: any, context: any, info: any) {

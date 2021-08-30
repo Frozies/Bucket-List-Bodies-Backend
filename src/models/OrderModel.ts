@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-const customerSchema = require('./CustomerModel')
 
 /*
 * An orderProducts schema has: (the products included in an order)
@@ -13,9 +12,11 @@ export const orderProductsSchema = new mongoose.Schema({
         vegetable: String,
         carbohydrate: String,
         sauce: String,
+        status: String,
     }],
     extras: [{
         extraID: String,
+        status: String,
     }]
 });
 
