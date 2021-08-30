@@ -43,6 +43,7 @@ export const productResolvers = {
             let photoURL = args.meal.photoURL
             let newMeal;
 
+            console.log("Creating Meal")
             //Create Stripe Product
             try {
                 const product = await stripe.products.create({
@@ -55,6 +56,7 @@ export const productResolvers = {
                 console.log("Product ID: " + product.id)
             }
             catch (err) {
+                console.log("Error creating Stripe Product: " + err)
                 return "Error creating Stripe Product: " + err;
             }
 
@@ -87,6 +89,7 @@ export const productResolvers = {
                     fatWeight: parseInt(args.meal.fatWeight),
                     carbs: parseInt(args.meal.carbs),
                     calories: parseInt(args.meal.calories),
+                    vegetables: args.meal.vegetables
                 })
             }
             catch (err) {

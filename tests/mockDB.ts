@@ -5,10 +5,11 @@ import {ApolloServer} from "apollo-server-express";
 import {rootResolvers} from "../src/resolvers/rootResolvers";
 import {rootSchema} from "../src/schemas/rootSchema";
 import {mongooseOpts} from "../src/utility/mongooseOpts";
+import exp = require("constants");
 
 
 let mongoServer: MongoMemoryServer;
-export let apolloServer: ApolloServer;
+let apolloServer: ApolloServer;
 
 //todo: this can be its own utility file
 let apolloConfig = {
@@ -24,7 +25,13 @@ before(async () => {
 
     apolloServer = new ApolloServer(apolloConfig);
     console.log("Created Apollo server")
+
+    module.exports = apolloServer;
 });
+
+module.exports.executeOperation = async (args: any) => {
+    return await apolloServer.executeOperation({...args})
+}
 
 module.exports.connect = async () => {
     const uri = mongoServer.getUri();
@@ -39,3 +46,4 @@ after(async () => {
     // await mongoServer.disconnect();
     await mongoServer.stop();
 });
+
