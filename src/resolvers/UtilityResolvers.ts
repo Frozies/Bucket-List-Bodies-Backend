@@ -85,11 +85,5 @@ export const UtilityResolvers = {
             return resolve;
         },
     }
-
-    /*
-    * TODO: Stripe Queries
-    * TODO: Mutations
-    * TODO: Find existing customer for stripe
-    */
 }
 module.exports = UtilityResolvers;

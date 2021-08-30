@@ -18,7 +18,7 @@ import {rootSchema} from "./schemas/rootSchema";
 
 const OrderResolvers = require('./resolvers/OrderResolvers')
 const CustomerResolvers = require('./resolvers/CustomerResolvers')
-const MealResolvers = require('./resolvers/MealResolvers')
+const ProductResolvers = require('./resolvers/productResolvers')
 const UtilityResolvers = require('./resolvers/UtilityResolvers')
 
 
@@ -55,7 +55,7 @@ async function startExpressApolloServer() {
         // @ts-ignore
         uploads: false,
         typeDefs: rootSchema,
-        resolvers: [UtilityResolvers, MealResolvers, OrderResolvers, CustomerResolvers],
+        resolvers: [UtilityResolvers, ProductResolvers, OrderResolvers, CustomerResolvers],
     });
 
     await server.start();
