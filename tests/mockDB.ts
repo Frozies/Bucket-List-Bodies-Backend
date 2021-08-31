@@ -38,6 +38,10 @@ module.exports.connect = async () => {
     await mongoose.connect(uri, mongooseOpts);
 }
 
+module.exports.disconnect = async () => {
+    await mongoose.disconnect();
+}
+
 module.exports.getUri = async () => {
     return mongoServer.getUri();
 }

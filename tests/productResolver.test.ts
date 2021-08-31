@@ -78,6 +78,46 @@ describe('Product Resolvers Unit Testing', () => {
                 });
                 expect(result.errors[0].message).to.equal('Error creating Stripe Product: Error: Missing required param: name.')
             });
+
+            it('Throw Error creating stripe price', async () => {
+                const result = await mockDB.executeOperation({
+                    query: CREATE_MEAL,
+                    variables: {
+                        "createMealMeal": {
+                            title: "Blackened Chicken",
+                            description: "A fresh cooked chicken and veggie.",
+                            photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg",
+                        }
+                    }
+                });
+                expect(result.errors[0].message).to.equal('Error creating Stripe Price: Error: Invalid integer: NaN')
+            });
+
+            it('Throw Error creating mealModel document', async () => {
+                mockDB.disconnect()
+                const result = await mockDB.executeOperation({
+                    query: CREATE_MEAL,
+                    variables: {
+                        "createMealMeal": {
+                            title: "Blackened Chicken",
+                            vegetables: ["Broccoli", "Green Beans"],
+                            description: "A fresh cooked chicken and veggie.",
+                            photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg",
+                            pretaxPrice: "9.99",
+                            proteinWeight: "5",
+                            fatWeight: "10",
+                            carbs: "15",
+                            calories: "20",
+                        }
+                    }
+                });
+
+                expect(result.errors[0].message).to.equal('Error pushing meal to MongoDB: MongooseError: Operation `meals.insertOne()` buffering timed out after 10000ms')
+
+                after(()=>{
+                    mockDB.connect()
+                })
+            });
         });
 
     });

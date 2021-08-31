@@ -97,7 +97,7 @@ export const productResolvers = {
                 throw new Error("Error pushing meal to MongoDB: " + err);
             }
             finally {
-                return newMeal
+                if (newMeal != undefined) return newMeal
             }
         },
 
