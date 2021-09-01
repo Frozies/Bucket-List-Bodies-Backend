@@ -118,7 +118,7 @@ export const productResolvers = {
             //Update Stripe Product
             try {
                 const params: Stripe.ProductUpdateParams = {
-                    active: args.meal.active ? args.meal.active : undefined,
+                    // active: args.meal.active ? args.meal.active : undefined, TODO: Fix this, and uncomment this line
                     description: args.meal.description ? args.meal.description : undefined,
                     images: [args.meal.photoURL ? args.meal.photoURL : undefined],
                     name: args.meal.title ? args.meal.title : undefined,

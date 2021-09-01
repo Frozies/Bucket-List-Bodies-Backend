@@ -7,6 +7,7 @@ const {apolloServer} = require('./mockDB');
 const mockDB = require('./mockDB');
 
 let mealModel: any;
+let productID: string;
 
 
 //Connect to the mock database before testing
@@ -67,6 +68,9 @@ describe('Product Resolvers Unit Testing', () => {
                 expect(result.data.createMeal.fatWeight).to.equal(10);
                 expect(result.data.createMeal.carbs).to.equal(15);
                 expect(result.data.createMeal.calories).to.equal(20);
+
+                //set the productID to be used in later queries.
+                productID = result.data.createMeal.productID
             });
 
             it('Throw Error creating stripe product', async () => {
@@ -114,12 +118,68 @@ describe('Product Resolvers Unit Testing', () => {
 
                 expect(result.errors[0].message).to.equal('Error pushing meal to MongoDB: MongooseError: Operation `meals.insertOne()` buffering timed out after 10000ms')
 
-                after(()=>{
-                    mockDB.connect()
-                })
+                //Reconnect to the database because we severed the connection to test the error message.
+                mockDB.connect()
             });
         });
 
+        describe('updateMeal', () => {
+            it('Successfully update all parameters of a meal', async () => {
+                const UPDATE_MEAL = gql`
+                    mutation UpdateMealMutation($updateMealMeal: updateMealInput) {
+                        updateMeal(meal: $updateMealMeal) {
+                            productID
+                            priceID
+                            title
+                            vegetables
+                            photoURL
+                            description
+                            pretaxPrice
+                            proteinWeight
+                            fatWeight
+                            carbs
+                            calories
+                        }
+                    }
+                `;
+
+                const result = await mockDB.executeOperation({
+                    query: UPDATE_MEAL,
+                    variables: {
+                        "updateMealMeal": {
+                            productID: productID,
+                            title: "Spaghetti",
+                            vegetables: ["Roasted Tomatoes"],
+                            description: "Fresh cooked mom's spaghetti!",
+                            photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1629420667/kjf28kcvywbbwqng8jld.jpg",
+                            proteinWeight: 4,
+                            fatWeight: 15,
+                            carbs: 20,
+                            calories: 25,
+                        }
+                    }
+                });
+                if (result.errors != undefined) console.log(result.errors);
+                expect(result.errors).to.undefined;
+
+                expect(result.data.updateMeal.title).to.equal("Spaghetti");
+                expect(result.data.updateMeal.vegetables).to.members(['Roasted Tomatoes'])
+                expect(result.data.updateMeal.description).to.equal('Fresh cooked mom\'s spaghetti!');
+                expect(result.data.updateMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1629420667/kjf28kcvywbbwqng8jld.jpg')
+                expect(result.data.updateMeal.proteinWeight).to.equal(4);
+                expect(result.data.updateMeal.fatWeight).to.equal(15);
+                expect(result.data.updateMeal.carbs).to.equal(20);
+                expect(result.data.updateMeal.calories).to.equal(25);
+            });
+        });
+
+        describe('updateMealPrice', () => {
+
+        });
+
+        describe('deleteMeal', () => {
+
+        });
     });
 
     /*describe('Queries', () => {
@@ -148,21 +208,8 @@ describe('Product Resolvers Unit Testing', () => {
     });
 
     describe('Mutations', () => {
-        describe('createMeal', () => {
-            
-        });
         
-        describe('updateMeal', () => {
-            
-        });
-        
-        describe('updateMealPrice', () => {
-            
-        });
-        
-        describe('deleteMeal', () => {
-            
-        });
+
 
         describe('createExtra', () => {
             
