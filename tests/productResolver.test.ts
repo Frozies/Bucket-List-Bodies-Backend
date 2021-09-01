@@ -8,6 +8,7 @@ const mockDB = require('./mockDB');
 
 let mealModel: any;
 let productID: string;
+let priceID: string;
 
 
 //Connect to the mock database before testing
@@ -71,6 +72,7 @@ describe('Product Resolvers Unit Testing', () => {
 
                 //set the productID to be used in later queries.
                 productID = result.data.createMeal.productID
+                priceID = result.data.createMeal.priceID
             });
 
             it('Throw Error creating stripe product', async () => {
@@ -95,6 +97,8 @@ describe('Product Resolvers Unit Testing', () => {
                     }
                 });
                 expect(result.errors[0].message).to.equal('Error creating Stripe Price: Error: Invalid integer: NaN')
+
+                //todo: Clear the test data out of stripe.
             });
 
             it('Throw Error creating mealModel document', async () => {
@@ -120,29 +124,30 @@ describe('Product Resolvers Unit Testing', () => {
 
                 //Reconnect to the database because we severed the connection to test the error message.
                 mockDB.connect()
+                //todo: Clear the test data out of stripe.
             });
         });
 
         describe('updateMeal', () => {
-            it('Successfully update all parameters of a meal', async () => {
-                const UPDATE_MEAL = gql`
-                    mutation UpdateMealMutation($updateMealMeal: updateMealInput) {
-                        updateMeal(meal: $updateMealMeal) {
-                            productID
-                            priceID
-                            title
-                            vegetables
-                            photoURL
-                            description
-                            pretaxPrice
-                            proteinWeight
-                            fatWeight
-                            carbs
-                            calories
-                        }
+            const UPDATE_MEAL = gql`
+                mutation UpdateMealMutation($updateMealMeal: updateMealInput) {
+                    updateMeal(meal: $updateMealMeal) {
+                        productID
+                        priceID
+                        title
+                        vegetables
+                        photoURL
+                        description
+                        pretaxPrice
+                        proteinWeight
+                        fatWeight
+                        carbs
+                        calories
                     }
-                `;
+                }
+            `;
 
+            it('Successfully update all parameters of a meal', async () => {
                 const result = await mockDB.executeOperation({
                     query: UPDATE_MEAL,
                     variables: {
@@ -174,7 +179,36 @@ describe('Product Resolvers Unit Testing', () => {
         });
 
         describe('updateMealPrice', () => {
+            const UPDATE_MEAL_PRICE = gql`
+                mutation UpdateMealMutation($updateMealPriceMeal: updatePriceInput) {
+                    updateMealPrice(meal: $updateMealPriceMeal) {
+                        productID
+                        priceID
+                        pretaxPrice
+                    }
+                }
+            `;
 
+            it('Successfully update the price of a meal', async () => {
+                const result = await mockDB.executeOperation({
+                    query: UPDATE_MEAL_PRICE,
+                    variables: {
+                        "updateMealPriceMeal": {
+                            productID: productID,
+                            priceID: priceID,
+                            pretaxPrice: "15.99"
+                        }
+                    }
+                });
+                if (result.errors != undefined) console.log(result.errors);
+                expect(result.errors).to.undefined;
+
+                expect(result.data.updateMealPrice.productID).to.equal(productID)
+                expect(result.data.updateMealPrice.priceID).not.equal(priceID)
+                expect(result.data.updateMealPrice.pretaxPrice).to.equal(15.99)
+
+                priceID = result.data.updateMealPrice.priceID;
+            });
         });
 
         describe('deleteMeal', () => {
