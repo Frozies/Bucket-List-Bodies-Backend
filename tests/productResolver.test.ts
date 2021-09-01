@@ -2,13 +2,12 @@ import {mealSchema} from "../src/models/mealModel";
 import * as mongoose from "mongoose";
 import {expect} from "chai";
 import { gql } from "apollo-server-express";
-const {apolloServer} = require('./mockDB');
 
 const mockDB = require('./mockDB');
 
 let mealModel: any;
-let productID: string;
-let priceID: string;
+let testProductID: string;
+let testPriceID: string;
 
 
 //Connect to the mock database before testing
@@ -71,8 +70,8 @@ describe('Product Resolvers Unit Testing', () => {
                 expect(result.data.createMeal.calories).to.equal(20);
 
                 //set the productID to be used in later queries.
-                productID = result.data.createMeal.productID
-                priceID = result.data.createMeal.priceID
+                testProductID = result.data.createMeal.productID
+                testPriceID = result.data.createMeal.priceID
             });
 
             it('Throw Error creating stripe product', async () => {
@@ -97,8 +96,6 @@ describe('Product Resolvers Unit Testing', () => {
                     }
                 });
                 expect(result.errors[0].message).to.equal('Error creating Stripe Price: Error: Invalid integer: NaN')
-
-                //todo: Clear the test data out of stripe.
             });
 
             it('Throw Error creating mealModel document', async () => {
@@ -152,7 +149,7 @@ describe('Product Resolvers Unit Testing', () => {
                     query: UPDATE_MEAL,
                     variables: {
                         "updateMealMeal": {
-                            productID: productID,
+                            productID: testProductID,
                             title: "Spaghetti",
                             vegetables: ["Roasted Tomatoes"],
                             description: "Fresh cooked mom's spaghetti!",
@@ -194,8 +191,8 @@ describe('Product Resolvers Unit Testing', () => {
                     query: UPDATE_MEAL_PRICE,
                     variables: {
                         "updateMealPriceMeal": {
-                            productID: productID,
-                            priceID: priceID,
+                            productID: testProductID,
+                            priceID: testPriceID,
                             pretaxPrice: "15.99"
                         }
                     }
@@ -203,24 +200,43 @@ describe('Product Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-                expect(result.data.updateMealPrice.productID).to.equal(productID)
-                expect(result.data.updateMealPrice.priceID).not.equal(priceID)
+                expect(result.data.updateMealPrice.productID).to.equal(testProductID)
+                expect(result.data.updateMealPrice.priceID).not.equal(testPriceID)
                 expect(result.data.updateMealPrice.pretaxPrice).to.equal(15.99)
 
-                priceID = result.data.updateMealPrice.priceID;
+                testPriceID = result.data.updateMealPrice.priceID;
             });
         });
 
         describe('deleteMeal', () => {
+            const DELETE_MEAL = gql`
+                mutation UpdateMealMutation($deleteMealMeal: deleteMealInput) {
+                    deleteMeal(meal: $deleteMealMeal)
+                }
+            `;
 
+            it('Successfully delete meal', async () => {
+                const result = await mockDB.executeOperation({
+                    query: DELETE_MEAL,
+                    variables: {
+                        "deleteMealMeal": {
+                            productID: testProductID,
+                        }
+                    }
+                });
+                if (result.errors != undefined) console.log(result.errors);
+                expect(result.errors).to.undefined;
+
+                expect(result.data.deleteMeal).to.equal("Deleted: " + testProductID)
+            });
         });
     });
 
-    /*describe('Queries', () => {
+    describe('Queries', () => {
         it('Retrieve all meals', () => {
 
         });
-    });*/
+    });
 
 
     /*describe('Queries', () => {

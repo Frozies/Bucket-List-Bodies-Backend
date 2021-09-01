@@ -17,7 +17,7 @@ const productSchema = gql`
         createMeal(meal: createMealInput): Meal
 
         #Using the ID from a meal, delete it.
-        deleteMeal(productID: String): String
+        deleteMeal(meal: deleteMealInput): String
 
         #Using the ID from a meal, update it.
         updateMeal(meal: updateMealInput): Meal
@@ -118,6 +118,10 @@ const productSchema = gql`
         carbs: Int
         calories: Int
         active: Boolean
+    },
+
+    input deleteMealInput {
+        productID: String
     },
 `;
 

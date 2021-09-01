@@ -102,14 +102,28 @@ export const productResolvers = {
         },
 
         deleteMeal: async(parent: any, args: any, context: any, info: any) => {
-            return mealModel.findByIdAndDelete(args.meal, (err: any, docs: any) => {
-                if (err){
-                    console.log(err)
-                }
-                else{
-                    console.log("Deleted: ", docs);
-                }
-            })
+            //Deactivate meal on stripe
+            try {
+                await stripe.products.update(
+                    args.meal.productID,
+                    {active:false}
+                );
+            }
+            catch (err) {
+                console.log("Error deactivating product on stripe: " + err);
+                return ("Error deactivating product on stripe: " + err);
+            }
+
+            //delete meal from db
+            try {
+                const deletedMeal = mealModel.findOneAndDelete({productID: args.meal.productID});
+                console.log("Deleted: " + deletedMeal._conditions.productID);
+                return ("Deleted: " + deletedMeal._conditions.productID);
+            }
+            catch (err) {
+                console.log("Error deleting product: " + err);
+                throw new Error("Error deleting product: " + err);
+            }
         },
 
         updateMeal: async(parent: any, args: any, context: any, info: any) => {
