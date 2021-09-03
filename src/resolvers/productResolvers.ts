@@ -2,12 +2,12 @@ import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
 import _ from "lodash";
 import {StatusCode} from "./UtilityResolvers";
-import {extraModel} from "../models/extraModel";
 
+const extraModel = require('../models/extraModel');
 const mealModel = require('../models/mealModel');
 
-const calculateMealPrice = (inputValue: string) => {
-    return  Math.ceil( parseInt(String(parseFloat(inputValue) * 100)))
+const calculateMealPrice = (inputValue: number) => {
+    return  Math.ceil( inputValue * 100)
 }
 
 
@@ -48,8 +48,8 @@ export const productResolvers = {
             try {
                 const product = await stripe.products.create({
                     name: args.meal.title,
-                    description: args.meal.description,
-                    images: [photoURL]
+                    description: args.meal.description ? args.meal.description : "",
+                    images: [photoURL],
                 });
 
                 productID = product.id
@@ -84,11 +84,11 @@ export const productResolvers = {
                     sides: args.meal.sides,
                     description: args.meal.description,
                     photoURL: photoURL,
-                    pretaxPrice: parseFloat(args.meal.pretaxPrice),
-                    proteinWeight: parseInt(args.meal.proteinWeight),
-                    fatWeight: parseInt(args.meal.fatWeight),
-                    carbs: parseInt(args.meal.carbs),
-                    calories: parseInt(args.meal.calories),
+                    pretaxPrice: args.meal.pretaxPrice,
+                    proteinWeight: args.meal.proteinWeight,
+                    fatWeight: args.meal.fatWeight,
+                    carbs: args.meal.carbs,
+                    calories: args.meal.calories,
                     vegetables: args.meal.vegetables
                 })
             }
@@ -117,7 +117,7 @@ export const productResolvers = {
             //delete meal from db
             try {
                 const deletedMeal = mealModel.findOneAndDelete({productID: args.meal.productID});
-                console.log("Deleted: " + deletedMeal._conditions.productID);
+                console.log("Deleted: " + deletedMeal._cbnditions.productID);
                 return ("Deleted: " + deletedMeal._conditions.productID);
             }
             catch (err) {
@@ -257,7 +257,7 @@ export const productResolvers = {
             try {
                 const product = await stripe.products.create({
                     name: args.extra.title,
-                    description: args.extra.description,
+                    description: args.extra.description ? args.extra.description : "",
                     images: [photoURL]
                 });
 
@@ -289,14 +289,14 @@ export const productResolvers = {
                 newExtra = await extraModel.create({
                     productID: productID,
                     priceID: priceID,
-                    title: args.meal.title,
-                    description: args.meal.description,
+                    title: args.extra.title,
+                    description: args.extra.description,
                     photoURL: photoURL,
-                    pretaxPrice: parseFloat(args.meal.pretaxPrice),
-                    proteinWeight: parseInt(args.meal.proteinWeight),
-                    fatWeight: parseInt(args.meal.fatWeight),
-                    carbs: parseInt(args.meal.carbs),
-                    calories: parseInt(args.meal.calories),
+                    pretaxPrice: args.extra.pretaxPrice,
+                    proteinWeight: args.extra.proteinWeight,
+                    fatWeight: args.extra.fatWeight,
+                    carbs: args.extra.carbs,
+                    calories: args.extra.calories,
                 })
             }
             catch (err) {
@@ -309,16 +309,28 @@ export const productResolvers = {
         },
 
         deleteExtra: async(parent: any, args: any, context: any, info: any) => {
-            // @ts-ignore
-            //TODO: this ts-ignore is hiding some dumb error... Also check the ID
-            return extraModel.findByIdAndDelete( {productID: args.extra}, (err: any, docs: any) => {
-                if (err){
-                    console.log(err)
-                }
-                else{
-                    console.log("Deleted: ", docs);
-                }
-            })
+            //Deactivate extra on stripe
+            try {
+                await stripe.products.update(
+                    args.extra.productID,
+                    {active:false}
+                );
+            }
+            catch (err) {
+                console.log("Error deactivating product on stripe: " + err);
+                return ("Error deactivating product on stripe: " + err);
+            }
+
+            //delete extra from db
+            try {
+                const deletedExtra = extraModel.findOneAndDelete({productID: args.extra.productID});
+                console.log("Deleted: " + deletedExtra._conditions.productID);
+                return ("Deleted: " + deletedExtra._conditions.productID);
+            }
+            catch (err) {
+                console.log("Error deleting product: " + err);
+                throw new Error("Error deleting product: " + err);
+            }
         },
 
         updateExtra: async(parent: any, args: any, context: any, info: any) => {

@@ -27,28 +27,28 @@ const productSchema = gql`
 
 
         #Creates a new Extra and adds it to the database
-        createExtra(Extra: createExtraInput): Extra
+        createExtra(extra: createExtraInput): Extra
 
         #Using the ID from a Extra, delete it.
-        deleteExtra(productID: String): String
+        deleteExtra(extra: deleteExtraInput): String
 
         #Using the ID from a Extra, update it.
-        updateExtra(Extra: updateExtraInput): Extra
+        updateExtra(extra: updateExtraInput): Extra
 
         #Create a new price in stripe and disable the old one.
-        updateExtraPrice(Extra: updatePriceInput): Extra
+        updateExtraPrice(extra: updatePriceInput): Extra
     },
 
     input createMealInput {
-        title: String
+        title: String!
         vegetables: [String]
         description: String
-        photoURL: String
-        pretaxPrice: String
-        proteinWeight: String
-        fatWeight: String
-        carbs: String
-        calories: String
+        photoURL: String!
+        pretaxPrice: Float!
+        proteinWeight: Int
+        fatWeight: Int
+        carbs: Int
+        calories: Int
     },
 
     type Meal {
@@ -79,9 +79,9 @@ const productSchema = gql`
     },
 
     input updatePriceInput {
-        pretaxPrice: String
-        priceID: String
-        productID: String
+        pretaxPrice: Float!
+        priceID: String!
+        productID: String!
     },
 
     type Extra {
@@ -100,12 +100,12 @@ const productSchema = gql`
     input createExtraInput {
         title: String
         description: String
-        photoURL: String
-        pretaxPrice: String
-        proteinWeight: String
-        fatWeight: String
-        carbs: String
-        calories: String
+        photoURL: String!
+        pretaxPrice: Float!
+        proteinWeight: Int
+        fatWeight: Int
+        carbs: Int
+        calories: Int
     },
     
     input updateExtraInput {
@@ -121,6 +121,10 @@ const productSchema = gql`
     },
 
     input deleteMealInput {
+        productID: String
+    },
+
+    input deleteExtraInput {
         productID: String
     },
 `;
