@@ -101,7 +101,7 @@ describe('Customer Resolvers Unit Testing', () => {
                 expect(result.data.createCustomer.shipping.address.state).to.equal('DC');
                 expect(result.data.createCustomer.shipping.name).to.equal('Joe Biden');
 
-                testCustomerID = result.data.createCustomer.id;
+                testCustomerID = result.data.createCustomer.customerId;
             });
         });
 
@@ -110,7 +110,7 @@ describe('Customer Resolvers Unit Testing', () => {
             const UPDATE_CUSTOMER = gql`
                 mutation Mutation($updateCustomerCustomer: updateCustomerInput) {
                     updateCustomer(customer: $updateCustomerCustomer) {
-                        id
+                        customerId
                         name
                         email
                         phone
@@ -133,23 +133,24 @@ describe('Customer Resolvers Unit Testing', () => {
                         }
                         default_source
                         notes
+                        allergies
                     }
                 }
             `;
 
             /**This is an example of changing the shipping and delivery information to a spouse without changing address.
              * */
-            it('Successfully update parameters of a meal', async () => {
+            it('Successfully update parameters of a customer', async () => {
                 const result = await mockDB.executeOperation({
                     query: UPDATE_CUSTOMER,
                     variables: {
                         "updateCustomerCustomer": {
-                            "id": testCustomerID,
+                            "customerId": testCustomerID,
                             "name": 'Kamala Harris',
                             "email": 'KamalaHarrise@whitehouse.gov',
                             "phone": '202-111-2292',
                             "shipping": {
-                                "name": 'Kamala Harris'
+                                "name": 'Kamala Harris',
                             },
                             "notes": 'This is a change to a simple note.',
                             "allergies": ['Nuts', 'Tomatoes', 'Eggs']
@@ -179,24 +180,6 @@ describe('Customer Resolvers Unit Testing', () => {
                 expect(result.data.updateCustomer.shipping.name).to.equal('Kamala Harris');
             });
         });
-
-        /*Disabled as stripe doesnt like it when you delete a customer. Perhaps it can be used to purge our DB.*/
-        /*describe('deleteCustomer', () => {
-
-            it('Successfully delete meal', async () => {
-                const result = await mockDB.executeOperation({
-                    query: DELETE_CUSTOMER,
-                    variables: {
-
-                    }
-                });
-                if (result.errors != undefined) console.log(result.errors);
-                expect(result.errors).to.undefined;
-
-                expect(result.data.deleteMeal).to.equal("Deleted: " + testMealProductID)
-            });
-        });*/
-
     });
 
     describe('Queries', () => {
@@ -205,7 +188,7 @@ describe('Customer Resolvers Unit Testing', () => {
             const GET_ALL_CUSTOMERS = gql`
                 query Query {
                     getAllCustomers {
-                        id
+                        customerId
                     }
                 }
             `
@@ -216,14 +199,16 @@ describe('Customer Resolvers Unit Testing', () => {
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            expect(result.data.getAllCustomers[0].id).to.equal(testCustomerID)
+            console.table(result.data.getAllCustomers)
+
+            expect(result.data.getAllCustomers[0].customerId).to.equal(testCustomerID)
         });
 
         it('Retrieve specific customer', async () => {
             const RETRIEVE_CUSTOMER = gql`
                 query Query($getCustomerId: String) {
                     getCustomer(id: $getCustomerId) {
-                        id
+                        customerId
                     }
                 }
             `;
@@ -237,7 +222,29 @@ describe('Customer Resolvers Unit Testing', () => {
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            expect(result.data.getAllCustomers[0].id).to.equal(testCustomerID)
+            expect(result.data.getCustomer.customerId).to.equal(testCustomerID)
+        });
+    });
+
+    describe('deleteCustomer', () => {
+
+        const DELETE_CUSTOMER = gql`
+            mutation Mutation($deleteCustomerCustomerId: String) {
+                deleteCustomer(customerId: $deleteCustomerCustomerId)
+            }
+        `;
+
+        it('Successfully delete customer', async () => {
+            const result = await mockDB.executeOperation({
+                query: DELETE_CUSTOMER,
+                variables: {
+                    "deleteCustomerCustomerId": testCustomerID
+                }
+            });
+            if (result.errors != undefined) console.log(result.errors);
+            expect(result.errors).to.undefined;
+
+            expect(result.data.deleteCustomer).to.equal(true)
         });
     });
 
