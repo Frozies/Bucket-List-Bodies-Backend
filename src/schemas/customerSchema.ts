@@ -7,7 +7,7 @@ const customerSchema = gql`
             getCustomer(id: String): Customer
 
             #Retrieves all customers
-            getAllCustomers(id: String): [Customer]
+            getAllCustomers: [Customer]
             
 #            #Retrieves all customers that do have a current subscription or order that has yet been completed.
 #            getAllActiveCustomers: [Customer]
@@ -39,7 +39,7 @@ const customerSchema = gql`
     }
 
     input updateCustomerInput{
-        id: String!
+        customerId: String!
         name: String
         email: String
         phone: String
@@ -50,7 +50,7 @@ const customerSchema = gql`
     }
 
     type Customer {
-        id: String
+        customerId: String
         name: String
         email: String
         phone: String
@@ -59,6 +59,7 @@ const customerSchema = gql`
         default_source: String
         orders: [Order]
         notes: String
+        allergies: [String]
     }
 `;
 

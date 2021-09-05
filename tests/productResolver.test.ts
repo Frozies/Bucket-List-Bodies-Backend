@@ -638,3 +638,5 @@ describe('Product Resolvers Unit Testing', () => {
     });
 
 });
+
+export default {}

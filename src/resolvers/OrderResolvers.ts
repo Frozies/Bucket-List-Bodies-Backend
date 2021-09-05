@@ -29,7 +29,7 @@ export const OrderResolvers = {
     },
 
     Mutation: {
-        async manualOrderCreation(parent: any, args: any, context: any, info: any) {
+        async createOrder(parent: any, args: any, context: any, info: any) {
             // Note to self: It might be a smart move to pull the first item out of the order,
             //  create one line item, then create the invoice, then add the rest of the line
             // items to the invoice. or something similar.

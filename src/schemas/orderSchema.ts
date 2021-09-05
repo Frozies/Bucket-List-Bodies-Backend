@@ -35,10 +35,10 @@ const orderSchema = gql`
 
     extend type Mutation {
         #On the administration dashboard, create a new order manually.
-        manualOrderCreation(order: manualOrderCreationInput): Order
+        createOrder(order: createOrderInput): Order
 
         #Update an order's information.
-#        updateOrder(order: orderUpdateInput): Order
+        #        updateOrder(order: orderUpdateInput): Order
 
         #        #Updates a specific meal if it has been made
         #        updateMealStatus(status: String): Boolean
@@ -79,7 +79,7 @@ const orderSchema = gql`
         status: StatusCode!
     },
 
-    input manualOrderCreationInput {
+    input createOrderInput {
         customerID: String!
         products: orderedProductsInput!
         coupon: String
@@ -105,32 +105,32 @@ const orderSchema = gql`
     },
 
     #todo: Update an invoice. I believe i need to break this down more.
-#    input orderUpdateInput {
-#        invoiceID: String!
-#        products: orderedProductsUpdateInput
-#        status: String
-#        pretaxPrice: Float
-#        notes: String
-#        deliveredDate: Date
-#    },
-#    
-#    input orderedProductsUpdateInput {
-#        meals: [orderedMealUpdateInput]
-#        extras: [orderedExtraUpdateInput]
-#    },
-#
-#    input orderedMealUpdateInput {
-#        proteinID: String!
-#        priceID: String
-#        vegetable: String
-#        carbohydrate: String
-#        sauce: String
-#    },
-#
-#    input orderedExtraUpdateInput {
-#        extraID: String!
-#        extrasPriceID: String
-#    },
+    #    input orderUpdateInput {
+    #        invoiceID: String!
+    #        products: orderedProductsUpdateInput
+    #        status: String
+    #        pretaxPrice: Float
+    #        notes: String
+    #        deliveredDate: Date
+    #    },
+    #    
+    #    input orderedProductsUpdateInput {
+    #        meals: [orderedMealUpdateInput]
+    #        extras: [orderedExtraUpdateInput]
+    #    },
+    #
+    #    input orderedMealUpdateInput {
+    #        proteinID: String!
+    #        priceID: String
+    #        vegetable: String
+    #        carbohydrate: String
+    #        sauce: String
+    #    },
+    #
+    #    input orderedExtraUpdateInput {
+    #        extraID: String!
+    #        extrasPriceID: String
+    #    },
 
 `;
 

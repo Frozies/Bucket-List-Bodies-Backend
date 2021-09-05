@@ -1,98 +1,187 @@
-import {mealSchema} from "../src/models/mealModel";
-import * as mongoose from "mongoose";
 import {expect} from "chai";
 import { gql } from "apollo-server-express";
 import {before} from "mocha";
 
 const mockDB = require('./mockDB');
 
-let mealModel: any;
-let testMealProductID: string;
-let testMealPriceID: string;
 
-
-let seedMealProductID: string;
-let seedExtraProductID: string;
-
+let testCustomerID: string;
 
 //Connect to the mock database before testing
-/*before(async () => {
+before(async () => {
     await mockDB.connect()
-    mealModel = mongoose.model("Meal", mealSchema)
-});*/
+    // mealModel = mongoose.model("Meal", mealSchema)
+});
 
 describe('Customer Resolvers Unit Testing', () => {
     describe('Mutations', () => {
         describe('createCustomer', () => {
 
-            /*const CREATE_MEAL = gql`
-                mutation CreateMealMutation($createMealMeal: createMealInput) {
-                    createMeal(meal: $createMealMeal) {
-                        productID
-                        priceID
-                        title
-                        vegetables
-                        photoURL
-                        description
-                        pretaxPrice
-                        proteinWeight
-                        fatWeight
-                        carbs
-                        calories
+            const CREATE_CUSTOMER = gql`
+                mutation Mutation($createCustomerCustomer: createNewCustomerInput) {
+                    createCustomer(customer: $createCustomerCustomer) {
+                        notes
+                        customerId
+                        name
+                        email
+                        phone
+                        address {
+                            line1
+                            city
+                            line2
+                            postal_code
+                            state
+                        }
+                        shipping {
+                            name
+                            address {
+                                city
+                                line1
+                                line2
+                                postal_code
+                                state
+                            }
+                        }
+                        allergies
                     }
-                }`*/
+                }
+            `
 
             it('Successfully create customer', async () => {
                 const result = await mockDB.executeOperation({
                     query: CREATE_CUSTOMER,
                     variables: {
+                        "createCustomerCustomer": {
+                            "allergies": ['Nuts', 'Tomatoes'],
+                            "notes": 'This is a simple note',
+                            "phone": '202-456-1111',
+                            "email": 'JoeBiden@whitehouse.gov',
+                            "name": 'Joe Biden',
+                            "address": {
+                                "city": 'Washington',
+                                "line1": '1600 Pennsylvania Avenue NW',
+                                "line2": '',
+                                "postal_code": '20500',
+                                "state": 'DC'
+                            },
+                            "shipping": {
+                                "address": {
+                                    "city": 'Washington',
+                                    "line1": '1600 Pennsylvania Avenue NW',
+                                    "line2": '',
+                                    "postal_code": '20500',
+                                    "state": 'DC'
+                                },
+                                "name": 'Joe Biden'
+                            }
+                        }
                     }
                 });
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-                /*expect(result.data.createMeal.productID).not.equal('' || undefined);
-                expect(result.data.createMeal.priceID).not.equal('' || undefined);
-                expect(result.data.createMeal.title).to.equal("Blackened Chicken");
-                expect(result.data.createMeal.vegetables).to.members(['Broccoli', 'Green Beans'])
-                expect(result.data.createMeal.description).to.equal('A fresh cooked chicken and veggie.');
-                expect(result.data.createMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg')
-                expect(result.data.createMeal.pretaxPrice).to.equal(9.99);
-                expect(result.data.createMeal.proteinWeight).to.equal(5);
-                expect(result.data.createMeal.fatWeight).to.equal(10);
-                expect(result.data.createMeal.carbs).to.equal(15);
-                expect(result.data.createMeal.calories).to.equal(20);*/
+                expect(result.data.createCustomer.customerId).not.equal('' || undefined || null);
 
-                //set the productID to be used in later queries.
-                testMealProductID = result.data.createMeal.productID
-                testMealPriceID = result.data.createMeal.priceID
+                expect(result.data.createCustomer.allergies).to.members(['Nuts', 'Tomatoes']);
+                expect(result.data.createCustomer.notes).to.equal('This is a simple note');
+                expect(result.data.createCustomer.phone).to.equal('202-456-1111');
+                expect(result.data.createCustomer.email).to.equal('JoeBiden@whitehouse.gov');
+                expect(result.data.createCustomer.name).to.equal('Joe Biden');
+
+                expect(result.data.createCustomer.address.city).to.equal('Washington');
+                expect(result.data.createCustomer.address.line1).to.equal('1600 Pennsylvania Avenue NW');
+                expect(result.data.createCustomer.address.line2).to.equal('');
+                expect(result.data.createCustomer.address.postal_code).to.equal('20500');
+                expect(result.data.createCustomer.address.state).to.equal('DC');
+
+                expect(result.data.createCustomer.shipping.address.city).to.equal('Washington');
+                expect(result.data.createCustomer.shipping.address.line1).to.equal('1600 Pennsylvania Avenue NW');
+                expect(result.data.createCustomer.shipping.address.line2).to.equal('');
+                expect(result.data.createCustomer.shipping.address.postal_code).to.equal('20500');
+                expect(result.data.createCustomer.shipping.address.state).to.equal('DC');
+                expect(result.data.createCustomer.shipping.name).to.equal('Joe Biden');
+
+                testCustomerID = result.data.createCustomer.id;
             });
         });
 
         describe('updateCustomer', () => {
 
-            it('Successfully update all parameters of a meal', async () => {
+            const UPDATE_CUSTOMER = gql`
+                mutation Mutation($updateCustomerCustomer: updateCustomerInput) {
+                    updateCustomer(customer: $updateCustomerCustomer) {
+                        id
+                        name
+                        email
+                        phone
+                        address {
+                            state
+                            postal_code
+                            line2
+                            line1
+                            city
+                        }
+                        shipping {
+                            address {
+                                city
+                                line1
+                                line2
+                                postal_code
+                                state
+                            }
+                            name
+                        }
+                        default_source
+                        notes
+                    }
+                }
+            `;
+
+            /**This is an example of changing the shipping and delivery information to a spouse without changing address.
+             * */
+            it('Successfully update parameters of a meal', async () => {
                 const result = await mockDB.executeOperation({
                     query: UPDATE_CUSTOMER,
                     variables: {
-
+                        "updateCustomerCustomer": {
+                            "id": testCustomerID,
+                            "name": 'Kamala Harris',
+                            "email": 'KamalaHarrise@whitehouse.gov',
+                            "phone": '202-111-2292',
+                            "shipping": {
+                                "name": 'Kamala Harris'
+                            },
+                            "notes": 'This is a change to a simple note.',
+                            "allergies": ['Nuts', 'Tomatoes', 'Eggs']
+                        }
                     }
                 });
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-                /*expect(result.data.updateMeal.title).to.equal("Spaghetti");
-                expect(result.data.updateMeal.vegetables).to.members(['Roasted Tomatoes'])
-                expect(result.data.updateMeal.description).to.equal('Fresh cooked mom\'s spaghetti!');
-                expect(result.data.updateMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1629420667/kjf28kcvywbbwqng8jld.jpg')
-                expect(result.data.updateMeal.proteinWeight).to.equal(4);
-                expect(result.data.updateMeal.fatWeight).to.equal(15);
-                expect(result.data.updateMeal.carbs).to.equal(20);
-                expect(result.data.updateMeal.calories).to.equal(25);*/
+                expect(result.data.updateCustomer.allergies).to.members(['Nuts', 'Tomatoes', 'Eggs']);
+                expect(result.data.updateCustomer.notes).to.equal('This is a change to a simple note.');
+                expect(result.data.updateCustomer.phone).to.equal('202-111-2292');
+                expect(result.data.updateCustomer.email).to.equal('KamalaHarrise@whitehouse.gov');
+                expect(result.data.updateCustomer.name).to.equal('Kamala Harris');
+
+                expect(result.data.updateCustomer.address.city).to.equal('Washington');
+                expect(result.data.updateCustomer.address.line1).to.equal('1600 Pennsylvania Avenue NW');
+                expect(result.data.updateCustomer.address.line2).to.equal('');
+                expect(result.data.updateCustomer.address.postal_code).to.equal('20500');
+                expect(result.data.updateCustomer.address.state).to.equal('DC');
+
+                expect(result.data.updateCustomer.shipping.address.city).to.equal('Washington');
+                expect(result.data.updateCustomer.shipping.address.line1).to.equal('1600 Pennsylvania Avenue NW');
+                expect(result.data.updateCustomer.shipping.address.line2).to.equal('');
+                expect(result.data.updateCustomer.shipping.address.postal_code).to.equal('20500');
+                expect(result.data.updateCustomer.shipping.address.state).to.equal('DC');
+                expect(result.data.updateCustomer.shipping.name).to.equal('Kamala Harris');
             });
         });
 
-        describe('deleteCustomer', () => {
+        /*Disabled as stripe doesnt like it when you delete a customer. Perhaps it can be used to purge our DB.*/
+        /*describe('deleteCustomer', () => {
 
             it('Successfully delete meal', async () => {
                 const result = await mockDB.executeOperation({
@@ -106,153 +195,50 @@ describe('Customer Resolvers Unit Testing', () => {
 
                 expect(result.data.deleteMeal).to.equal("Deleted: " + testMealProductID)
             });
-        });
+        });*/
 
     });
 
     describe('Queries', () => {
 
-        /*it('Seed with meal', async () => {
-            const result = await mockDB.executeOperation({
-                query: CREATE_MEAL,
-                variables: {
-                    "createMealMeal": {
-                        title: "Blackened Chicken",
-                        vegetables: ["Broccoli", "Green Beans"],
-                        description: "A fresh cooked chicken and veggie.",
-                        photoURL: "https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg",
-                        pretaxPrice: 9.99,
-                        proteinWeight: 5,
-                        fatWeight: 10,
-                        carbs: 15,
-                        calories: 20,
-                    }
-                }
-            });
-            if (result.errors != undefined) console.log(result.errors);
-            expect(result.errors).to.undefined;
-
-            expect(result.data.createMeal.productID).not.equal('' || undefined);
-            expect(result.data.createMeal.priceID).not.equal('' || undefined);
-            expect(result.data.createMeal.title).to.equal("Blackened Chicken");
-            expect(result.data.createMeal.vegetables).to.members(['Broccoli', 'Green Beans'])
-            expect(result.data.createMeal.description).to.equal('A fresh cooked chicken and veggie.');
-            expect(result.data.createMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1628629228/ill70niz6u808sni9elf.jpg')
-            expect(result.data.createMeal.pretaxPrice).to.equal(9.99);
-            expect(result.data.createMeal.proteinWeight).to.equal(5);
-            expect(result.data.createMeal.fatWeight).to.equal(10);
-            expect(result.data.createMeal.carbs).to.equal(15);
-            expect(result.data.createMeal.calories).to.equal(20);
-
-            //set the productID to be used in later queries.
-            seedMealProductID = result.data.createMeal.productID
-        });
-
-        it('Seed with Extra', async () => {
-            const result = await mockDB.executeOperation({
-                query: CREATE_EXTRA,
-                variables: {
-                    "createExtraExtra": {
-                        "title": "Egg White Bites",
-                        "description": "Delicious egg white bites!",
-                        "photoURL": "https://res.cloudinary.com/bucketlistbodies/image/upload/v1630536377/Egg-white-veggie-bites_mv1aga.jpg",
-                        "pretaxPrice": 2.00,
-                        "proteinWeight": 10,
-                        "fatWeight": 15,
-                        "carbs": 20,
-                        "calories": 25,
-                    }
-                }
-            });
-            if (result.errors != undefined) console.log(result.errors);
-            expect(result.errors).to.undefined;
-
-            expect(result.data.createExtra.productID).not.equal('' || undefined);
-            expect(result.data.createExtra.priceID).not.equal('' || undefined);
-            expect(result.data.createExtra.title).to.equal("Egg White Bites");
-            expect(result.data.createExtra.description).to.equal('Delicious egg white bites!');
-            expect(result.data.createExtra.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1630536377/Egg-white-veggie-bites_mv1aga.jpg')
-            expect(result.data.createExtra.pretaxPrice).to.equal(2.00);
-            expect(result.data.createExtra.proteinWeight).to.equal(10);
-            expect(result.data.createExtra.fatWeight).to.equal(15);
-            expect(result.data.createExtra.carbs).to.equal(20);
-            expect(result.data.createExtra.calories).to.equal(25);
-
-            //set the productID to be used in later queries.
-            seedExtraProductID = result.data.createExtra.productID
-        });*/
-
         it('Retrieve all customers', async () => {
+            const GET_ALL_CUSTOMERS = gql`
+                query Query {
+                    getAllCustomers {
+                        id
+                    }
+                }
+            `
+
             const result = await mockDB.executeOperation({
-                query: RETRIEVE_ALL_CUSTOMERS
+                query: GET_ALL_CUSTOMERS
             });
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            console.log(result.data.retrieveAllMeals)
-            console.log("seedMeal: " + seedMealProductID)
-
-            expect(result.data.retrieveAllMeals[0].productID).to.equal(seedMealProductID)
+            expect(result.data.getAllCustomers[0].id).to.equal(testCustomerID)
         });
 
         it('Retrieve specific customer', async () => {
+            const RETRIEVE_CUSTOMER = gql`
+                query Query($getCustomerId: String) {
+                    getCustomer(id: $getCustomerId) {
+                        id
+                    }
+                }
+            `;
+
             const result = await mockDB.executeOperation({
                 query: RETRIEVE_CUSTOMER,
                 variables: {
-                    "retrieveMealMeal": seedMealProductID
+                    "getCustomerId": testCustomerID
                 }
             });
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            expect(result.data.retrieveMeal[0].productID).to.equal(seedMealProductID)
+            expect(result.data.getAllCustomers[0].id).to.equal(testCustomerID)
         });
-
-
-        after(()=>{
-            //cleanup
-            const DELETE_EXTRA = gql`
-                mutation DeleteExtraMutation($deleteExtraExtra: deleteExtraInput) {
-                    deleteExtra(extra: $deleteExtraExtra)
-                }
-            `;
-
-            const DELETE_MEAL = gql`
-                mutation DeleteMealMutation($deleteMealMeal: deleteMealInput) {
-                    deleteMeal(meal: $deleteMealMeal)
-                }
-            `;
-
-            it('Delete seed meal', async () => {
-                const result = await mockDB.executeOperation({
-                    query: DELETE_MEAL,
-                    variables: {
-                        "deleteMealMeal": {
-                            productID: seedMealProductID,
-                        }
-                    }
-                });
-                if (result.errors != undefined) console.log(result.errors);
-                expect(result.errors).to.undefined;
-
-                expect(result.data.deleteMeal).to.equal("Deleted: " + seedMealProductID)
-            });
-
-            it('Delete seed extra', async () => {
-                const result = await mockDB.executeOperation({
-                    query: DELETE_EXTRA,
-                    variables: {
-                        "deleteExtraExtra": {
-                            productID: seedExtraProductID,
-                        }
-                    }
-                });
-                if (result.errors != undefined) console.log(result.errors);
-                expect(result.errors).to.undefined;
-
-                expect(result.data.deleteExtra).to.equal("Deleted: " + seedExtraProductID)
-            });
-        })
     });
 
 });

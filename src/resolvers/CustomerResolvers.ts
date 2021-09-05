@@ -1,6 +1,7 @@
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import {customerModel} from "../models/CustomerModel";
+
+const customerModel = require('../models/CustomerModel')
 
 export const CustomerResolvers = {
     Query: {
@@ -64,6 +65,7 @@ export const CustomerResolvers = {
          * */
         async createCustomer(parent: any, args: any, context: any, info: any) {
             let customerID = '';
+            let newCustomer;
 
             // Search stripe for a customer with that email
             try {
@@ -74,72 +76,76 @@ export const CustomerResolvers = {
                     }
                     const customers = await stripe.customers.list(params);
 
-                    if (customers.data.length >= 1) throw "There is a customer with that email already!"
+                    if (customers.data.length > 0) throw "There is a customer with that email already!"
                 }
-
-
-                await findCustomerByEmail().then(async () => {
-
-                    // Create a customer in stripe
-                    try {
-                        const createCustomer = async () => {
-                            //Check if the shipping address has been supplied. if false => use billing address
-                            if (!args.customer.shipping.address) {
-                                args.customer.shipping.address = args.customer.address;
-                            }
-
-                            const params: Stripe.CustomerCreateParams = {
-                                address: {
-                                    city: args.customer.address.city,
-                                    country: "US",
-                                    line1: args.customer.address.line1,
-                                    line2: args.customer.address.line2,
-                                    postal_code: args.customer.address.postal_code,
-                                    state: args.customer.address.state,
-                                },
-                                description: args.customer.notes,
-                                email: args.customer.email,
-                                name: args.customer.name,
-                                phone: args.customer.phone,
-                                shipping: {
-                                    name: args.customer.name,
-                                    address: {
-                                        city: args.customer.shipping.address.city,
-                                        country: "US",
-                                        line1: args.customer.shipping.address.line1,
-                                        line2: args.customer.shipping.address.line2,
-                                        postal_code: args.customer.shipping.address.postal_code,
-                                        state: args.customer.shipping.address.state,
-                                    },
-                                }
-                            };
-
-                            const customer: Stripe.Customer = await stripe.customers.create(params);
-
-                            customerID = customer.id
-                            console.log("Created a new customer: " + customer.id)
-                        };
-
-                        await createCustomer().then(async () => {
-                            //Send customer data to DB.
-                            const customer = await customerModel.create({
-                                id: customerID,
-                                name: args.customer.name,
-                                notes: args.customer.notes,
-                                allergies: args.customer.allergies ? args.customer.allergies : undefined,
-                            })
-                        });
-                    } catch (err) {
-                        console.log(err)
-                        return "Error createCustomer: " + err;
-                    }
-                })
+                await findCustomerByEmail()
             } catch (err) {
-                return "Error findCustomerByEmail: " + err
-            } finally {
-                /* If customerID has been returned by stripe then return that data*/
-                if (customerID != '') return {...args.customer, id: customerID}
+                console.log("Error findCustomerByEmail: " + err)
+                throw new Error("Error findCustomerByEmail: " + err);
             }
+
+            // Create a customer in stripe
+            try {
+                const createCustomer = async () => {
+                    //Check if the shipping address has been supplied. if false => use billing address
+                    if (!args.customer.shipping.address) {
+                        args.customer.shipping.address = args.customer.address;
+                    }
+
+                    const params: Stripe.CustomerCreateParams = {
+                        address: {
+                            city: args.customer.address.city,
+                            country: "US",
+                            line1: args.customer.address.line1,
+                            line2: args.customer.address.line2,
+                            postal_code: args.customer.address.postal_code,
+                            state: args.customer.address.state,
+                        },
+                        description: args.customer.notes,
+                        email: args.customer.email,
+                        name: args.customer.name,
+                        phone: args.customer.phone,
+                        shipping: {
+                            name: args.customer.name,
+                            address: {
+                                city: args.customer.shipping.address.city,
+                                country: "US",
+                                line1: args.customer.shipping.address.line1,
+                                line2: args.customer.shipping.address.line2,
+                                postal_code: args.customer.shipping.address.postal_code,
+                                state: args.customer.shipping.address.state,
+                            },
+                        }
+                    };
+
+                    const customer: Stripe.Customer = await stripe.customers.create(params);
+
+                    customerID = customer.id
+                    console.log("Created a new customer: " + customer.id)
+                };
+                await createCustomer()
+            }
+            catch (err) {
+                console.log("Error creatingCustomer in stripe: " + err)
+                throw new Error("Error creatingCustomer in stripe: " + err);
+            }
+
+            try {
+                console.log("Adding new customer to DB.")
+                //Send customer data to DB.
+                newCustomer = await customerModel.create({
+                    customerId: customerID,
+                    name: args.customer.name,
+                    notes: args.customer.notes,
+                    allergies: args.customer.allergies,
+                })
+            }
+            catch (err) {
+                console.log("Error creatingCustomer in database: " + err)
+                throw new Error("Error creatingCustomer in database: " + err);
+            }
+
+            return newCustomer;
         },
 
         /**
@@ -191,14 +197,53 @@ export const CustomerResolvers = {
                 retrievedOrders = orders.data
             }
             catch (err) {
-                return "Error retrieving orders: " + err
+                console.log("Error retrieving orders: " + err);
+                throw new Error("Error retrieving orders: " + err);
             }
             finally {
                 return retrievedOrders
             }
-        }
+        },
 
-        //Eventually ill need to put cards and stuff for the user side to edit their profile.
+        async email(parent: any, context: any) {
+            const customerID = parent._doc.customerId;
+            console.log("Retrieving Customer email: " + customerID)
+            
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerID)
+            return "email" in customer ? customer.email : undefined
+        },
+
+        async phone(parent: any) {
+            const customerID = parent._doc.customerId;
+            console.log("Retrieving Customer phone: " + customerID)
+
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerID)
+            return "phone" in customer ? customer.phone : undefined
+        },
+
+        async address(parent: any) {
+            const customerID = parent._doc.customerId;
+            console.log("Retrieving Customer address: " + customerID)
+
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerID)
+            return "address" in customer ? customer.address : undefined
+        },
+
+        async shipping(parent: any) {
+            const customerID = parent._doc.customerId;
+            console.log("Retrieving Customer shipping: " + customerID)
+
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerID)
+            return "shipping" in customer ? customer.shipping : undefined
+        },
+
+        async default_source(parent: any) {
+            const customerID = parent._doc.customerId;
+            console.log("Retrieving Customer default_source: " + customerID)
+
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerID)
+            return "default_source" in customer ? customer.default_source : undefined
+        },
     },
 };
 

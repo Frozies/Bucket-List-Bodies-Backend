@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 * allergies: an array of strings that correspond to someones allergies.
 * * */
 export const customerSchema = new mongoose.Schema({
-    id: String,
+    customerId: String,
     name: String,
     cards: [String],
     orders: [String],
