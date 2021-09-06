@@ -117,7 +117,7 @@ export const productResolvers = {
             //delete meal from db
             try {
                 const deletedMeal = mealModel.findOneAndDelete({productID: args.meal.productID});
-                console.log("Deleted: " + deletedMeal._cbnditions.productID);
+                console.log("Deleted: " + deletedMeal._conditions.productID);
                 return ("Deleted: " + deletedMeal._conditions.productID);
             }
             catch (err) {

@@ -525,8 +525,7 @@ describe('Product Resolvers Unit Testing', () => {
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            console.log(result.data.retrieveAllMeals)
-            console.log("seedMeal: " + seedMealProductID)
+            console.log(result.data.retrieveAllMeals[0])
 
             expect(result.data.retrieveAllMeals[0].productID).to.equal(seedMealProductID)
         });
