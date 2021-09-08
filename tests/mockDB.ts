@@ -29,6 +29,9 @@ before(async () => {
     module.exports = apolloServer;
 });
 
+
+//These are exports for use in test files. for example you may want to connect and disconnect from the DB for testing.
+// TODO: add comments here
 module.exports.executeOperation = async (args: any) => {
     return await apolloServer.executeOperation({...args})
 }
@@ -47,6 +50,8 @@ module.exports.getUri = async () => {
 }
 
 after(async () => {
+    //TODO: Clean up all test data from stripe.
+
     // await mongoServer.disconnect();
     await mongoServer.stop();
 });

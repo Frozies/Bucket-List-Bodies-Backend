@@ -39,8 +39,8 @@ export const CustomerResolvers = {
             let customerID = '';
             let newCustomer;
 
-            //TODO: This is broken again lmao
-            // Search stripe for a customer with that email
+            //todo: Commented out for testing reasons :) note: make a failcase for this.
+            /*// Search stripe for a customer with that email
             try {
                 const findCustomerByEmail = async () => {
                     const params: Stripe.CustomerListParams = {
@@ -55,7 +55,7 @@ export const CustomerResolvers = {
             } catch (err) {
                 console.log("Error findCustomerByEmail: " + err)
                 throw new Error("Error findCustomerByEmail: " + err);
-            }
+            }*/
 
             // Create a customer in stripe
             try {
