@@ -1,8 +1,9 @@
 
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import {customerModel, customerSchema} from "../models/CustomerModel";
+import {forEach, map} from "lodash";
 const orderModel = require('../models/OrderModel');
+const customerModel = require('../models/CustomerModel')
 
 export const OrderResolvers = {
     Query: {
@@ -34,7 +35,13 @@ export const OrderResolvers = {
             //  create one line item, then create the invoice, then add the rest of the line
             // items to the invoice. or something similar.
 
-            let invoiceItemIDs: any = [];
+            //I dont think i need to store the entire array in memory...
+            //let invoiceItems: Array<Stripe.InvoiceItem> = [];
+
+            let invoiceItemIDs: Array<string> = [];
+            let totalUnitAmount = 0;
+            let invoiceID: any;
+
 
             //Add each line item to the invoice
             try {
@@ -48,14 +55,14 @@ export const OrderResolvers = {
                     const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
                     console.log("Adding invoice item to invoice: " + invoiceItem.id)
                     invoiceItemIDs.push(invoiceItem.id)
+                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
+                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
                 }
             }
             catch (err) {
                 console.log("Error creating invoice item: " + err);
                 return ("Error creating invoice item: " + err);
             }
-
-            let invoiceID: any;
 
             //Create invoice on customer in stripe
             try {
@@ -71,37 +78,52 @@ export const OrderResolvers = {
             catch (err) {
                 console.log("Error creating invoice: " + err)
             }
+
+            console.log("Sending order to DB")
             //Create Mongoose Model
             try {
+                //insert status into each product
+                let products = () => {
+                    meals: {
+                        for(let meal in args.order.products.meals) {
+                            return {
+                                ...args.order.products.meals[meal],
+                                status: 'UNMADE',
+                            }
+                        }
+                    }
+                    extras: {
+                        for(let extra in args.order.products.extras) {
+                            return {
+                                ...args.order.products.meals[extra],
+                                status: 'UNMADE',
+                            }
+                        }
+                    }
+                }
+                
+                const order = await orderModel.create({
+                    invoiceID: invoiceID,
+                    invoiceItemIDs: invoiceItemIDs,
+                    customerID: args.order.customerID,
 
+                    products: {
+                        ...products()
+                    },
 
+                    status: "UNMADE",
+                    pretaxPrice: totalUnitAmount/100    ,
+                    coupon: args.order.coupon,
+                    notes: args.order.notes,
+                    deliveryDate: args.order.deliveryDate,
+                    creationDate: new Date(),
+                })
             } catch (err) {
                 return "Error pushing meal to MongoDB: " + err;
             }
 
-            console.log("Sent order to DB")
 
-            const order = await orderModel.create({
-                invoiceID: invoiceID,
-                invoiceItemIDs: invoiceItemIDs,
-                customerID: args.order.customerID,
-                products: {
-                    ...args.order.products,
-                    meals: {
-                        status: "UNMADE"
-                    },
-                    extras: {
-                        status: "UNMADE"
-                    }
-                },
-                status: "UNMADE",
-                pretaxPrice: args.order.pretaxPrice,
-                coupon: args.order.coupon,
-                notes: args.order.notes,
-                deliveryDate: args.order.deliveryDate,
-                creationDate: new Date(),
-            })
-
+            console.log("Adding order to Customer's order ledger.")
             //Add order to customer ledger.
             try {
                 await customerModel.findOneAndUpdate({id: args.order.customerID}, {
@@ -115,7 +137,8 @@ export const OrderResolvers = {
                 return ("Error adding order to customer ledger: " + err);
             }
 
-            return orderModel.findOne({invoiceID: invoiceID})
+            const updatedOrder = orderModel.findOne({invoiceID: invoiceID})
+            return updatedOrder
         },
 
         /*async updateOrder(args: any) {
@@ -157,7 +180,7 @@ export const OrderResolvers = {
 
         //Retrieve the productIDs inside an order for the meals.
         async products(parent: any) {
-            console.log("Retrieving Products")
+            console.log("Retrieving products from order chain.")
             let meals: any[] = []
             let extras: any[] = []
 
@@ -169,13 +192,15 @@ export const OrderResolvers = {
                     carbohydrate: meal.carbohydrate,
                     sauce: meal.sauce,
                     priceID: meal.priceID,
+                    status: meal.status
                 })
             })
 
             //make an array of extras
             parent.products.extras.forEach((extra: any) => {
-                extra.push({
+                extras.push({
                     extraID: extra.extraID,
+                    status: extra.status,
                 })
             })
 
