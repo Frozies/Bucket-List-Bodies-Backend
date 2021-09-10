@@ -1,6 +1,8 @@
 import {expect} from "chai";
 import { gql } from "apollo-server-express";
-import exp = require("constants");
+
+const chai = require('chai');
+chai.use(require('chai-datetime'));
 
 const mockDB = require('./mockDB');
 
@@ -261,17 +263,17 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.createOrder.invoiceItemIDs).length(2);
 
                 //Check if both items are in the invoice as items directly
-                expect(result.data.createOrder.invoiceItemIDs[1].productID).to.equal(testMealProductID); //invoice items not product ids
-                expect(result.data.createOrder.invoiceItemIDs[0].productID).to.equal(testExtraProductID);
+                expect(result.data.createOrder.invoiceItemIDs[0]).not.equal('' || undefined);
+                expect(result.data.createOrder.invoiceItemIDs[1]).not.equal('' || undefined);
 
 
                 expect(result.data.createOrder.customer.customerId).to.equal(testCustomerID);
                 expect(result.data.createOrder.products.meals).length(1);
-                expect(result.data.createOrder.products.meals[0].priceID).to.equal(testMealPriceID); //todo fix invoiceID not price id?
+                expect(result.data.createOrder.products.meals[0].proteinID).to.equal(testMealProductID);
                 expect(result.data.createOrder.products.meals[0].status).to.equal('UNMADE');
 
                 expect(result.data.createOrder.products.extras).length(1);
-                expect(result.data.createOrder.products.extras[0].priceID).to.equal(testExtraPriceID);//todo fix
+                expect(result.data.createOrder.products.extras[0].extraID).to.equal(testExtraProductID);
                 expect(result.data.createOrder.products.extras[0].status).to.equal('UNMADE');
 
                 expect(result.data.createOrder.status).to.equal("UNMADE");
@@ -279,7 +281,8 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.createOrder.coupon).to.equal('GYM5');
                 expect(result.data.createOrder.notes).to.equal('Deliver before 5pm');
 
-                expect(result.data.createOrder.creationDate).approximately(0,0) //TODO: Fix time
+                expect(result.data.createOrder.creationDate).to.closeToTime(new Date(), 10)
+
 
             });
         });
