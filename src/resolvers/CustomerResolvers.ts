@@ -3,12 +3,8 @@ import {Stripe} from "stripe";
 import _ from "lodash";
 
 const customerModel = require('../models/CustomerModel')
+const {customerID} = require('../utility/stripe');
 
-const customerID = (_parent: any) => {
-    if (_parent?.customerId) return _parent.customerId;
-    if (_parent._doc?.customerId) return _parent._doc.customerId;
-    if (_parent._conditions?.customerId) return _parent._conditions.customerId;
-}
 
 export const CustomerResolvers = {
     Query: {

@@ -4,6 +4,9 @@ import {Stripe} from "stripe";
 import {forEach, map} from "lodash";
 const orderModel = require('../models/OrderModel');
 const customerModel = require('../models/CustomerModel')
+const {customerID} = require('../utility/stripe');
+
+
 
 export const OrderResolvers = {
     Query: {
@@ -53,7 +56,22 @@ export const OrderResolvers = {
                     }
 
                     const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
-                    console.log("Adding invoice item to invoice: " + invoiceItem.id)
+                    console.log("Adding invoice item Meal to invoice: " + invoiceItem.id)
+                    invoiceItemIDs.push(invoiceItem.id)
+                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
+                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
+                }
+
+                //todo: DUPLICATE CODE make some generics
+                for (const extra of args.order.products.extras) {
+                    const params: Stripe.InvoiceItemCreateParams = {
+                        customer: args.order.customerID,
+                        price: extra.extrasPriceID,
+                        quantity: 1,
+                    }
+
+                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
+                    console.log("Adding invoice item Extra to invoice: " + invoiceItem.id)
                     invoiceItemIDs.push(invoiceItem.id)
                     console.log("Price: " + <number>invoiceItem.price?.unit_amount)
                     totalUnitAmount += <number>invoiceItem.price?.unit_amount;
@@ -83,32 +101,39 @@ export const OrderResolvers = {
             //Create Mongoose Model
             try {
                 //insert status into each product
-                let products = () => {
-                    meals: {
-                        for(let meal in args.order.products.meals) {
-                            return {
-                                ...args.order.products.meals[meal],
-                                status: 'UNMADE',
-                            }
-                        }
-                    }
-                    extras: {
-                        for(let extra in args.order.products.extras) {
-                            return {
-                                ...args.order.products.meals[extra],
-                                status: 'UNMADE',
-                            }
+
+                let meals = () => {
+                    for(let meal in args.order.products.meals) {
+                        return {
+                            ...args.order.products.meals[meal],
+                            status: 'UNMADE',
                         }
                     }
                 }
-                
+                let extras = () => {
+                    for(let extra in args.order.products.extras) {
+                        return {
+                            ...args.order.products.extras[extra],
+                            status: 'UNMADE',
+                        }
+                    }
+                }
+
+
+                console.log("CUSTOMER ID: " + args.order.customerID)
+
                 const order = await orderModel.create({
                     invoiceID: invoiceID,
                     invoiceItemIDs: invoiceItemIDs,
-                    customerID: args.order.customerID,
+                    customerId: args.order.customerID,
 
                     products: {
-                        ...products()
+                        meals: {
+                            ...meals()
+                        },
+                        extras: {
+                            ...extras()
+                        }
                     },
 
                     status: "UNMADE",
@@ -164,10 +189,13 @@ export const OrderResolvers = {
 
     Order: {
         async customer(parent: any, args: any, context: any, info: any) {
-            console.log("Retrieving Customer Data: " + parent.customerID)
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(parent.customerID)
+
+            let customerId = await stripe.invoices.retrieve(parent.invoiceID).then((invoice: any) => {return invoice.customer})
+            console.log("Retrieving Customer Data: " + customerId)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+
             return {
-                id:  customer.id,
+                customerId:  customer.id,
                 name: "name" in customer ? customer.name : undefined,
                 email: "email" in customer ? customer.email : undefined,
                 phone: "phone" in customer ? customer.email : undefined,
@@ -196,6 +224,8 @@ export const OrderResolvers = {
                 })
             })
 
+            console.table(meals)
+
             //make an array of extras
             parent.products.extras.forEach((extra: any) => {
                 extras.push({
@@ -203,10 +233,12 @@ export const OrderResolvers = {
                     status: extra.status,
                 })
             })
+            console.table(extras)
+
 
             return {
-                meals: meals,
-                extras: extras
+            meals: meals,
+            extras: extras
             }
         }
     }
