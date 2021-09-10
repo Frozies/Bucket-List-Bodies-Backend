@@ -120,7 +120,6 @@ export const OrderResolvers = {
                 }
 
 
-                console.log("CUSTOMER ID: " + args.order.customerID)
 
                 const order = await orderModel.create({
                     invoiceID: invoiceID,
@@ -205,15 +204,15 @@ export const OrderResolvers = {
                 notes: "description" in customer ? customer.description : undefined
             }
         },
-
+    },
+    orderedProducts: {
         //Retrieve the productIDs inside an order for the meals.
-        async products(parent: any) {
-            console.log("Retrieving products from order chain.")
+        async meals(parent: any) {
+            console.log("Retrieving meals from order chain.")
             let meals: any[] = []
-            let extras: any[] = []
 
             //make an array of meals
-            parent.products.meals.forEach((meal: any) => {
+            parent.meals.forEach((meal: any) => {
                 meals.push({
                     proteinID: meal.proteinID,
                     vegetable: meal.vegetable,
@@ -223,23 +222,22 @@ export const OrderResolvers = {
                     status: meal.status
                 })
             })
+            return meals
+        },
 
-            console.table(meals)
+        async extras(parent: any) {
+            console.log("Retrieving extas from order chain.")
+            let extras: any[] = []
 
             //make an array of extras
-            parent.products.extras.forEach((extra: any) => {
+            parent.extras.forEach((extra: any) => {
                 extras.push({
                     extraID: extra.extraID,
                     status: extra.status,
                 })
             })
-            console.table(extras)
 
-
-            return {
-            meals: meals,
-            extras: extras
-            }
+            return extras
         }
     }
 };

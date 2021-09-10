@@ -245,19 +245,15 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-                //expect back
-                //order -> customer -> invoiceID -> order
-                /*invoiceID: String!
-                invoiceItemIDs: [String!]!
-                customer: Customer!
-                products: orderedProducts!
-                status: String!
-                pretaxPrice: Float!
-                coupon: String
-                notes: String
-                deliveredDate: Date
-                creationDate: Date!*/
+                console.log("Overall")
                 console.table(result.data.createOrder)
+
+                console.log("meals")
+                console.table(result.data.createOrder.products.meals)
+
+                console.log("extras")
+                console.table(result.data.createOrder.products.extras)
+                console.log("Creation date: " + result.data.createOrder.creationDate)
 
                 expect(result.data.createOrder.invoiceID).not.equal('' || undefined);
 
@@ -268,21 +264,22 @@ describe('Order Resolvers Unit Testing', () => {
 /*                expect(result.data.createOrder.invoiceItemIDs[1].productID).to.equal(testMealProductID); //invoice items not product ids
                 expect(result.data.createOrder.invoiceItemIDs[0].productID).to.equal(testExtraProductID);*/
 
+
                 expect(result.data.createOrder.customer.customerId).to.equal(testCustomerID);
                 expect(result.data.createOrder.products.meals).length(1);
-                // expect(result.data.createOrder.products.meals[0].priceID).to.equal(testMealPriceID); //todo fix
-                expect(result.data.createOrder.products.meals[0].staus).to.equal('UNMADE');
+                // expect(result.data.createOrder.products.meals[0].priceID).to.equal(testMealPriceID); //todo fix invoiceID not price id?
+                expect(result.data.createOrder.products.meals[0].status).to.equal('UNMADE');
+
                 expect(result.data.createOrder.products.extras).length(1);
                 // expect(result.data.createOrder.products.extras[0].priceID).to.equal(testExtraPriceID);//todo fix
                 expect(result.data.createOrder.products.extras[0].status).to.equal('UNMADE');
 
                 expect(result.data.createOrder.status).to.equal("UNMADE");
-                expect(result.data.createOrder.pretaxPrice).to.equal(0); //todo actual calculate price :)
+                expect(result.data.createOrder.pretaxPrice).to.equal(11.99);
                 expect(result.data.createOrder.coupon).to.equal('GYM5');
                 expect(result.data.createOrder.notes).to.equal('Deliver before 5pm');
 
-                expect(result.data.createOrder.deliveredDate).approximately(0,0) //TODO: check time :)
-                expect(result.data.createOrder.creationDate).approximately(0,0)
+                // expect(result.data.createOrder.creationDate).approximately(0,0) //TODO: Fix time
 
             });
         });

@@ -449,6 +449,6 @@ export const productResolvers = {
                 throw new Error("Error updatingExtraPrice: " + err)
             }
         },
-    }
+    },
 }
 module.exports = productResolvers;

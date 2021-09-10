@@ -56,5 +56,11 @@
     ],
     "exit": true,
     "require": "ts-node/register"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "latest",
+      "arch": "x64"
+    }
   }
 }
