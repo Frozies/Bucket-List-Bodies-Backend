@@ -104,33 +104,32 @@ const orderSchema = gql`
         extrasPriceID: String!
     },
 
-    #todo: Update an invoice. I believe i need to break this down more.
-    #    input orderUpdateInput {
-    #        invoiceID: String!
-    #        products: orderedProductsUpdateInput
-    #        status: String
-    #        pretaxPrice: Float
-    #        notes: String
-    #        deliveredDate: Date
-    #    },
-    #    
-    #    input orderedProductsUpdateInput {
-    #        meals: [orderedMealUpdateInput]
-    #        extras: [orderedExtraUpdateInput]
-    #    },
-    #
-    #    input orderedMealUpdateInput {
-    #        proteinID: String!
-    #        priceID: String
-    #        vegetable: String
-    #        carbohydrate: String
-    #        sauce: String
-    #    },
-    #
-    #    input orderedExtraUpdateInput {
-    #        extraID: String!
-    #        extrasPriceID: String
-    #    },
+        input orderUpdateInput {
+            invoiceID: String!
+            products: orderedProductsUpdateInput
+            status: String
+            pretaxPrice: Float
+            notes: String
+            deliveredDate: Date
+        },
+        
+        input orderedProductsUpdateInput {
+            meals: [orderedMealUpdateInput]
+            extras: [orderedExtraUpdateInput]
+        },
+
+        input orderedMealUpdateInput {
+            proteinID: String!
+            priceID: String
+            vegetable: String
+            carbohydrate: String
+            sauce: String
+        },
+
+        input orderedExtraUpdateInput {
+            extraID: String!
+            extrasPriceID: String
+        },
 
 `;
 

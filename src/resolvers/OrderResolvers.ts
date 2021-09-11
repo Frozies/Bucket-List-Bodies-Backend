@@ -165,22 +165,27 @@ export const OrderResolvers = {
             return updatedOrder
         },
 
-        /*async updateOrder(args: any) {
-            try {
-                const params: Stripe.InvoiceUpdateParams = {
+        async updateOrder(args: any) {
+            /* *
+            invoiceID: String!
+            products: orderedProductsUpdateInput
+            status: String
+            pretaxPrice: Float
+            notes: String
+            deliveredDate: Date
+            * */
+            //using the stripe invoice id, update order information. do not finalize any pricing
 
-                }
-            }
-            catch (err) {
-                console.log("Error: " + err);
-                return ("Error: " + err);
-            }
-          //update mongodb
-        },*/
+        },
 
-        /*updateMealStatus(parent, args, context, info){},
+        updateProductStatus(args: any){},
 
-        updateOrderStatus(parent, args, context, info){},*/
+        addInvoiceItem(args: any) {},
+
+        removeInvoiceItem(args: any) {},
+
+
+        updateOrderStatus(args: any){},
 
     },
 
