@@ -1,10 +1,9 @@
 
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import {forEach, map} from "lodash";
+import _, {forEach, map} from "lodash";
 const orderModel = require('../models/OrderModel');
 const customerModel = require('../models/CustomerModel')
-const {customerID} = require('../utility/stripe');
 
 
 
@@ -165,20 +164,20 @@ export const OrderResolvers = {
             return updatedOrder
         },
 
-        async updateOrder(args: any) {
-            /* *
-            invoiceID: String!
-            status: String
-            notes: String
-            deliveredDate: Date
-            * */
+        async updateOrder(parent: any, args: any,) {
             //using the stripe invoice id, update order information. do not finalize any pricing
-            const invoiceID = args.updateOrder.invoiceID;
+
+            console.table(args)
+
+            const invoiceID = args.order.invoiceID;
+            let updatedOrder;
+
+            console.log("Updating an order: " + invoiceID)
 
             //update coupon if updated in stripe
             try {
                 const params: Stripe.InvoiceUpdateParams = {
-                    description: args.updateOrder.description ? args.updateOrder.description : undefined,
+                    description: args.order.description ? args.order.description : undefined,
                     //todo: Discount
                 }
 
@@ -191,14 +190,29 @@ export const OrderResolvers = {
 
             //update order in database
             try {
-                const order = orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
+                const filter = {
+                    invoiceID: args.order.invoiceID
+                }
 
-                })
+                const update = {
+                    status: args.order.status ? args.order.status : undefined,
+                    coupon: args.order.coupon ? args.order.coupon : undefined,
+                    notes: args.order.notes ? args.order.notes : undefined,
+                    deliveryDate: args.order.deliveryDate ? args.order.deliveryDate : undefined,
+                }
+
+                await orderModel.updateOne(filter, _.pickBy(update, (param: any) => {
+                    if (param !== undefined) return param
+                }))
+
+                updatedOrder = orderModel.findOne(filter)
             }
             catch (err) {
                 console.log("Error updating database invoice: " + err);
                 throw new Error("Error updating database invoice: " + err);
             }
+
+            return updatedOrder;
         },
 
         /*updateProductStatus(args: any){},

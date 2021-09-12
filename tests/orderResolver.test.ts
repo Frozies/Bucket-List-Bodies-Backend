@@ -11,6 +11,7 @@ let testExtraProductID: string;
 let testExtraPriceID: string;
 let testMealProductID: string;
 let testMealPriceID: string;
+let testInvoiceID: string;
 
 describe('Create test data for an order', () => {
     it('Successfully create customer', async () => {
@@ -247,17 +248,10 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-                console.log("Overall")
-                console.table(result.data.createOrder)
-
-                console.log("meals")
-                console.table(result.data.createOrder.products.meals)
-
-                console.log("extras")
-                console.table(result.data.createOrder.products.extras)
-                console.log("Creation date: " + result.data.createOrder.creationDate)
 
                 expect(result.data.createOrder.invoiceID).not.equal('' || undefined);
+
+                testInvoiceID = result.data.createOrder.invoiceID;
 
                 //check to see if both items were added to the invoice.
                 expect(result.data.createOrder.invoiceItemIDs).length(2);
@@ -289,27 +283,69 @@ describe('Order Resolvers Unit Testing', () => {
 
         describe('updateOrder', () => {
             let UPDATE_ORDER = gql`
-                
+                mutation Mutation($updateOrderOrder: orderUpdateInput) {
+                    updateOrder(order: $updateOrderOrder) {
+                        invoiceID
+                        status
+                        notes
+                        deliveredDate
+                    }
+                }
             `;
 
             it('Successfully update all parameters of a meal', async () => {
+                const deliveryDate = new Date()
+
                 const result = await mockDB.executeOperation({
                     query: UPDATE_ORDER,
                     variables: {
-
+                        "updateOrderOrder": {
+                            "invoiceID": testInvoiceID,
+                            "status": "DELIVERED",
+                            "notes": "First time customer. Loved the order!",
+                            "deliveredDate": deliveryDate,
+                        }
                     }
                 });
-                if (result.errors != undefined) console.log(result.errors);
+                if (result.errors != undefined) console.table(result.errors);
                 expect(result.errors).to.undefined;
 
-                /*expect(result.data.updateMeal.title).to.equal("Spaghetti");
-                expect(result.data.updateMeal.vegetables).to.members(['Roasted Tomatoes'])
-                expect(result.data.updateMeal.description).to.equal('Fresh cooked mom\'s spaghetti!');
-                expect(result.data.updateMeal.photoURL).to.equal('https://res.cloudinary.com/bucketlistbodies/image/upload/v1629420667/kjf28kcvywbbwqng8jld.jpg')
-                expect(result.data.updateMeal.proteinWeight).to.equal(4);
-                expect(result.data.updateMeal.fatWeight).to.equal(15);
-                expect(result.data.updateMeal.carbs).to.equal(20);
-                expect(result.data.updateMeal.calories).to.equal(25);*/
+                console.log("UPDATE ORDER")
+                console.table(result.data)
+
+                /*expect(result.data.updateOrder.invoiceID).to.equal(testInvoiceID);
+
+                expect(result.data.updateOrder.status).to.equal('DELIVERED');
+                expect(result.data.updateOrder.notes).to.equal('First time customer. Loved the order!');
+                expect(result.data.updateOrder.deliveryDate).to.closeToTime(deliveryDate, 10)*/
+            });
+        });
+        
+        describe('Update line items', () => {
+            it( 'Add meal line item', () => {
+                expect(0).to.equal(1)
+            });
+
+            
+            it( 'Update Meal line item', () => {
+                expect(0).to.equal(1)
+
+            });
+
+            it( 'Remove Meal line item', () => {
+                expect(0).to.equal(1)
+            });
+
+            it( 'Add extra line item', () => {
+                expect(0).to.equal(1)
+            });
+
+            it( 'Update extra line item', () => {
+                expect(0).to.equal(1)
+            });
+
+            it( 'Remove extra line item', () => {
+                expect(0).to.equal(1)
             });
         });
 
