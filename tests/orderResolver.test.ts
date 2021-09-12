@@ -289,7 +289,7 @@ describe('Order Resolvers Unit Testing', () => {
 
         describe('updateOrder', () => {
             let UPDATE_ORDER = gql`
-            
+                
             `;
 
             it('Successfully update all parameters of a meal', async () => {

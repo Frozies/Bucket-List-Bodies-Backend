@@ -37,8 +37,10 @@ const orderSchema = gql`
         #On the administration dashboard, create a new order manually.
         createOrder(order: createOrderInput): Order
 
+        updateOrder(order: orderUpdateInput): Order
+
         #Update an order's information.
-        #        updateOrder(order: orderUpdateInput): Order
+        #        
 
         #        #Updates a specific meal if it has been made
         #        updateMealStatus(status: String): Boolean
@@ -104,32 +106,38 @@ const orderSchema = gql`
         extrasPriceID: String!
     },
 
-        input orderUpdateInput {
-            invoiceID: String!
-            products: orderedProductsUpdateInput
-            status: String
-            pretaxPrice: Float
-            notes: String
-            deliveredDate: Date
-        },
-        
-        input orderedProductsUpdateInput {
-            meals: [orderedMealUpdateInput]
-            extras: [orderedExtraUpdateInput]
-        },
+    input orderUpdateInput {
+        invoiceID: String!
+        status: String
+        notes: String
+        deliveredDate: Date
+    },
+    
+    input updateInvoiceLineItems {
+        products: orderedProductsUpdateInput
+    }
+    
+    input orderedProductsUpdateInput {
+        meals: [orderedMealUpdateInput]
+        extras: [orderedExtraUpdateInput]
+    },
 
-        input orderedMealUpdateInput {
-            proteinID: String!
-            priceID: String
-            vegetable: String
-            carbohydrate: String
-            sauce: String
-        },
+    input orderedMealUpdateInput {
+        invoiceItemID: String!
+        proteinID: String!
+        priceID: String!
+        vegetable: String
+        carbohydrate: String
+        sauce: String
+        status: String
+    },
 
-        input orderedExtraUpdateInput {
-            extraID: String!
-            extrasPriceID: String
-        },
+    input orderedExtraUpdateInput {
+        extraID: String!
+        extrasPriceID: String!
+        invoiceItemID: String!
+        status: String
+    },
 
 `;
 

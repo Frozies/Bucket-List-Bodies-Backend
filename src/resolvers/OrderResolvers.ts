@@ -168,24 +168,47 @@ export const OrderResolvers = {
         async updateOrder(args: any) {
             /* *
             invoiceID: String!
-            products: orderedProductsUpdateInput
             status: String
-            pretaxPrice: Float
             notes: String
             deliveredDate: Date
             * */
             //using the stripe invoice id, update order information. do not finalize any pricing
+            const invoiceID = args.updateOrder.invoiceID;
 
+            //update coupon if updated in stripe
+            try {
+                const params: Stripe.InvoiceUpdateParams = {
+                    description: args.updateOrder.description ? args.updateOrder.description : undefined,
+                    //todo: Discount
+                }
+
+                const invoice = stripe.invoices.update(invoiceID, params)
+            }
+            catch (err) {
+                console.log("Error updating stripe invoice: " + err);
+                throw new Error("Error updating stripe invoice: " + err);
+            }
+
+            //update order in database
+            try {
+                const order = orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
+
+                })
+            }
+            catch (err) {
+                console.log("Error updating database invoice: " + err);
+                throw new Error("Error updating database invoice: " + err);
+            }
         },
 
-        updateProductStatus(args: any){},
+        /*updateProductStatus(args: any){},
 
         addInvoiceItem(args: any) {},
 
         removeInvoiceItem(args: any) {},
 
 
-        updateOrderStatus(args: any){},
+        updateOrderStatus(args: any){},*/
 
     },
 
