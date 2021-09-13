@@ -17,7 +17,7 @@ const orderSchema = gql`
         #        #Retrieve the orders by a specified date.
         #        getAllActiveOrdersByDate(date: Date): [Order]
         #
-        #        #Finds an ORDER by its status of whether or not its been seen, preped, or delivered.
+        #        #Finds an ORDER by its status of whether or not its been seen, prepped, or delivered.
         #        getOrdersByStatus(status: String): [Order]
         #
         #        #finds orders by their listed Food Type
@@ -36,9 +36,16 @@ const orderSchema = gql`
     extend type Mutation {
         #On the administration dashboard, create a new order manually.
         createOrder(order: createOrderInput): Order
-
+        
+        #Update an order's basic information. This does not affect pricing or invoice items.
         updateOrder(order: orderUpdateInput): Order
-
+        
+        #Add the line items and pricing for an invoice.
+        addOrderLineItems(order: updateOrderLineItemsInput): Order
+        
+        #Remove the line items from an order.
+        removeOrderLineItems(order: updateOrderLineItemsInput): Order
+        
         #Update an order's information.
         #        
 
@@ -87,6 +94,12 @@ const orderSchema = gql`
         coupon: String
         notes: String
     },
+    
+    input updateOrderLineItemsInput {
+        invoiceID: String!
+        customerID: String!
+        products: orderedProductsInput
+    }
 
     input orderedProductsInput {
         meals: [orderedMealInput!]!
@@ -96,9 +109,9 @@ const orderSchema = gql`
     input orderedMealInput {
         proteinID: String!
         priceID: String!
-        vegetable: String!
-        carbohydrate: String!
-        sauce: String!
+        vegetable: String
+        carbohydrate: String
+        sauce: String
     },
 
     input orderedExtraInput {

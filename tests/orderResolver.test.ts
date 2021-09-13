@@ -310,23 +310,80 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.table(result.errors);
                 expect(result.errors).to.undefined;
 
-                console.log("UPDATE ORDER")
-                console.table(result.data)
-
-                /*expect(result.data.updateOrder.invoiceID).to.equal(testInvoiceID);
+                expect(result.data.updateOrder.invoiceID).to.equal(testInvoiceID);
 
                 expect(result.data.updateOrder.status).to.equal('DELIVERED');
                 expect(result.data.updateOrder.notes).to.equal('First time customer. Loved the order!');
-                expect(result.data.updateOrder.deliveryDate).to.closeToTime(deliveryDate, 10)*/
+                expect(result.data.updateOrder.deliveredDate).to.closeToTime(deliveryDate, 10)
             });
         });
-        
+
         describe('Update line items', () => {
-            it( 'Add meal line item', () => {
-                expect(0).to.equal(1)
+            it( 'Add meal line item', async () => {
+                let ADD_PRODUCT = gql`
+                    mutation AddOrderLineItemsMutation($addOrderLineItemsOrder: updateOrderLineItemsInput) {
+                        addOrderLineItems(order: $addOrderLineItemsOrder) {
+                            products {
+                                extras {
+                                    extraID
+                                    status
+                                }
+                                meals {
+                                    proteinID
+                                    vegetable
+                                    carbohydrate
+                                    sauce
+                                    status
+                                }
+                            }
+                            customer{
+                                customerId
+                            }
+                            invoiceID
+                            pretaxPrice
+                        }
+                    }
+                `;
+
+                const result = await mockDB.executeOperation({
+                    query: ADD_PRODUCT,
+                    variables: {
+                        "addOrderLineItemsOrder": {
+                            "invoiceID": testInvoiceID,
+                            "customerID": testCustomerID,
+                            "products": {
+                                "extras": [
+                                    {
+                                        "extraID": testExtraProductID,
+                                        "extrasPriceID": testExtraPriceID
+                                    }
+                                ],
+                                "meals": [
+                                    {
+                                        "proteinID": testMealProductID,
+                                        "priceID": testMealPriceID,
+                                        "vegetable": "Green Beans",
+                                        "carbohydrate": "Bread",
+                                        "sauce": "BBQ"
+                                    }
+                                ]
+                            },
+                        }
+                    }
+                });
+                if (result.errors != undefined) console.table(result.errors);
+                expect(result.errors).to.undefined;
+
+                console.table(result.data.addOrderLineItems)
+                /*
+                *2 extras
+                * 2 meals
+                 */
+
+                expect(result.data.addOrderLineItems.pretaxPrice).to.equal(23.98)
             });
 
-            
+
             it( 'Update Meal line item', () => {
                 expect(0).to.equal(1)
 

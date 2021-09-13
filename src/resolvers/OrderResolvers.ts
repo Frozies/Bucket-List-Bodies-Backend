@@ -1,7 +1,7 @@
 
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import _, {forEach, map} from "lodash";
+import _, {forEach, map, update} from "lodash";
 const orderModel = require('../models/OrderModel');
 const customerModel = require('../models/CustomerModel')
 
@@ -44,8 +44,10 @@ export const OrderResolvers = {
             let totalUnitAmount = 0;
             let invoiceID: any;
 
-
-            //Add each line item to the invoice
+            /**Add each line item to the invoice
+             * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
+             * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
+             */
             try {
                 for (const meal of args.order.products.meals) {
                     const params: Stripe.InvoiceItemCreateParams = {
@@ -78,10 +80,13 @@ export const OrderResolvers = {
             }
             catch (err) {
                 console.log("Error creating invoice item: " + err);
-                return ("Error creating invoice item: " + err);
+                throw new Error("Error creating invoice item: " + err);
             }
 
-            //Create invoice on customer in stripe
+            /**
+             * Create invoice on customer in stripe using the customer ID as params.
+             */
+
             try {
                 const params: Stripe.InvoiceCreateParams = {
                     customer: args.order.customerID,
@@ -97,7 +102,11 @@ export const OrderResolvers = {
             }
 
             console.log("Sending order to DB")
-            //Create Mongoose Model
+            /**Create Mongoose Model
+             * First create an object of all of the meals/extras with a new property 'status'. Then create a order model
+             * to push to the Database. note the spreading of the objects in the products object.
+             */
+
             try {
                 //insert status into each product
 
@@ -135,7 +144,7 @@ export const OrderResolvers = {
                     },
 
                     status: "UNMADE",
-                    pretaxPrice: totalUnitAmount/100    ,
+                    pretaxPrice: totalUnitAmount/100,
                     coupon: args.order.coupon,
                     notes: args.order.notes,
                     deliveryDate: args.order.deliveryDate,
@@ -147,7 +156,11 @@ export const OrderResolvers = {
 
 
             console.log("Adding order to Customer's order ledger.")
-            //Add order to customer ledger.
+            /**
+             * Add order to customer ledger.
+             * This simply takes the invoiceID and pushes it to the customer database for the specified customer by its
+             * ID.
+             */
             try {
                 await customerModel.findOneAndUpdate({id: args.order.customerID}, {
                     $push: {
@@ -157,17 +170,15 @@ export const OrderResolvers = {
             }
             catch (err) {
                 console.log("Error adding order to customer ledger: " + err);
-                return ("Error adding order to customer ledger: " + err);
+                throw new Error("Error adding order to customer ledger: " + err);
             }
 
-            const updatedOrder = orderModel.findOne({invoiceID: invoiceID})
-            return updatedOrder
+            //retrieve the newly updated order and return that to the client.
+            return orderModel.findOne({invoiceID: invoiceID})
         },
 
         async updateOrder(parent: any, args: any,) {
             //using the stripe invoice id, update order information. do not finalize any pricing
-
-            console.table(args)
 
             const invoiceID = args.order.invoiceID;
             let updatedOrder;
@@ -198,7 +209,7 @@ export const OrderResolvers = {
                     status: args.order.status ? args.order.status : undefined,
                     coupon: args.order.coupon ? args.order.coupon : undefined,
                     notes: args.order.notes ? args.order.notes : undefined,
-                    deliveryDate: args.order.deliveryDate ? args.order.deliveryDate : undefined,
+                    deliveredDate: args.order.deliveredDate ? args.order.deliveredDate : undefined,
                 }
 
                 await orderModel.updateOne(filter, _.pickBy(update, (param: any) => {
@@ -215,15 +226,114 @@ export const OrderResolvers = {
             return updatedOrder;
         },
 
-        /*updateProductStatus(args: any){},
+        async addOrderLineItems(parent: any, args: any) {
+            let invoiceItemIDs: Array<string> = [];
+            let totalUnitAmount = 0;
+            const invoiceID = args.order.invoiceID;
 
-        addInvoiceItem(args: any) {},
+            //Iterate through the line items using some sort of generic....
+            /**Add each line item to the invoice
+             * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
+             * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
+             */
+            try {
+                for (const meal of args.order.products.meals) {
+                    const params: Stripe.InvoiceItemCreateParams = {
+                        invoice: invoiceID,
+                        customer: args.order.customerID,
+                        price: meal.priceID,
+                        quantity: 1,
+                    }
 
-        removeInvoiceItem(args: any) {},
+                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
+                    console.log("Adding invoice item Meal to invoice: " + invoiceItem.id)
+                    invoiceItemIDs.push(invoiceItem.id)
+                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
+                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
+                }
 
+                //todo: DUPLICATE CODE make some generics
+                for (const extra of args.order.products.extras) {
+                    const params: Stripe.InvoiceItemCreateParams = {
+                        invoice: invoiceID,
+                        customer: args.order.customerID,
+                        price: extra.extrasPriceID,
+                        quantity: 1,
+                    }
 
-        updateOrderStatus(args: any){},*/
+                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
+                    console.log("Adding invoice item Extra to invoice: " + invoiceItem.id)
+                    invoiceItemIDs.push(invoiceItem.id)
+                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
+                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
+                }
+            }
+            catch (err) {
+                console.log("Error creating invoice item: " + err);
+                throw new Error("Error creating invoice item: " + err);
+            }
+            
+            console.log("Sending order to DB")
+            /**Update Mongoose Model
+             * First create an object of all of the meals/extras with a new property 'status'. Then add the new products
+             * to the model provided.
+             */
+            try {
+                //insert status into each product
+                let meals = () => {
+                    for(let meal in args.order.products.meals) {
+                        return {
+                            ...args.order.products.meals[meal],
+                            status: 'UNMADE',
+                        }
+                    }
+                }
 
+                let extras = () => {
+                    for(let extra in args.order.products.extras) {
+                        return {
+                            ...args.order.products.extras[extra],
+                            status: 'UNMADE',
+                        }
+                    }
+                }
+
+                //DEBUG
+                const oldOrder = await orderModel.findOne({invoiceID: invoiceID}, (err: any, doc: any)=>{
+                    console.log("OLD ORDER MEALS: " + doc.products.meals.length)
+                })
+
+                
+                const order = await orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
+                    products: {
+                        $push: {
+                            meals: {
+                                ...meals()
+                            },
+                        },
+                    },
+                }, (err: any,doc: any)=> {
+                    console.log("NEW ORDER MEALS: " + doc.products.meals.length)
+                })
+
+                const newOrder = await orderModel.findOne({invoiceID: invoiceID}, (err: any, doc: any)=>{
+                    console.log("NEW ORDER MEALS: " + doc.products.meals.length)
+                })
+
+                /*$push: {
+                            extras: {
+                                $each: {
+                                    ...extras()
+                                }
+                            }
+                        },*/
+            } catch (err) {
+                console.log("Error pushing meal to MongoDB: " + err);
+                throw new Error("Error pushing meal to MongoDB: " + err);
+            }
+
+            return orderModel.findOne({invoiceID: invoiceID})
+        },
     },
 
     /** Resolver Chains **/
@@ -253,6 +363,8 @@ export const OrderResolvers = {
             console.log("Retrieving meals from order chain.")
             let meals: any[] = []
 
+            console.table(parent.meals)
+
             //make an array of meals
             parent.meals.forEach((meal: any) => {
                 meals.push({
@@ -270,6 +382,8 @@ export const OrderResolvers = {
         async extras(parent: any) {
             console.log("Retrieving extas from order chain.")
             let extras: any[] = []
+
+            console.table(parent.extras)
 
             //make an array of extras
             parent.extras.forEach((extra: any) => {
