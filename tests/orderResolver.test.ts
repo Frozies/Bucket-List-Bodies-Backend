@@ -227,7 +227,7 @@ describe('Order Resolvers Unit Testing', () => {
                                 "extras": [
                                     {
                                         "extraID": testExtraProductID,
-                                        "extrasPriceID": testExtraPriceID
+                                        "extraPriceID": testExtraPriceID
                                     }
                                 ],
                                 "meals": [
@@ -355,7 +355,7 @@ describe('Order Resolvers Unit Testing', () => {
                                 "extras": [
                                     {
                                         "extraID": testExtraProductID,
-                                        "extrasPriceID": testExtraPriceID
+                                        "extraPriceID": testExtraPriceID
                                     }
                                 ],
                                 "meals": [
@@ -365,6 +365,13 @@ describe('Order Resolvers Unit Testing', () => {
                                         "vegetable": "Green Beans",
                                         "carbohydrate": "Bread",
                                         "sauce": "BBQ"
+                                    },
+                                    {
+                                        "proteinID": testMealProductID,
+                                        "priceID": testMealPriceID,
+                                        "vegetable": "Broccoli",
+                                        "carbohydrate": "Chips",
+                                        "sauce": "Ketchup"
                                     }
                                 ]
                             },
@@ -380,7 +387,7 @@ describe('Order Resolvers Unit Testing', () => {
                 * 2 meals
                  */
 
-                expect(result.data.addOrderLineItems.pretaxPrice).to.equal(23.98)
+                expect(result.data.addOrderLineItems.pretaxPrice).to.equal(33.97)
             });
 
 

@@ -67,7 +67,7 @@ export const OrderResolvers = {
                 for (const extra of args.order.products.extras) {
                     const params: Stripe.InvoiceItemCreateParams = {
                         customer: args.order.customerID,
-                        price: extra.extrasPriceID,
+                        price: extra.extraPriceID,
                         quantity: 1,
                     }
 
@@ -113,7 +113,11 @@ export const OrderResolvers = {
                 let meals = () => {
                     for(let meal in args.order.products.meals) {
                         return {
-                            ...args.order.products.meals[meal],
+                            proteinID: args.order.products.meals[meal].proteinID,
+                            priceID: args.order.products.meals[meal].priceID,
+                            vegetable: args.order.products.meals[meal].vegetable,
+                            carbohydrate: args.order.products.meals[meal].carbohydrate,
+                            sauce: args.order.products.meals[meal].sauce,
                             status: 'UNMADE',
                         }
                     }
@@ -121,7 +125,8 @@ export const OrderResolvers = {
                 let extras = () => {
                     for(let extra in args.order.products.extras) {
                         return {
-                            ...args.order.products.extras[extra],
+                            extraID: args.order.products.extras[extra].extraID,
+                            extraPriceID: args.order.products.extras[extra].extraPriceID,
                             status: 'UNMADE',
                         }
                     }
@@ -257,7 +262,7 @@ export const OrderResolvers = {
                     const params: Stripe.InvoiceItemCreateParams = {
                         invoice: invoiceID,
                         customer: args.order.customerID,
-                        price: extra.extrasPriceID,
+                        price: extra.extraPriceID,
                         quantity: 1,
                     }
 
@@ -279,54 +284,83 @@ export const OrderResolvers = {
              * to the model provided.
              */
             try {
-                //insert status into each product
-                let meals = () => {
-                    for(let meal in args.order.products.meals) {
-                        return {
-                            ...args.order.products.meals[meal],
-                            status: 'UNMADE',
-                        }
-                    }
-                }
+                let newMeals: any = [];
+                let newExtras: any = [];
+                let pretaxPrice = 0;
 
-                let extras = () => {
-                    for(let extra in args.order.products.extras) {
-                        return {
-                            ...args.order.products.extras[extra],
-                            status: 'UNMADE',
-                        }
-                    }
-                }
+                //Push old products into a temporary array
+                await orderModel.findOne({invoiceID: invoiceID}, (err: any, doc: any)=>{
 
-                //DEBUG
-                const oldOrder = await orderModel.findOne({invoiceID: invoiceID}, (err: any, doc: any)=>{
-                    console.log("OLD ORDER MEALS: " + doc.products.meals.length)
+                    pretaxPrice = doc.pretaxPrice
+
+                    doc.products.meals.forEach((doc: any)=> {
+                        newMeals.push({
+                            proteinID: doc.proteinID,
+                            priceID: doc.priceID,
+                            vegetable: doc.vegetable,
+                            carbohydrate: doc.carbohydrate,
+                            sauce: doc.sauce,
+                            status: doc.status
+                        })
+                    });
+
+                    doc.products.extras.forEach((doc: any)=> {
+                        newExtras.push({
+                            extraID: doc.extraID,
+                            extraPriceID: doc.extraPriceID,
+                            status: doc.status
+                        })
+                    });
+
+                    doc.invoiceItemIDs.forEach((doc: any)=> {
+                        invoiceItemIDs.push(doc)
+                    });
                 })
 
+                //push new products into the temporary array
+                for(let meal in args.order.products.meals) {
+                    const priceID = args.order.products.meals[meal].priceID
+                    newMeals.push(
+                        {
+                            proteinID: args.order.products.meals[meal].proteinID,
+                            priceID: priceID,
+                            vegetable: args.order.products.meals[meal].vegetable,
+                            carbohydrate: args.order.products.meals[meal].carbohydrate,
+                            sauce: args.order.products.meals[meal].sauce,
+                            status: 'UNMADE',
+                        }
+                    )
+                    const price = await stripe.prices.retrieve( priceID )
+                    pretaxPrice += price.unit_amount ? (price.unit_amount/100) : 0;
+                }
+
+                for(let extra in args.order.products.extras) {
+                    const priceID = args.order.products.extras[extra].extraPriceID;
+                    newExtras.push(
+                        {
+                            extraID: args.order.products.extras[extra].extraID,
+                            extraPriceID: priceID,
+                            status: 'UNMADE',
+                        }
+                    )
+
+                    const price = await stripe.prices.retrieve( priceID )
+                    pretaxPrice += price.unit_amount ? (price.unit_amount/100) : 0;
+                }
+
+                console.table(newMeals)
+                console.table(invoiceItemIDs)
                 
                 const order = await orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
                     products: {
-                        $push: {
-                            meals: {
-                                ...meals()
-                            },
-                        },
+                        meals: newMeals,
+                        extras: newExtras
                     },
-                }, (err: any,doc: any)=> {
-                    console.log("NEW ORDER MEALS: " + doc.products.meals.length)
+                    invoiceItemIDs: invoiceItemIDs,
+                    pretaxPrice: pretaxPrice
                 })
 
-                const newOrder = await orderModel.findOne({invoiceID: invoiceID}, (err: any, doc: any)=>{
-                    console.log("NEW ORDER MEALS: " + doc.products.meals.length)
-                })
 
-                /*$push: {
-                            extras: {
-                                $each: {
-                                    ...extras()
-                                }
-                            }
-                        },*/
             } catch (err) {
                 console.log("Error pushing meal to MongoDB: " + err);
                 throw new Error("Error pushing meal to MongoDB: " + err);
@@ -363,8 +397,6 @@ export const OrderResolvers = {
             console.log("Retrieving meals from order chain.")
             let meals: any[] = []
 
-            console.table(parent.meals)
-
             //make an array of meals
             parent.meals.forEach((meal: any) => {
                 meals.push({
@@ -382,8 +414,6 @@ export const OrderResolvers = {
         async extras(parent: any) {
             console.log("Retrieving extas from order chain.")
             let extras: any[] = []
-
-            console.table(parent.extras)
 
             //make an array of extras
             parent.extras.forEach((extra: any) => {

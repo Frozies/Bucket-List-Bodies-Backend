@@ -116,7 +116,7 @@ const orderSchema = gql`
 
     input orderedExtraInput {
         extraID: String!
-        extrasPriceID: String!
+        extraPriceID: String!
     },
 
     input orderUpdateInput {
