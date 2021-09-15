@@ -388,6 +388,13 @@ describe('Order Resolvers Unit Testing', () => {
                  */
 
                 expect(result.data.addOrderLineItems.pretaxPrice).to.equal(33.97)
+                expect(0).to.equal(1)
+                //TODO: Actually test for the rest of the data :)
+                // 3 meals
+                // 2 extras
+                // 5 invoice item IDs
+                // customerID
+                // invoiceID
             });
 
 
