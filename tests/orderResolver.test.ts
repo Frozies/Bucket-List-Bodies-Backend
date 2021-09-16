@@ -341,6 +341,7 @@ describe('Order Resolvers Unit Testing', () => {
                             }
                             invoiceID
                             pretaxPrice
+                            invoiceItemIDs
                         }
                     }
                 `;
@@ -387,14 +388,14 @@ describe('Order Resolvers Unit Testing', () => {
                 * 2 meals
                  */
 
+
+                expect(result.data.addOrderLineItems.customer.customerId).to.equal(testCustomerID)
+                expect(result.data.addOrderLineItems.invoiceID).to.equal(testInvoiceID)
+
                 expect(result.data.addOrderLineItems.pretaxPrice).to.equal(33.97)
-                expect(0).to.equal(1)
-                //TODO: Actually test for the rest of the data :)
-                // 3 meals
-                // 2 extras
-                // 5 invoice item IDs
-                // customerID
-                // invoiceID
+                expect(result.data.addOrderLineItems.products.meals).length(3)
+                expect(result.data.addOrderLineItems.products.extras).length(2)
+                expect(result.data.addOrderLineItems.invoiceItemIDs).length(5)
             });
 
 
