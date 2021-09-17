@@ -1,11 +1,85 @@
 
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import _, {forEach, map, update} from "lodash";
+import _ from "lodash";
 const orderModel = require('../models/OrderModel');
 const customerModel = require('../models/CustomerModel')
 
 
+/**Add each line item to the invoice
+ * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
+ * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
+ */
+let createMeals = async (inputMeals: any, inputCustomerID: string) => {
+    let meals: any = [];
+    let total: number = 0;
+
+    try {
+        for (let meal in inputMeals) {
+            const params: Stripe.InvoiceItemCreateParams = {
+                customer: inputCustomerID,
+                price: inputMeals[meal].priceID,
+                quantity: 1,
+            }
+
+            const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create( params );
+            console.log( "Adding invoice item Meal to invoice: " + invoiceItem.id )
+            console.log( "Price: " + <number>invoiceItem.price?.unit_amount )
+            total += <number>invoiceItem.price?.unit_amount;
+
+            meals.push({
+                proteinID: inputMeals[meal].proteinID,
+                priceID: inputMeals[meal].priceID,
+                invoiceItemID: invoiceItem.id,
+                vegetable: inputMeals[meal].vegetable,
+                carbohydrate: inputMeals[meal].carbohydrate,
+                sauce: inputMeals[meal].sauce,
+                status: 'UNMADE',
+            })
+        }
+    }
+    catch (err) {
+        console.log("Error creating meal invoice item: " + err);
+        throw new Error("Error creating meal invoice item: " + err);
+    }
+
+
+
+    return {meals, total};
+}
+
+let createExtras = async (inputExtras: any, inputCustomerID: string) => {
+    let extras: any = [];
+    let total: number = 0;
+
+    try {
+        for (let extra in inputExtras) {
+            const params: Stripe.InvoiceItemCreateParams = {
+                customer: inputCustomerID,
+                price: inputExtras[extra].extraPriceID,
+                quantity: 1,
+            }
+
+            const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create( params );
+            console.log( "Adding invoice item Extra to invoice: " + invoiceItem.id )
+            console.log( "Price: " + <number>invoiceItem.price?.unit_amount )
+            total += <number>invoiceItem.price?.unit_amount;
+
+            extras.push({
+                extraID: inputExtras[extra].extraID,
+                extraPriceID: inputExtras[extra].extraPriceID,
+                invoiceItemID: invoiceItem.id,
+                status: 'UNMADE',
+            })
+        }
+    }
+    catch (err) {
+        console.log("Error creating extra invoice item: " + err);
+        throw new Error("Error creating extra invoice item: " + err);
+    }
+
+    return {extras, total}
+}
 
 export const OrderResolvers = {
     Query: {
@@ -40,48 +114,13 @@ export const OrderResolvers = {
             //I dont think i need to store the entire array in memory...
             //let invoiceItems: Array<Stripe.InvoiceItem> = [];
 
-            let invoiceItemIDs: Array<string> = [];
             let totalUnitAmount = 0;
             let invoiceID: any;
 
-            /**Add each line item to the invoice
-             * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
-             * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
-             */
-            try {
-                for (const meal of args.order.products.meals) {
-                    const params: Stripe.InvoiceItemCreateParams = {
-                        customer: args.order.customerID,
-                        price: meal.priceID,
-                        quantity: 1,
-                    }
+            let meals = await createMeals(args.order.products.meals, args.order.customerID);
+            let extras = await createExtras(args.order.products.extras, args.order.customerID);
 
-                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
-                    console.log("Adding invoice item Meal to invoice: " + invoiceItem.id)
-                    invoiceItemIDs.push(invoiceItem.id)
-                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
-                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
-                }
-
-                //todo: DUPLICATE CODE make some generics
-                for (const extra of args.order.products.extras) {
-                    const params: Stripe.InvoiceItemCreateParams = {
-                        customer: args.order.customerID,
-                        price: extra.extraPriceID,
-                        quantity: 1,
-                    }
-
-                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
-                    console.log("Adding invoice item Extra to invoice: " + invoiceItem.id)
-                    invoiceItemIDs.push(invoiceItem.id)
-                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
-                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
-                }
-            }
-            catch (err) {
-                console.log("Error creating invoice item: " + err);
-                throw new Error("Error creating invoice item: " + err);
-            }
+            totalUnitAmount = meals.total + extras.total;
 
             /**
              * Create invoice on customer in stripe using the customer ID as params.
@@ -108,44 +147,14 @@ export const OrderResolvers = {
              */
 
             try {
-                //insert status into each product
-
-                let meals = () => {
-                    for(let meal in args.order.products.meals) {
-                        return {
-                            proteinID: args.order.products.meals[meal].proteinID,
-                            priceID: args.order.products.meals[meal].priceID,
-                            vegetable: args.order.products.meals[meal].vegetable,
-                            carbohydrate: args.order.products.meals[meal].carbohydrate,
-                            sauce: args.order.products.meals[meal].sauce,
-                            status: 'UNMADE',
-                        }
-                    }
-                }
-                let extras = () => {
-                    for(let extra in args.order.products.extras) {
-                        return {
-                            extraID: args.order.products.extras[extra].extraID,
-                            extraPriceID: args.order.products.extras[extra].extraPriceID,
-                            status: 'UNMADE',
-                        }
-                    }
-                }
-
-
 
                 const order = await orderModel.create({
                     invoiceID: invoiceID,
-                    invoiceItemIDs: invoiceItemIDs,
                     customerId: args.order.customerID,
 
                     products: {
-                        meals: {
-                            ...meals()
-                        },
-                        extras: {
-                            ...extras()
-                        }
+                        meals: meals.meals,
+                        extras: extras.extras
                     },
 
                     status: "UNMADE",
@@ -167,11 +176,17 @@ export const OrderResolvers = {
              * ID.
              */
             try {
-                await customerModel.findOneAndUpdate({id: args.order.customerID}, {
-                    $push: {
-                        orders: invoiceID
-                    }
-                })
+                const orders: any[] = []
+                 await customerModel.findOne({id: args.order.customerID},
+                    (err: any, res: any) => {
+                    orders.push(res.data.orders)
+                }).then(async () => {
+                     orders.push( invoiceID )
+
+                     await customerModel.findOneAndUpdate( {id: args.order.customerID}, {
+                         orders: orders
+                     } )
+                 })
             }
             catch (err) {
                 console.log("Error adding order to customer ledger: " + err);
@@ -232,51 +247,13 @@ export const OrderResolvers = {
         },
 
         async addOrderLineItems(parent: any, args: any) {
-            let invoiceItemIDs: Array<string> = [];
             let totalUnitAmount = 0;
             const invoiceID = args.order.invoiceID;
 
-            //Iterate through the line items using some sort of generic....
-            /**Add each line item to the invoice
-             * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
-             * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
-             */
-            try {
-                for (const meal of args.order.products.meals) {
-                    const params: Stripe.InvoiceItemCreateParams = {
-                        invoice: invoiceID,
-                        customer: args.order.customerID,
-                        price: meal.priceID,
-                        quantity: 1,
-                    }
+            let meals = await createMeals(args.order.products.meals, args.order.customerID);
+            let extras = await createExtras(args.order.products.meals, args.order.customerID);
 
-                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
-                    console.log("Adding invoice item Meal to invoice: " + invoiceItem.id)
-                    invoiceItemIDs.push(invoiceItem.id)
-                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
-                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
-                }
-
-                //todo: DUPLICATE CODE make some generics
-                for (const extra of args.order.products.extras) {
-                    const params: Stripe.InvoiceItemCreateParams = {
-                        invoice: invoiceID,
-                        customer: args.order.customerID,
-                        price: extra.extraPriceID,
-                        quantity: 1,
-                    }
-
-                    const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create(params);
-                    console.log("Adding invoice item Extra to invoice: " + invoiceItem.id)
-                    invoiceItemIDs.push(invoiceItem.id)
-                    console.log("Price: " + <number>invoiceItem.price?.unit_amount)
-                    totalUnitAmount += <number>invoiceItem.price?.unit_amount;
-                }
-            }
-            catch (err) {
-                console.log("Error creating invoice item: " + err);
-                throw new Error("Error creating invoice item: " + err);
-            }
+            totalUnitAmount = meals.total + extras.total;
             
             console.log("Sending order to DB")
             /**Update Mongoose Model
@@ -297,6 +274,7 @@ export const OrderResolvers = {
                         newMeals.push({
                             proteinID: doc.proteinID,
                             priceID: doc.priceID,
+                            invoiceItemID: doc.invoiceItemID,
                             vegetable: doc.vegetable,
                             carbohydrate: doc.carbohydrate,
                             sauce: doc.sauce,
@@ -307,13 +285,10 @@ export const OrderResolvers = {
                     doc.products.extras.forEach((doc: any)=> {
                         newExtras.push({
                             extraID: doc.extraID,
+                            invoiceItemID: doc.invoiceItemID,
                             extraPriceID: doc.extraPriceID,
                             status: doc.status
                         })
-                    });
-
-                    doc.invoiceItemIDs.forEach((doc: any)=> {
-                        invoiceItemIDs.push(doc)
                     });
                 })
 
@@ -324,6 +299,7 @@ export const OrderResolvers = {
                         {
                             proteinID: args.order.products.meals[meal].proteinID,
                             priceID: priceID,
+                            invoiceItemID: args.order.products.meals[meal].invoiceItemID,
                             vegetable: args.order.products.meals[meal].vegetable,
                             carbohydrate: args.order.products.meals[meal].carbohydrate,
                             sauce: args.order.products.meals[meal].sauce,
@@ -340,6 +316,7 @@ export const OrderResolvers = {
                         {
                             extraID: args.order.products.extras[extra].extraID,
                             extraPriceID: priceID,
+                            invoiceItemID: args.order.products.extras[extra].invoiceItemID,
                             status: 'UNMADE',
                         }
                     )
@@ -349,14 +326,12 @@ export const OrderResolvers = {
                 }
 
                 console.table(newMeals)
-                console.table(invoiceItemIDs)
-                
+
                 const order = await orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
                     products: {
                         meals: newMeals,
                         extras: newExtras
                     },
-                    invoiceItemIDs: invoiceItemIDs,
                     pretaxPrice: pretaxPrice
                 })
 
@@ -405,6 +380,7 @@ export const OrderResolvers = {
                     carbohydrate: meal.carbohydrate,
                     sauce: meal.sauce,
                     priceID: meal.priceID,
+                    invoiceItemID: meal.invoiceItemID,
                     status: meal.status
                 })
             })
@@ -412,12 +388,14 @@ export const OrderResolvers = {
         },
 
         async extras(parent: any) {
-            console.log("Retrieving extas from order chain.")
+            console.log("Retrieving extras from order chain.")
             let extras: any[] = []
 
             //make an array of extras
             parent.extras.forEach((extra: any) => {
                 extras.push({
+                    invoiceItemID: extra.invoiceItemID,
+                    extraPriceID: extra.extraPriceID,
                     extraID: extra.extraID,
                     status: extra.status,
                 })

@@ -190,9 +190,11 @@ describe('Order Resolvers Unit Testing', () => {
                 mutation Mutation($createOrderOrder: createOrderInput) {
                     createOrder(order: $createOrderOrder) {
                         invoiceID
-                        invoiceItemIDs
                         customer {
                             customerId
+                            orders {
+                                invoiceID
+                            }
                         }
                         products {
                             meals {
@@ -201,10 +203,14 @@ describe('Order Resolvers Unit Testing', () => {
                                 carbohydrate
                                 vegetable
                                 proteinID
+                                invoiceItemID
+                                priceID
                             }
                             extras {
                                 status
                                 extraID
+                                invoiceItemID
+                                extraPriceID
                             }
                         }
                         status
@@ -253,22 +259,18 @@ describe('Order Resolvers Unit Testing', () => {
 
                 testInvoiceID = result.data.createOrder.invoiceID;
 
-                //check to see if both items were added to the invoice.
-                expect(result.data.createOrder.invoiceItemIDs).length(2);
-
-                //Check if both items are in the invoice as items directly
-                expect(result.data.createOrder.invoiceItemIDs[0]).not.equal('' || undefined);
-                expect(result.data.createOrder.invoiceItemIDs[1]).not.equal('' || undefined);
-
-
                 expect(result.data.createOrder.customer.customerId).to.equal(testCustomerID);
+                expect(result.data.createOrder.customer.orders[0].invoiceID).to.equal(testInvoiceID);
                 expect(result.data.createOrder.products.meals).length(1);
                 expect(result.data.createOrder.products.meals[0].proteinID).to.equal(testMealProductID);
                 expect(result.data.createOrder.products.meals[0].status).to.equal('UNMADE');
+                expect(result.data.createOrder.products.meals[0].invoiceItemID).not.equal('' || undefined);
 
                 expect(result.data.createOrder.products.extras).length(1);
                 expect(result.data.createOrder.products.extras[0].extraID).to.equal(testExtraProductID);
                 expect(result.data.createOrder.products.extras[0].status).to.equal('UNMADE');
+                expect(result.data.createOrder.products.extras[0].invoiceItemID).not.equal('' || undefined);
+
 
                 expect(result.data.createOrder.status).to.equal("UNMADE");
                 expect(result.data.createOrder.pretaxPrice).to.equal(11.99);
@@ -286,14 +288,40 @@ describe('Order Resolvers Unit Testing', () => {
                 mutation Mutation($updateOrderOrder: orderUpdateInput) {
                     updateOrder(order: $updateOrderOrder) {
                         invoiceID
+                        customer {
+                            customerId
+                            orders {
+                                invoiceID
+                            }
+                        }
+                        products {
+                            meals {
+                                status
+                                sauce
+                                carbohydrate
+                                vegetable
+                                proteinID
+                                invoiceItemID
+                                priceID
+                            }
+                            extras {
+                                status
+                                extraID
+                                invoiceItemID
+                                extraPriceID
+                            }
+                        }
                         status
+                        pretaxPrice
+                        coupon
                         notes
                         deliveredDate
+                        creationDate
                     }
                 }
             `;
 
-            it('Successfully update all parameters of a meal', async () => {
+            it('Successfully update all parameters of an Order', async () => {
                 const deliveryDate = new Date()
 
                 const result = await mockDB.executeOperation({
@@ -312,9 +340,27 @@ describe('Order Resolvers Unit Testing', () => {
 
                 expect(result.data.updateOrder.invoiceID).to.equal(testInvoiceID);
 
+
                 expect(result.data.updateOrder.status).to.equal('DELIVERED');
                 expect(result.data.updateOrder.notes).to.equal('First time customer. Loved the order!');
                 expect(result.data.updateOrder.deliveredDate).to.closeToTime(deliveryDate, 10)
+                
+                expect(result.data.updateOrder.customer.customerId).to.equal(testCustomerID);
+                expect(result.data.updateOrder.customer.orders[0].invoiceID).to.equal(testInvoiceID);
+                expect(result.data.updateOrder.products.meals).length(1);
+                expect(result.data.updateOrder.products.meals[0].proteinID).to.equal(testMealProductID);
+                expect(result.data.updateOrder.products.meals[0].status).to.equal('UNMADE');
+                expect(result.data.updateOrder.products.meals[0].invoiceItemID).not.equal('' || undefined);
+
+                expect(result.data.updateOrder.products.extras).length(1);
+                expect(result.data.updateOrder.products.extras[0].extraID).to.equal(testExtraProductID);
+                expect(result.data.updateOrder.products.extras[0].status).to.equal('UNMADE');
+                expect(result.data.updateOrder.products.extras[0].invoiceItemID).not.equal('' || undefined);
+
+
+                expect(result.data.updateOrder.pretaxPrice).to.equal(11.99);
+                expect(result.data.updateOrder.coupon).to.equal('GYM5');
+
             });
         });
 
@@ -341,7 +387,6 @@ describe('Order Resolvers Unit Testing', () => {
                             }
                             invoiceID
                             pretaxPrice
-                            invoiceItemIDs
                         }
                     }
                 `;
@@ -382,13 +427,6 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.table(result.errors);
                 expect(result.errors).to.undefined;
 
-                console.table(result.data.addOrderLineItems)
-                /*
-                *2 extras
-                * 2 meals
-                 */
-
-
                 expect(result.data.addOrderLineItems.customer.customerId).to.equal(testCustomerID)
                 expect(result.data.addOrderLineItems.invoiceID).to.equal(testInvoiceID)
 
@@ -398,22 +436,23 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.addOrderLineItems.invoiceItemIDs).length(5)
             });
 
-
             it( 'Update Meal line item', () => {
-                expect(0).to.equal(1)
+                let results: any;
 
+                expect(results.data.updateOrderLineItem.proteinID).to.equal(testMealProductID)
+                expect(results.data.updateOrderLineItem.vegetable).to.equal('Asparagus')
+                expect(results.data.updateOrderLineItem.carbohydrate).to.equal('Rice')
+                expect(results.data.updateOrderLineItem.sauce).to.equal('Balsamic')
+                expect(results.data.updateOrderLineItem.status).to.equal('COOKED')
             });
 
             it( 'Remove Meal line item', () => {
                 expect(0).to.equal(1)
             });
 
-            it( 'Add extra line item', () => {
-                expect(0).to.equal(1)
-            });
-
             it( 'Update extra line item', () => {
-                expect(0).to.equal(1)
+                let results: any;
+                expect(results.data.updateExtraLineItem.status).to.equal('COOKED')
             });
 
             it( 'Remove extra line item', () => {

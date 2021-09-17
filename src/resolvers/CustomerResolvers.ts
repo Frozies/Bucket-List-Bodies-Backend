@@ -3,6 +3,7 @@ import {Stripe} from "stripe";
 import _ from "lodash";
 
 const customerModel = require('../models/CustomerModel')
+const orderModel = require("../models/OrderModel");
 const {customerID} = require('../utility/stripe');
 
 
@@ -200,22 +201,35 @@ export const CustomerResolvers = {
     Customer: {
         async orders(parent: any) {
             let retrievedOrders;
+            let invoices: any = [];
             try {
-                console.log("LOOKING FOR CUSTOMER FROM ORDER")
-                const orders = await stripe.orders.list({
-                    limit: 3,
-                    customer: parent.customer.id
+                console.log("Retrieving orders from customer information.")
+                const orders = await stripe.invoices.list({
+                    customer: parent.customerId
                 });
 
                 retrievedOrders = orders.data
             }
             catch (err) {
-                console.log("Error retrieving orders: " + err);
-                throw new Error("Error retrieving orders: " + err);
+                console.log("Error retrieving stripe orders: " + err);
+                throw new Error("Error retrieving stripe orders: " + err);
             }
-            finally {
-                return retrievedOrders
+
+            try {
+                for(let invoice in retrievedOrders) {
+                    const orders = await orderModel.findOne({invoiceID: retrievedOrders[invoice].id},
+                        (err: any, doc: any) => {
+                        console.log("Found invoice: " + doc.invoiceID);
+                        invoices.push(doc);
+                    })
+                }
             }
+            catch (err) {
+                console.log("Error retrieving database orders: " + err);
+                throw new Error("Error retrieving database orders: " + err);
+            }
+
+            return invoices;
         },
 
         async email(parent: any, context: any) {

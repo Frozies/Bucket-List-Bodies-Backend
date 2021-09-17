@@ -59,7 +59,6 @@ const orderSchema = gql`
     # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
     type Order {
         invoiceID: String!
-        invoiceItemIDs: [String!]!
         customer: Customer!
         products: orderedProducts!
         status: String!
@@ -77,6 +76,8 @@ const orderSchema = gql`
 
     type orderedMeal {
         proteinID: String!
+        priceID: String!
+        invoiceItemID: String!
         vegetable: String!
         carbohydrate: String!
         sauce: String!
@@ -85,6 +86,8 @@ const orderSchema = gql`
 
     type orderedExtra {
         extraID: String!
+        extraPriceID: String!
+        invoiceItemID: String!
         status: StatusCode!
     },
 

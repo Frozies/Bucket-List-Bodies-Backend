@@ -10,6 +10,7 @@ export const orderProductsSchema = new mongoose.Schema({
     meals: [{
         proteinID: String,
         priceID: String,
+        invoiceItemID: String,
         vegetable: String,
         carbohydrate: String,
         sauce: String,
@@ -17,6 +18,8 @@ export const orderProductsSchema = new mongoose.Schema({
     }],
     extras: [{
         extraID: String,
+        invoiceItemID: String,
+        extraPriceID: String,
         status: String,
     }]
 });
@@ -36,7 +39,6 @@ export const orderProductsModel = mongoose.model('Order Products', orderProducts
 * */
 export const orderSchema = new mongoose.Schema({
     invoiceID: String,
-    invoiceItemIDs: [String],
     customerID: String,
     products: orderProductsSchema,
     status: String,
