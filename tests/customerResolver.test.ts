@@ -201,7 +201,7 @@ describe('Customer Resolvers Unit Testing', () => {
 
             console.table(result.data.getAllCustomers)
 
-            expect(result.data.getAllCustomers[0].customerId).to.equal(testCustomerID)
+            expect(result.data.getAllCustomers[result.data.getAllCustomers.length-1].customerId).to.equal(testCustomerID)
         });
 
         it('Retrieve specific customer', async () => {

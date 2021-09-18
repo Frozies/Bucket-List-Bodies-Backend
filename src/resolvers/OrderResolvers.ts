@@ -137,7 +137,8 @@ export const OrderResolvers = {
                 console.log("Created invoice: " + invoiceID)
             }
             catch (err) {
-                console.log("Error creating invoice: " + err)
+                console.log("Error creating invoice: " + err);
+                throw new Error("Error creating invoice: " + err);
             }
 
             console.log("Sending order to DB")
@@ -165,28 +166,25 @@ export const OrderResolvers = {
                     creationDate: new Date(),
                 })
             } catch (err) {
-                return "Error pushing meal to MongoDB: " + err;
+                console.log("Error pushing meal to MongoDB: " + err);
+                throw new Error("Error pushing meal to MongoDB: " + err);
             }
 
 
-            console.log("Adding order to Customer's order ledger.")
             /**
              * Add order to customer ledger.
              * This simply takes the invoiceID and pushes it to the customer database for the specified customer by its
              * ID.
              */
             try {
-                const orders: any[] = []
-                 await customerModel.findOne({id: args.order.customerID},
-                    (err: any, res: any) => {
-                    orders.push(res.data.orders)
-                }).then(async () => {
-                     orders.push( invoiceID )
-
-                     await customerModel.findOneAndUpdate( {id: args.order.customerID}, {
-                         orders: orders
-                     } )
-                 })
+                console.log("Adding order to Customer's order ledger.")
+                await customerModel.findOneAndUpdate(
+                    {customerId: args.order.customerID},
+                    {
+                        $push: {
+                            orders: invoiceID
+                        }
+                    });
             }
             catch (err) {
                 console.log("Error adding order to customer ledger: " + err);
