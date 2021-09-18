@@ -249,7 +249,7 @@ export const OrderResolvers = {
             const invoiceID = args.order.invoiceID;
 
             let meals = await createMeals(args.order.products.meals, args.order.customerID);
-            let extras = await createExtras(args.order.products.meals, args.order.customerID);
+            let extras = await createExtras(args.order.products.extras, args.order.customerID);
 
             totalUnitAmount = meals.total + extras.total;
             
@@ -341,6 +341,8 @@ export const OrderResolvers = {
 
             return orderModel.findOne({invoiceID: invoiceID})
         },
+
+        async updateOrderLineItems(parent: any, args: any) {},
     },
 
     /** Resolver Chains **/

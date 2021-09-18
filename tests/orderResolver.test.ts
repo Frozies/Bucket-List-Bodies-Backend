@@ -433,29 +433,21 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.addOrderLineItems.pretaxPrice).to.equal(33.97)
                 expect(result.data.addOrderLineItems.products.meals).length(3)
                 expect(result.data.addOrderLineItems.products.extras).length(2)
-                expect(result.data.addOrderLineItems.invoiceItemIDs).length(5)
             });
 
-            it( 'Update Meal line item', () => {
+            it( 'Update multiple line items', () => {
                 let results: any;
 
-                expect(results.data.updateOrderLineItem.proteinID).to.equal(testMealProductID)
-                expect(results.data.updateOrderLineItem.vegetable).to.equal('Asparagus')
-                expect(results.data.updateOrderLineItem.carbohydrate).to.equal('Rice')
-                expect(results.data.updateOrderLineItem.sauce).to.equal('Balsamic')
-                expect(results.data.updateOrderLineItem.status).to.equal('COOKED')
+                expect(results.data.updateOrderLineItems.meals.proteinID).to.equal(testMealProductID);
+                expect(results.data.updateOrderLineItems.meals.vegetable).to.equal('Asparagus');
+                expect(results.data.updateOrderLineItems.meals.carbohydrate).to.equal('Rice');
+                expect(results.data.updateOrderLineItems.meals.sauce).to.equal('Balsamic');
+                expect(results.data.updateOrderLineItems.meals.status).to.equal('COOKED');
+
+                expect(results.data.upddateOrderLineItems.extras.status).to.equal('COOKED');
             });
 
             it( 'Remove Meal line item', () => {
-                expect(0).to.equal(1)
-            });
-
-            it( 'Update extra line item', () => {
-                let results: any;
-                expect(results.data.updateExtraLineItem.status).to.equal('COOKED')
-            });
-
-            it( 'Remove extra line item', () => {
                 expect(0).to.equal(1)
             });
         });

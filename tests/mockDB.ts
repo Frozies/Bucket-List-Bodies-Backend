@@ -5,11 +5,10 @@ import {ApolloServer} from "apollo-server-express";
 import {rootResolvers} from "../src/resolvers/rootResolvers";
 import {rootSchema} from "../src/schemas/rootSchema";
 import {mongooseOpts} from "../src/utility/mongooseOpts";
-require('dotenv').config(); // Allows use of environmental variables from the .env file
+import exp = require("constants");
 
 
-
-let mongoServer: any; /*: MongoMemoryServer*/
+let mongoServer: MongoMemoryServer;
 let apolloServer: ApolloServer;
 
 //todo: this can be its own utility file
@@ -21,10 +20,7 @@ let apolloConfig = {
 }
 
 before(async () => {
-    // mongoServer = await MongoMemoryServer.create();
-
-    // @ts-ignore
-    mongoServer = await mongoose.connect(process.env.MONGODB, mongooseOpts);
+    mongoServer = await MongoMemoryServer.create();
     console.log("Created in memory database")
 
     apolloServer = new ApolloServer(apolloConfig);
@@ -41,10 +37,8 @@ module.exports.executeOperation = async (args: any) => {
 }
 
 module.exports.connect = async () => {
-    // const uri = mongoServer.getUri();
-    // @ts-ignore
-    mongoServer = await mongoose.connect(process.env.MONGODB, mongooseOpts);
-
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri, mongooseOpts);
 }
 
 module.exports.disconnect = async () => {
@@ -61,4 +55,3 @@ after(async () => {
     // await mongoServer.disconnect();
     await mongoServer.stop();
 });
-

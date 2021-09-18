@@ -45,7 +45,11 @@ const orderSchema = gql`
         
         #Remove the line items from an order.
         removeOrderLineItems(order: updateOrderLineItemsInput): Order
-        
+
+        #Update the attributes of products (ie products, status, sides of meals)
+        updateOrderLineItems(order: updateOrderLineItemsInput): Order
+
+
         #Update an order's information.
         #        
 
