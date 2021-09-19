@@ -79,7 +79,7 @@ const orderSchema = gql`
     },
 
     type orderedMeal {
-        proteinID: String!
+        productID: String!
         priceID: String!
         invoiceItemID: String!
         vegetable: String!
@@ -89,8 +89,8 @@ const orderSchema = gql`
     },
 
     type orderedExtra {
-        extraID: String!
-        extraPriceID: String!
+        productID: String!
+        priceID: String!
         invoiceItemID: String!
         status: StatusCode!
     },
@@ -114,9 +114,9 @@ const orderSchema = gql`
     },
 
     input orderedMealInput {
-        proteinID: String!
+        productID: String!
         priceID: String!
-        invoiceItemID: String!
+        invoiceItemID: String
         vegetable: String
         carbohydrate: String
         sauce: String
@@ -124,9 +124,9 @@ const orderSchema = gql`
     },
 
     input orderedExtraInput {
-        extraID: String!
-        extraPriceID: String!
-        invoiceItemID: String!
+        productID: String!
+        priceID: String!
+        invoiceItemID: String
         status: String
     },
 
@@ -148,7 +148,7 @@ const orderSchema = gql`
 
     input orderedMealUpdateInput {
         invoiceItemID: String!
-        proteinID: String!
+        productID: String!
         priceID: String!
         vegetable: String
         carbohydrate: String
@@ -157,8 +157,8 @@ const orderSchema = gql`
     },
 
     input orderedExtraUpdateInput {
-        extraID: String!
-        extrasPriceID: String!
+        productID: String!
+        priceID: String!
         invoiceItemID: String!
         status: String
     },

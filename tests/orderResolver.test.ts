@@ -1,5 +1,8 @@
 import {expect} from "chai";
 import { gql } from "apollo-server-express";
+import {stripe} from "../src/utility/stripe";
+import {Stripe} from "stripe";
+
 
 const chai = require('chai');
 chai.use(require('chai-datetime'));
@@ -12,6 +15,8 @@ let testExtraPriceID: string;
 let testMealProductID: string;
 let testMealPriceID: string;
 let testInvoiceID: string;
+let testMealInvoiceItemID: string;
+let testExtraInvoiceItemID: string;
 
 describe('Create test data for an order', () => {
     it('Successfully create customer', async () => {
@@ -131,8 +136,8 @@ describe('Create test data for an order', () => {
         expect(result.data.createExtra.description).to.equal('Delicious egg white bites!');
 
         //set the productID to be used in later queries.
-        testExtraProductID = result.data.createExtra.productID
-        testExtraPriceID = result.data.createExtra.priceID
+        testExtraProductID = result.data.createExtra.productID;
+        testExtraPriceID = result.data.createExtra.priceID;
     });
 
     it('Successfully Create a meal', async () => {
@@ -202,15 +207,15 @@ describe('Order Resolvers Unit Testing', () => {
                                 sauce
                                 carbohydrate
                                 vegetable
-                                proteinID
+                                productID
                                 invoiceItemID
                                 priceID
                             }
                             extras {
                                 status
-                                extraID
+                                productID
                                 invoiceItemID
-                                extraPriceID
+                                priceID
                             }
                         }
                         status
@@ -232,13 +237,13 @@ describe('Order Resolvers Unit Testing', () => {
                             "products": {
                                 "extras": [
                                     {
-                                        "extraID": testExtraProductID,
-                                        "extraPriceID": testExtraPriceID
+                                        "productID": testExtraProductID,
+                                        "priceID": testExtraPriceID
                                     }
                                 ],
                                 "meals": [
                                     {
-                                        "proteinID": testMealProductID,
+                                        "productID": testMealProductID,
                                         "priceID": testMealPriceID,
                                         "vegetable": "Green Beans",
                                         "carbohydrate": "Bread",
@@ -262,12 +267,12 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.createOrder.customer.customerId).to.equal(testCustomerID);
                 expect(result.data.createOrder.customer.orders[0].invoiceID).to.equal(testInvoiceID);
                 expect(result.data.createOrder.products.meals).length(1);
-                expect(result.data.createOrder.products.meals[0].proteinID).to.equal(testMealProductID);
+                expect(result.data.createOrder.products.meals[0].productID).to.equal(testMealProductID);
                 expect(result.data.createOrder.products.meals[0].status).to.equal('UNMADE');
                 expect(result.data.createOrder.products.meals[0].invoiceItemID).not.equal('' || undefined);
 
                 expect(result.data.createOrder.products.extras).length(1);
-                expect(result.data.createOrder.products.extras[0].extraID).to.equal(testExtraProductID);
+                expect(result.data.createOrder.products.extras[0].productID).to.equal(testExtraProductID);
                 expect(result.data.createOrder.products.extras[0].status).to.equal('UNMADE');
                 expect(result.data.createOrder.products.extras[0].invoiceItemID).not.equal('' || undefined);
 
@@ -300,15 +305,15 @@ describe('Order Resolvers Unit Testing', () => {
                                 sauce
                                 carbohydrate
                                 vegetable
-                                proteinID
+                                productID
                                 invoiceItemID
                                 priceID
                             }
                             extras {
                                 status
-                                extraID
+                                productID
                                 invoiceItemID
-                                extraPriceID
+                                priceID
                             }
                         }
                         status
@@ -344,22 +349,25 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.updateOrder.status).to.equal('DELIVERED');
                 expect(result.data.updateOrder.notes).to.equal('First time customer. Loved the order!');
                 expect(result.data.updateOrder.deliveredDate).to.closeToTime(deliveryDate, 10)
-                
+
                 expect(result.data.updateOrder.customer.customerId).to.equal(testCustomerID);
                 expect(result.data.updateOrder.customer.orders[0].invoiceID).to.equal(testInvoiceID);
                 expect(result.data.updateOrder.products.meals).length(1);
-                expect(result.data.updateOrder.products.meals[0].proteinID).to.equal(testMealProductID);
+                expect(result.data.updateOrder.products.meals[0].productID).to.equal(testMealProductID);
                 expect(result.data.updateOrder.products.meals[0].status).to.equal('UNMADE');
                 expect(result.data.updateOrder.products.meals[0].invoiceItemID).not.equal('' || undefined);
 
                 expect(result.data.updateOrder.products.extras).length(1);
-                expect(result.data.updateOrder.products.extras[0].extraID).to.equal(testExtraProductID);
+                expect(result.data.updateOrder.products.extras[0].productID).to.equal(testExtraProductID);
                 expect(result.data.updateOrder.products.extras[0].status).to.equal('UNMADE');
                 expect(result.data.updateOrder.products.extras[0].invoiceItemID).not.equal('' || undefined);
 
 
                 expect(result.data.updateOrder.pretaxPrice).to.equal(11.99);
                 expect(result.data.updateOrder.coupon).to.equal('GYM5');
+
+                let invoice: Stripe.Invoice = await stripe.invoices.retrieve(testInvoiceID);
+                expect(invoice.subtotal/100).to.equal(result.data.updateOrder.pretaxPrice);
 
             });
         });
@@ -371,11 +379,15 @@ describe('Order Resolvers Unit Testing', () => {
                         addOrderLineItems(order: $addOrderLineItemsOrder) {
                             products {
                                 extras {
-                                    extraID
+                                    productID
                                     status
+                                    invoiceItemID
+                                    priceID
                                 }
                                 meals {
-                                    proteinID
+                                    productID
+                                    invoiceItemID
+                                    priceID
                                     vegetable
                                     carbohydrate
                                     sauce
@@ -400,20 +412,20 @@ describe('Order Resolvers Unit Testing', () => {
                             "products": {
                                 "extras": [
                                     {
-                                        "extraID": testExtraProductID,
-                                        "extraPriceID": testExtraPriceID
+                                        "productID": testExtraProductID,
+                                        "priceID": testExtraPriceID
                                     }
                                 ],
                                 "meals": [
                                     {
-                                        "proteinID": testMealProductID,
+                                        "productID": testMealProductID,
                                         "priceID": testMealPriceID,
                                         "vegetable": "Green Beans",
                                         "carbohydrate": "Bread",
                                         "sauce": "BBQ"
                                     },
                                     {
-                                        "proteinID": testMealProductID,
+                                        "productID": testMealProductID,
                                         "priceID": testMealPriceID,
                                         "vegetable": "Broccoli",
                                         "carbohydrate": "Chips",
@@ -433,18 +445,92 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.addOrderLineItems.pretaxPrice).to.equal(33.97)
                 expect(result.data.addOrderLineItems.products.meals).length(3)
                 expect(result.data.addOrderLineItems.products.extras).length(2)
+
+                let invoice: Stripe.Invoice = await stripe.invoices.retrieve(testInvoiceID);
+                expect(invoice.subtotal/100).to.equal(result.data.addOrderLineItems.pretaxPrice);
+
+                expect(result.data.addOrderLineItems.products.meals[0].invoiceItemID).not.equal(undefined)
+                expect(result.data.addOrderLineItems.products.meals[1].invoiceItemID).not.equal(undefined)
+                expect(result.data.addOrderLineItems.products.meals[2].invoiceItemID).not.equal(undefined)
+
+                expect(result.data.addOrderLineItems.products.extras[0].invoiceItemID).not.equal(undefined)
+                expect(result.data.addOrderLineItems.products.extras[1].invoiceItemID).not.equal(undefined)
+
+
+                testMealInvoiceItemID = result.data.addOrderLineItems.products.meals[2].invoiceItemID;
+                testExtraInvoiceItemID = result.data.addOrderLineItems.products.extras[1].invoiceItemID;
             });
 
-            it( 'Update multiple line items', () => {
-                let results: any;
+            it( 'Update multiple line items', async () => {
+                let UPDATE_PRODUCTS = gql`
+                    mutation UpdateOrderLineItemsMutation($updateOrderLineItemsOrder: updateOrderLineItemsInput) {
+                        updateOrderLineItems(order: $updateOrderLineItemsOrder) {
+                            products {
+                                extras {
+                                    productID
+                                    priceID
+                                    invoiceItemID
+                                    status
+                                }
+                                meals {
+                                    productID
+                                    priceID
+                                    invoiceItemID
+                                    vegetable
+                                    carbohydrate
+                                    sauce
+                                    status
+                                }
+                            }
+                            invoiceID
+                            status
+                        }
+                    }
+                `;
 
-                expect(results.data.updateOrderLineItems.meals.proteinID).to.equal(testMealProductID);
-                expect(results.data.updateOrderLineItems.meals.vegetable).to.equal('Asparagus');
-                expect(results.data.updateOrderLineItems.meals.carbohydrate).to.equal('Rice');
-                expect(results.data.updateOrderLineItems.meals.sauce).to.equal('Balsamic');
-                expect(results.data.updateOrderLineItems.meals.status).to.equal('COOKED');
+                const result = await mockDB.executeOperation( {
+                    query: UPDATE_PRODUCTS,
+                    variables: {
+                        "updateOrderLineItemsOrder": {
+                            "customerID": testCustomerID,
+                            "invoiceID": testInvoiceID,
+                            "products": {
+                                "extras": [
+                                    {
+                                        "productID": testExtraProductID,
+                                        "priceID": testExtraPriceID,
+                                        "invoiceItemID": testExtraInvoiceItemID,
+                                        "status": 'COOKED'
+                                    }
+                                ],
+                                "meals": [
+                                    {
+                                        "productID": testMealProductID,
+                                        "priceID": testMealPriceID,
+                                        "invoiceItemID": testMealInvoiceItemID,
+                                        "vegetable": 'Asparagus',
+                                        "carbohydrate": 'Rice',
+                                        "status": 'COOKED',
+                                        "sauce": 'Balsamic'
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                } );
 
-                expect(results.data.upddateOrderLineItems.extras.status).to.equal('COOKED');
+                if (result.errors != undefined) console.table( result.errors );
+                expect( result.errors ).to.undefined;
+
+                console.table(result.data.updateOrderLineItems)
+
+                expect( result.data.updateOrderLineItems.meals.productID ).to.equal( testMealProductID );
+                expect( result.data.updateOrderLineItems.meals.vegetable ).to.equal( 'Asparagus' );
+                expect( result.data.updateOrderLineItems.meals.carbohydrate ).to.equal( 'Rice' );
+                expect( result.data.updateOrderLineItems.meals.sauce ).to.equal( 'Balsamic' );
+                expect( result.data.updateOrderLineItems.meals.status ).to.equal( 'COOKED' );
+
+                expect( result.data.upddateOrderLineItems.extras.status ).to.equal( 'COOKED' );
             });
 
             it( 'Remove Meal line item', () => {

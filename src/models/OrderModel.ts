@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 export const orderProductsSchema = new mongoose.Schema({
     meals: [{
-        proteinID: String,
+        productID: String,
         priceID: String,
         invoiceItemID: String,
         vegetable: String,
@@ -17,9 +17,9 @@ export const orderProductsSchema = new mongoose.Schema({
         status: String,
     }],
     extras: [{
-        extraID: String,
+        productID: String,
         invoiceItemID: String,
-        extraPriceID: String,
+        priceID: String,
         status: String,
     }]
 });

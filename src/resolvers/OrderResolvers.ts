@@ -10,7 +10,7 @@ const customerModel = require('../models/CustomerModel')
  * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
  * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
  */
-let createMeals = async (inputMeals: any, inputCustomerID: string) => {
+let createMeals = async (inputMeals: any, inputCustomerID: string, invoiceID: string | undefined = undefined) => {
     let meals: any = [];
     let total: number = 0;
 
@@ -20,6 +20,7 @@ let createMeals = async (inputMeals: any, inputCustomerID: string) => {
                 customer: inputCustomerID,
                 price: inputMeals[meal].priceID,
                 quantity: 1,
+                invoice: invoiceID ? invoiceID : undefined
             }
 
             const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create( params );
@@ -28,7 +29,7 @@ let createMeals = async (inputMeals: any, inputCustomerID: string) => {
             total += <number>invoiceItem.price?.unit_amount;
 
             meals.push({
-                proteinID: inputMeals[meal].proteinID,
+                productID: inputMeals[meal].productID,
                 priceID: inputMeals[meal].priceID,
                 invoiceItemID: invoiceItem.id,
                 vegetable: inputMeals[meal].vegetable,
@@ -48,7 +49,7 @@ let createMeals = async (inputMeals: any, inputCustomerID: string) => {
     return {meals, total};
 }
 
-let createExtras = async (inputExtras: any, inputCustomerID: string) => {
+let createExtras = async (inputExtras: any, inputCustomerID: string, invoiceID: string | undefined = undefined) => {
     let extras: any = [];
     let total: number = 0;
 
@@ -56,8 +57,9 @@ let createExtras = async (inputExtras: any, inputCustomerID: string) => {
         for (let extra in inputExtras) {
             const params: Stripe.InvoiceItemCreateParams = {
                 customer: inputCustomerID,
-                price: inputExtras[extra].extraPriceID,
+                price: inputExtras[extra].priceID,
                 quantity: 1,
+                invoice: invoiceID ? invoiceID : undefined
             }
 
             const invoiceItem: Stripe.InvoiceItem = await stripe.invoiceItems.create( params );
@@ -66,8 +68,8 @@ let createExtras = async (inputExtras: any, inputCustomerID: string) => {
             total += <number>invoiceItem.price?.unit_amount;
 
             extras.push({
-                extraID: inputExtras[extra].extraID,
-                extraPriceID: inputExtras[extra].extraPriceID,
+                productID: inputExtras[extra].productID,
+                priceID: inputExtras[extra].priceID,
                 invoiceItemID: invoiceItem.id,
                 status: 'UNMADE',
             })
@@ -245,14 +247,8 @@ export const OrderResolvers = {
         },
 
         async addOrderLineItems(parent: any, args: any) {
-            let totalUnitAmount = 0;
             const invoiceID = args.order.invoiceID;
 
-            let meals = await createMeals(args.order.products.meals, args.order.customerID);
-            let extras = await createExtras(args.order.products.extras, args.order.customerID);
-
-            totalUnitAmount = meals.total + extras.total;
-            
             console.log("Sending order to DB")
             /**Update Mongoose Model
              * First create an object of all of the meals/extras with a new property 'status'. Then add the new products
@@ -265,12 +261,11 @@ export const OrderResolvers = {
 
                 //Push old products into a temporary array
                 await orderModel.findOne({invoiceID: invoiceID}, (err: any, doc: any)=>{
-
                     pretaxPrice = doc.pretaxPrice
 
                     doc.products.meals.forEach((doc: any)=> {
                         newMeals.push({
-                            proteinID: doc.proteinID,
+                            productID: doc.productID,
                             priceID: doc.priceID,
                             invoiceItemID: doc.invoiceItemID,
                             vegetable: doc.vegetable,
@@ -282,48 +277,38 @@ export const OrderResolvers = {
 
                     doc.products.extras.forEach((doc: any)=> {
                         newExtras.push({
-                            extraID: doc.extraID,
+                            productID: doc.productID,
                             invoiceItemID: doc.invoiceItemID,
-                            extraPriceID: doc.extraPriceID,
+                            priceID: doc.priceID,
                             status: doc.status
                         })
                     });
                 })
 
-                //push new products into the temporary array
-                for(let meal in args.order.products.meals) {
-                    const priceID = args.order.products.meals[meal].priceID
-                    newMeals.push(
-                        {
-                            proteinID: args.order.products.meals[meal].proteinID,
-                            priceID: priceID,
-                            invoiceItemID: args.order.products.meals[meal].invoiceItemID,
-                            vegetable: args.order.products.meals[meal].vegetable,
-                            carbohydrate: args.order.products.meals[meal].carbohydrate,
-                            sauce: args.order.products.meals[meal].sauce,
-                            status: 'UNMADE',
-                        }
-                    )
-                    const price = await stripe.prices.retrieve( priceID )
-                    pretaxPrice += price.unit_amount ? (price.unit_amount/100) : 0;
-                }
-
-                for(let extra in args.order.products.extras) {
-                    const priceID = args.order.products.extras[extra].extraPriceID;
-                    newExtras.push(
-                        {
-                            extraID: args.order.products.extras[extra].extraID,
-                            extraPriceID: priceID,
-                            invoiceItemID: args.order.products.extras[extra].invoiceItemID,
-                            status: 'UNMADE',
-                        }
-                    )
-
-                    const price = await stripe.prices.retrieve( priceID )
-                    pretaxPrice += price.unit_amount ? (price.unit_amount/100) : 0;
-                }
-
+                console.log("OLD PRODUCTS")
                 console.table(newMeals)
+                console.table(newExtras)
+
+                let meals = await createMeals(args.order.products.meals, args.order.customerID, invoiceID);
+                newMeals.push(
+                    ...meals.meals
+                )
+                pretaxPrice += meals.total / 100
+
+                let extras = await createExtras(args.order.products.extras, args.order.customerID, invoiceID);
+                newExtras.push(
+                    ...extras.extras
+                )
+                pretaxPrice += extras.total / 100
+
+                console.log("NEW PRODUCTS")
+                console.table(meals.meals)
+                console.table(extras.extras)
+
+                console.log("ALL PRODUCTS")
+                console.table(newMeals)
+                console.table(newExtras)
+
 
                 const order = await orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
                     products: {
@@ -343,6 +328,7 @@ export const OrderResolvers = {
         },
 
         async updateOrderLineItems(parent: any, args: any) {
+            const filter = {invoiceID: args.order.invoiceID}
             //change meal veggy, carb, sauce, status & change extra status
 
             //update meals in db
@@ -351,6 +337,9 @@ export const OrderResolvers = {
 
                 for(let meal in args.order.products.meals) {
                     let item = {
+                        invoiceItemID: args.order.products.meals[meal].invoiceItemID,
+                        priceID: args.order.products.meals[meal].priceID,
+                        productID: args.order.products.meals[meal].productID,
                         vegetable: args.order.products.meals[meal].vegetable ? args.order.products.meals[meal].vegetable : undefined,
                         carbohydrate: args.order.products.meals[meal].carbohydrate ? args.order.products.meals[meal].carbohydrate : undefined,
                         sauce: args.order.products.meals[meal].sauce ? args.order.products.meals[meal].sauce : undefined,
@@ -361,24 +350,37 @@ export const OrderResolvers = {
 
                 for(let extra in args.order.products.extras) {
                     let item = {
+                        productID: args.order.products.extras[extra].productID,
+                        priceID: args.order.products.extras[extra].priceID,
+                        invoiceItemID: args.order.products.extras[extra].invoiceItemID,
                         status: args.order.products.extras[extra].status ? args.order.products.extras[extra].status : undefined,
                     }
                     update.push(item)
                 }
 
-                await orderModel.findOneAndUpdate(
-                    {invoiceID: args.order.invoiceID},
-                    _.pickBy(update, (param: any) => {
-                        if (param !== undefined) return param
-                    })
-                )
+                console.log('UPDATE: ')
+                console.table(update)
+
+                const order = orderModel.findOne(filter, (err: any, doc: any) => {
+                    if (err) {
+                        console.log("Error finding order: " + err);
+                        throw new Error("Error finding order: " + err);
+                    }
+                    if (doc) {
+                        console.log("DOC: ")
+                        console.log(doc._doc.products.meals)
+
+                        
+                    }
+                })
+
             }
             catch (err) {
                 console.log("Error updating line items: " + err);
                 throw new Error("Error updating line items: " + err);
             }
 
-            return orderModel.findOne({invoiceID: args.order.invoiceID})
+            return orderModel.findOne(filter)
         },
     },
 
@@ -412,7 +414,7 @@ export const OrderResolvers = {
             //make an array of meals
             parent.meals.forEach((meal: any) => {
                 meals.push({
-                    proteinID: meal.proteinID,
+                    productID: meal.productID,
                     vegetable: meal.vegetable,
                     carbohydrate: meal.carbohydrate,
                     sauce: meal.sauce,
@@ -432,8 +434,8 @@ export const OrderResolvers = {
             parent.extras.forEach((extra: any) => {
                 extras.push({
                     invoiceItemID: extra.invoiceItemID,
-                    extraPriceID: extra.extraPriceID,
-                    extraID: extra.extraID,
+                    priceID: extra.priceID,
+                    productID: extra.productID,
                     status: extra.status,
                 })
             })
