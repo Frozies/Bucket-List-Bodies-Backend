@@ -1,7 +1,7 @@
 
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import _ from "lodash";
+import _, {forEach} from "lodash";
 const orderModel = require('../models/OrderModel');
 const customerModel = require('../models/CustomerModel')
 
@@ -231,7 +231,7 @@ export const OrderResolvers = {
                 }
 
                 await orderModel.updateOne(filter, _.pickBy(update, (param: any) => {
-                    if (param !== undefined) return param
+                    if (param !== undefined) return param 
                 }))
 
                 updatedOrder = orderModel.findOne(filter)
@@ -342,7 +342,44 @@ export const OrderResolvers = {
             return orderModel.findOne({invoiceID: invoiceID})
         },
 
-        async updateOrderLineItems(parent: any, args: any) {},
+        async updateOrderLineItems(parent: any, args: any) {
+            //change meal veggy, carb, sauce, status & change extra status
+
+            //update meals in db
+            try {
+                let update: any = [];
+
+                for(let meal in args.order.products.meals) {
+                    let item = {
+                        vegetable: args.order.products.meals[meal].vegetable ? args.order.products.meals[meal].vegetable : undefined,
+                        carbohydrate: args.order.products.meals[meal].carbohydrate ? args.order.products.meals[meal].carbohydrate : undefined,
+                        sauce: args.order.products.meals[meal].sauce ? args.order.products.meals[meal].sauce : undefined,
+                        status: args.order.products.meals[meal].status ? args.order.products.meals[meal].status : undefined,
+                    }
+                    update.push(item)
+                }
+
+                for(let extra in args.order.products.extras) {
+                    let item = {
+                        status: args.order.products.extras[extra].status ? args.order.products.extras[extra].status : undefined,
+                    }
+                    update.push(item)
+                }
+
+                await orderModel.findOneAndUpdate(
+                    {invoiceID: args.order.invoiceID},
+                    _.pickBy(update, (param: any) => {
+                        if (param !== undefined) return param
+                    })
+                )
+            }
+            catch (err) {
+                console.log("Error updating line items: " + err);
+                throw new Error("Error updating line items: " + err);
+            }
+
+            return orderModel.findOne({invoiceID: args.order.invoiceID})
+        },
     },
 
     /** Resolver Chains **/

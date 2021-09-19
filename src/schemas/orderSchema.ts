@@ -116,14 +116,18 @@ const orderSchema = gql`
     input orderedMealInput {
         proteinID: String!
         priceID: String!
+        invoiceItemID: String!
         vegetable: String
         carbohydrate: String
         sauce: String
+        status: String
     },
 
     input orderedExtraInput {
         extraID: String!
         extraPriceID: String!
+        invoiceItemID: String!
+        status: String
     },
 
     input orderUpdateInput {
