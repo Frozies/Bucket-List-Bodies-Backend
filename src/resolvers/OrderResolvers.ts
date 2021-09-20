@@ -1,7 +1,6 @@
-
 import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
-import _, {forEach} from "lodash";
+import _ from "lodash";
 const orderModel = require('../models/OrderModel');
 const customerModel = require('../models/CustomerModel')
 
@@ -301,15 +300,6 @@ export const OrderResolvers = {
                 )
                 pretaxPrice += extras.total / 100
 
-                console.log("NEW PRODUCTS")
-                console.table(meals.meals)
-                console.table(extras.extras)
-
-                console.log("ALL PRODUCTS")
-                console.table(newMeals)
-                console.table(newExtras)
-
-
                 const order = await orderModel.findOneAndUpdate({invoiceID: invoiceID}, {
                     products: {
                         meals: newMeals,
@@ -329,11 +319,13 @@ export const OrderResolvers = {
 
         async updateOrderLineItems(parent: any, args: any) {
             const filter = {invoiceID: args.order.invoiceID}
+            let orderID: string;
             //change meal veggy, carb, sauce, status & change extra status
 
             //update meals in db
             try {
-                let update: any = [];
+                let updateMeals: any = [];
+                let updateExtras: any = [];
 
                 for(let meal in args.order.products.meals) {
                     let item = {
@@ -345,7 +337,7 @@ export const OrderResolvers = {
                         sauce: args.order.products.meals[meal].sauce ? args.order.products.meals[meal].sauce : undefined,
                         status: args.order.products.meals[meal].status ? args.order.products.meals[meal].status : undefined,
                     }
-                    update.push(item)
+                    updateMeals.push(item)
                 }
 
                 for(let extra in args.order.products.extras) {
@@ -355,25 +347,79 @@ export const OrderResolvers = {
                         invoiceItemID: args.order.products.extras[extra].invoiceItemID,
                         status: args.order.products.extras[extra].status ? args.order.products.extras[extra].status : undefined,
                     }
-                    update.push(item)
+                    updateExtras.push(item)
                 }
 
-                console.log('UPDATE: ')
-                console.table(update)
+                let intersectionMeals: any = []
+                let intersectionExtras: any = []
 
-                const order = orderModel.findOne(filter, (err: any, doc: any) => {
+                const order = await orderModel.findOne(filter, (err: any, doc: any) => {
                     if (err) {
                         console.log("Error finding order: " + err);
                         throw new Error("Error finding order: " + err);
                     }
-                    if (doc) {
-                        console.log("DOC: ")
-                        console.log(doc._doc.products.meals)
+                }).then(async (orderDoc: any) => {
+                    for (let index in updateMeals) {
+                        let intersection = orderDoc._doc.products.meals.filter((item: any) => {
+                            if (item.invoiceItemID != updateMeals[index].invoiceItemID) {
+                                intersectionMeals.push(item)
+                            }
+                            return item.invoiceItemID == updateMeals[index].invoiceItemID
 
-                        
+                        })
+
+                        let updatedMeal = {
+                            _id: intersection[index]._id,
+                            productID: intersection[index].productID,
+                            priceID: intersection[index].priceID,
+                            invoiceItemID: intersection[index].invoiceItemID,
+                            vegetable: updateMeals[index].vegetable ? updateMeals[index].vegetable : intersection[index].vegetable,
+                            carbohydrate: updateMeals[index].carbohydrate ? updateMeals[index].carbohydrate : intersection[index].carbohydrate,
+                            sauce: updateMeals[index].sauce ? updateMeals[index].sauce : intersection[index].sauce,
+                            status: updateMeals[index].status ? updateMeals[index].status : intersection[index].status
+                        }
+
+                        intersectionMeals.push(updatedMeal)
                     }
-                })
 
+                    for (let index in updateExtras) {
+                        let intersection = orderDoc._doc.products.extras.filter((item: any) => {
+                            if (item.invoiceItemID != updateExtras[index].invoiceItemID) {
+                                intersectionExtras.push(item)
+                            }
+                            return item.invoiceItemID == updateExtras[index].invoiceItemID
+
+                        })
+
+                        let updatedExtra = {
+                            _id: intersection[index]._id,
+                            productID: intersection[index].productID,
+                            priceID: intersection[index].priceID,
+                            invoiceItemID: intersection[index].invoiceItemID,
+                            status: updateExtras[index].status ? updateExtras[index].status : intersection[index].status
+                        }
+
+                        intersectionExtras.push(updatedExtra)
+                    }
+
+                    console.log("UPDATING ORDER")
+
+                    await orderModel.updateOne(
+                        {
+                            invoiceID: args.order.invoiceID
+                        },
+                        {
+                            products: {
+                                meals: [...intersectionMeals],
+                                extras: [...intersectionExtras]
+                            }
+                        }, null, (err: any, res: any) => {
+                            if (err) {
+                                console.log("Error finding order: " + err);
+                                throw new Error("Error finding order: " + err);
+                            }
+                        })
+                })
             }
             catch (err) {
                 console.log("Error updating line items: " + err);

@@ -2,6 +2,7 @@ import {expect} from "chai";
 import { gql } from "apollo-server-express";
 import {stripe} from "../src/utility/stripe";
 import {Stripe} from "stripe";
+import {forEach} from "lodash";
 
 
 const chai = require('chai');
@@ -500,7 +501,7 @@ describe('Order Resolvers Unit Testing', () => {
                                         "productID": testExtraProductID,
                                         "priceID": testExtraPriceID,
                                         "invoiceItemID": testExtraInvoiceItemID,
-                                        "status": 'COOKED'
+                                        "status": 'MADE'
                                     }
                                 ],
                                 "meals": [
@@ -510,7 +511,7 @@ describe('Order Resolvers Unit Testing', () => {
                                         "invoiceItemID": testMealInvoiceItemID,
                                         "vegetable": 'Asparagus',
                                         "carbohydrate": 'Rice',
-                                        "status": 'COOKED',
+                                        "status": 'MADE',
                                         "sauce": 'Balsamic'
                                     }
                                 ]
@@ -522,15 +523,15 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.table( result.errors );
                 expect( result.errors ).to.undefined;
 
-                console.table(result.data.updateOrderLineItems)
+                console.log(result.data.updateOrderLineItems)
 
-                expect( result.data.updateOrderLineItems.meals.productID ).to.equal( testMealProductID );
-                expect( result.data.updateOrderLineItems.meals.vegetable ).to.equal( 'Asparagus' );
-                expect( result.data.updateOrderLineItems.meals.carbohydrate ).to.equal( 'Rice' );
-                expect( result.data.updateOrderLineItems.meals.sauce ).to.equal( 'Balsamic' );
-                expect( result.data.updateOrderLineItems.meals.status ).to.equal( 'COOKED' );
+                expect( result.data.updateOrderLineItems.products.meals[2].productID ).to.equal( testMealProductID );
+                expect( result.data.updateOrderLineItems.products.meals[2].vegetable ).to.equal( 'Asparagus' );
+                expect( result.data.updateOrderLineItems.products.meals[2].carbohydrate ).to.equal( 'Rice' );
+                expect( result.data.updateOrderLineItems.products.meals[2].sauce ).to.equal( 'Balsamic' );
+                expect( result.data.updateOrderLineItems.products.meals[2].status ).to.equal( 'MADE' );
 
-                expect( result.data.upddateOrderLineItems.extras.status ).to.equal( 'COOKED' );
+                expect( result.data.updateOrderLineItems.products.extras[1].status ).to.equal( 'MADE' );
             });
 
             it( 'Remove Meal line item', () => {
