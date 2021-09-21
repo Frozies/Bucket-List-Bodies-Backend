@@ -2,8 +2,6 @@ import {expect} from "chai";
 import { gql } from "apollo-server-express";
 import {stripe} from "../src/utility/stripe";
 import {Stripe} from "stripe";
-import {forEach} from "lodash";
-
 
 const chai = require('chai');
 chai.use(require('chai-datetime'));
@@ -188,7 +186,7 @@ describe('Create test data for an order', () => {
         testMealProductID = result.data.createMeal.productID
         testMealPriceID = result.data.createMeal.priceID
     });
-})
+});
 describe('Order Resolvers Unit Testing', () => {
     describe('Mutations', () => {
         describe('createOrder', () => {
@@ -534,8 +532,79 @@ describe('Order Resolvers Unit Testing', () => {
                 expect( result.data.updateOrderLineItems.products.extras[1].status ).to.equal( 'MADE' );
             });
 
-            it( 'Remove Meal line item', () => {
-                expect(0).to.equal(1)
+            it( 'Remove line items', async () => {
+                let REMOVE_PRODUCTS = gql`
+                    mutation UpdateOrderLineItemsMutation($removeOrderLineItemsOrder: updateOrderLineItemsInput) {
+                        removeOrderLineItems(order: $removeOrderLineItemsOrder) {
+                            products {
+                                extras {
+                                    productID
+                                    priceID
+                                    invoiceItemID
+                                    status
+                                }
+                                meals {
+                                    productID
+                                    priceID
+                                    invoiceItemID
+                                    vegetable
+                                    carbohydrate
+                                    sauce
+                                    status
+                                }
+                            }
+                            invoiceID
+                            status
+                        }
+                    }
+                `;
+
+                let mealPricePromise = await stripe.prices.retrieve(testMealPriceID)
+                // @ts-ignore
+                let mealPrice = mealPricePromise.unit_amount/100
+
+                let extraPricePromise = await stripe.prices.retrieve(testExtraPriceID)
+                // @ts-ignore
+                let extraPrice = extraPricePromise.unit_amount/100
+
+                const result = await mockDB.executeOperation( {
+                    query: REMOVE_PRODUCTS,
+                    variables: {
+                        "removeOrderLineItemsOrder": {
+                            "customerID": testCustomerID,
+                            "invoiceID": testInvoiceID,
+                            "products": {
+                                "extras": [
+                                    {
+                                        "productID": testExtraProductID,
+                                        "priceID": testExtraPriceID,
+                                        "invoiceItemID": testExtraInvoiceItemID,
+                                        "pretaxPrice": mealPrice
+                                    }
+                                ],
+                                "meals": [
+                                    {
+                                        "productID": testMealProductID,
+                                        "priceID": testMealPriceID,
+                                        "invoiceItemID": testMealInvoiceItemID,
+                                        "pretaxPrice": extraPrice
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                } );
+
+                if (result.errors != undefined) console.table( result.errors );
+                expect( result.errors ).to.undefined;
+
+                console.log(result.data.removeOrderLineItems)
+
+                expect( result.data.removeOrderLineItems.products.meals ).length(2)
+                expect( result.data.removeOrderLineItems.products.extras ).length(1)
+
+                let invoice: Stripe.Invoice = await stripe.invoices.retrieve(testInvoiceID);
+                expect(invoice.subtotal/100).to.equal(result.data.removeOrderLineItems.pretaxPrice);
             });
         });
 

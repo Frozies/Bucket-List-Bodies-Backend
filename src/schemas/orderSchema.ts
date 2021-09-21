@@ -48,7 +48,7 @@ const orderSchema = gql`
 
         #Update the attributes of products (ie products, status, sides of meals)
         updateOrderLineItems(order: updateOrderLineItemsInput): Order
-
+        
 
         #Update an order's information.
         #        
@@ -86,6 +86,7 @@ const orderSchema = gql`
         carbohydrate: String!
         sauce: String!
         status: StatusCode!
+        pretaxPrice: Float!
     },
 
     type orderedExtra {
@@ -93,6 +94,7 @@ const orderSchema = gql`
         priceID: String!
         invoiceItemID: String!
         status: StatusCode!
+        pretaxPrice: Float!
     },
 
     input createOrderInput {
@@ -109,8 +111,8 @@ const orderSchema = gql`
     }
 
     input orderedProductsInput {
-        meals: [orderedMealInput!]!
-        extras: [orderedExtraInput]
+        meals: [orderedMealInput!]
+        extras: [orderedExtraInput!]
     },
 
     input orderedMealInput {
@@ -121,6 +123,7 @@ const orderSchema = gql`
         carbohydrate: String
         sauce: String
         status: String
+        pretaxPrice: Float
     },
 
     input orderedExtraInput {
@@ -128,6 +131,7 @@ const orderSchema = gql`
         priceID: String!
         invoiceItemID: String
         status: String
+        pretaxPrice: Float
     },
 
     input orderUpdateInput {

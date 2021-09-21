@@ -35,6 +35,7 @@ let createMeals = async (inputMeals: any, inputCustomerID: string, invoiceID: st
                 carbohydrate: inputMeals[meal].carbohydrate,
                 sauce: inputMeals[meal].sauce,
                 status: 'UNMADE',
+                pretaxPrice: inputMeals[meals].pretaxPrice
             })
         }
     }
@@ -71,6 +72,7 @@ let createExtras = async (inputExtras: any, inputCustomerID: string, invoiceID: 
                 priceID: inputExtras[extra].priceID,
                 invoiceItemID: invoiceItem.id,
                 status: 'UNMADE',
+                pretaxPrice: inputExtras[extra].pretaxPrice
             })
         }
     }
@@ -270,7 +272,8 @@ export const OrderResolvers = {
                             vegetable: doc.vegetable,
                             carbohydrate: doc.carbohydrate,
                             sauce: doc.sauce,
-                            status: doc.status
+                            status: doc.status,
+                            pretaxPrice: doc.pretaxPrice,
                         })
                     });
 
@@ -279,7 +282,8 @@ export const OrderResolvers = {
                             productID: doc.productID,
                             invoiceItemID: doc.invoiceItemID,
                             priceID: doc.priceID,
-                            status: doc.status
+                            status: doc.status,
+                            pretaxPrice: doc.pretaxPrice
                         })
                     });
                 })
@@ -419,6 +423,102 @@ export const OrderResolvers = {
                                 throw new Error("Error finding order: " + err);
                             }
                         })
+                })
+            }
+            catch (err) {
+                console.log("Error updating line items: " + err);
+                throw new Error("Error updating line items: " + err);
+            }
+
+            return orderModel.findOne(filter)
+        },
+
+        async removeOrderLineItems(parent: any, args: any) {
+            const filter = {invoiceID: args.order.invoiceID}
+
+
+            //update meals in db
+            try {
+                let intersectionMeals: any = []
+                let intersectionExtras: any = []
+
+                let updateMeals: any = [];
+                let updateExtras: any = [];
+
+                for(let meal in args.order.products.meals) {
+                    let item = {
+                        invoiceItemID: args.order.products.meals[meal].invoiceItemID,
+                        priceID: args.order.products.meals[meal].priceID,
+                        productID: args.order.products.meals[meal].productID,
+                        pretaxPrice: args.order.products.meals[meal].pretaxPrice,
+                    }
+                    updateMeals.push(item)
+                }
+
+                for(let extra in args.order.products.extras) {
+                    let item = {
+                        productID: args.order.products.extras[extra].productID,
+                        priceID: args.order.products.extras[extra].priceID,
+                        invoiceItemID: args.order.products.extras[extra].invoiceItemID,
+                        pretaxPrice: args.order.products.extras[extra].pretaxPrice,
+                    }
+                    updateExtras.push(item)
+                }
+
+                const order = await orderModel.findOne(filter, (err: any, doc: any) => {
+                    if (err) {
+                        console.log("Error finding order: " + err);
+                        throw new Error("Error finding order: " + err);
+                    }
+                }).then(async (orderDoc: any) => {
+
+                    for (let index in updateMeals) {
+                        let doc = orderDoc._doc.products.meals.filter(async (item: any) => {
+                            if (item.invoiceItemID != updateMeals[index].invoiceItemID) {
+                                intersectionMeals.push( item )
+                            }
+                        })
+                    }
+
+                    for (let index in updateExtras) {
+                        let doc = orderDoc._doc.products.extras.filter(async (item: any) => {
+                            if (item.invoiceItemID != updateExtras[index].invoiceItemID) {
+                                intersectionExtras.push( item )
+                            }
+                        })
+                    }
+
+                }).then(async () => {
+                    console.log( "UPDATING ORDER" )
+                    let pretaxPrice = 0;
+                    console.log(intersectionMeals)
+
+
+                    for(let i in intersectionMeals) {
+                        pretaxPrice += intersectionMeals[i].pretaxPrice
+                    }
+                    for(let i in intersectionExtras){
+                        pretaxPrice += intersectionExtras[i].pretaxPrice
+                    }
+
+                    console.log("PretaxPrice " + pretaxPrice)
+
+                    await orderModel.updateOne(
+                        {
+                            invoiceID: args.order.invoiceID
+                        },
+                        {
+                            pretaxPrice: pretaxPrice,
+                            products: {
+                                meals: [...intersectionMeals],
+                                extras: [...intersectionExtras]
+                            }
+                        }, null, (err: any, res: any) => {
+                            if (err) {
+                                console.log( "Error finding order: " + err );
+                                throw new Error( "Error finding order: " + err );
+                            }
+                        } )
                 })
             }
             catch (err) {
