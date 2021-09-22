@@ -202,6 +202,7 @@ export const CustomerResolvers = {
         async orders(parent: any) {
             let retrievedOrders;
             let invoices: any = [];
+
             try {
                 console.log("Retrieving orders from customer information.")
                 const orders = await stripe.invoices.list({
@@ -216,8 +217,8 @@ export const CustomerResolvers = {
             }
 
             try {
-                for(let invoice in retrievedOrders) {
-                    const orders = await orderModel.findOne({invoiceID: retrievedOrders[invoice].id},
+                for await (let invoice of retrievedOrders) {
+                    const orders = await orderModel.findOne({invoiceID: invoice.id},
                         (err: any, doc: any) => {
                         console.log("Found invoice: " + doc.invoiceID);
                         invoices.push(doc);
@@ -229,7 +230,7 @@ export const CustomerResolvers = {
                 throw new Error("Error retrieving database orders: " + err);
             }
 
-            return invoices;
+            return await invoices;
         },
 
         async email(parent: any, context: any) {

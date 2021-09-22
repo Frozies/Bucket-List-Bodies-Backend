@@ -199,7 +199,6 @@ describe('Customer Resolvers Unit Testing', () => {
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            console.table(result.data.getAllCustomers)
 
             expect(result.data.getAllCustomers[result.data.getAllCustomers.length-1].customerId).to.equal(testCustomerID)
         });

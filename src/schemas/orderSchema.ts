@@ -49,6 +49,10 @@ const orderSchema = gql`
         #Update the attributes of products (ie products, status, sides of meals)
         updateOrderLineItems(order: updateOrderLineItemsInput): Order
         
+        payOutOfBandOrder(order: orderUpdateInput): Order
+        
+        sendForManualPaymentOrder(order: orderUpdateInput): Order
+        
 
         #Update an order's information.
         #        

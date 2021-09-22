@@ -15,12 +15,14 @@ export const orderProductsSchema = new mongoose.Schema({
         carbohydrate: String,
         sauce: String,
         status: String,
+        pretaxPrice: Number,
     }],
     extras: [{
         productID: String,
         invoiceItemID: String,
         priceID: String,
         status: String,
+        pretaxPrice: Number,
     }]
 });
 

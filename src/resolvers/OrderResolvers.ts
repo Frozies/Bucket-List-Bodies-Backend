@@ -14,10 +14,10 @@ let createMeals = async (inputMeals: any, inputCustomerID: string, invoiceID: st
     let total: number = 0;
 
     try {
-        for (let meal in inputMeals) {
+        for await (let meal of inputMeals) {
             const params: Stripe.InvoiceItemCreateParams = {
                 customer: inputCustomerID,
-                price: inputMeals[meal].priceID,
+                price: meal.priceID,
                 quantity: 1,
                 invoice: invoiceID ? invoiceID : undefined
             }
@@ -28,14 +28,14 @@ let createMeals = async (inputMeals: any, inputCustomerID: string, invoiceID: st
             total += <number>invoiceItem.price?.unit_amount;
 
             meals.push({
-                productID: inputMeals[meal].productID,
-                priceID: inputMeals[meal].priceID,
+                productID: meal.productID,
+                priceID: meal.priceID,
                 invoiceItemID: invoiceItem.id,
-                vegetable: inputMeals[meal].vegetable,
-                carbohydrate: inputMeals[meal].carbohydrate,
-                sauce: inputMeals[meal].sauce,
+                vegetable: meal.vegetable,
+                carbohydrate: meal.carbohydrate,
+                sauce: meal.sauce,
                 status: 'UNMADE',
-                pretaxPrice: inputMeals[meals].pretaxPrice
+                pretaxPrice: <number>invoiceItem.price?.unit_amount / 100
             })
         }
     }
@@ -54,10 +54,10 @@ let createExtras = async (inputExtras: any, inputCustomerID: string, invoiceID: 
     let total: number = 0;
 
     try {
-        for (let extra in inputExtras) {
+        for await (let extra of inputExtras) {
             const params: Stripe.InvoiceItemCreateParams = {
                 customer: inputCustomerID,
-                price: inputExtras[extra].priceID,
+                price: extra.priceID,
                 quantity: 1,
                 invoice: invoiceID ? invoiceID : undefined
             }
@@ -68,11 +68,11 @@ let createExtras = async (inputExtras: any, inputCustomerID: string, invoiceID: 
             total += <number>invoiceItem.price?.unit_amount;
 
             extras.push({
-                productID: inputExtras[extra].productID,
-                priceID: inputExtras[extra].priceID,
+                productID: extra.productID,
+                priceID: extra.priceID,
                 invoiceItemID: invoiceItem.id,
                 status: 'UNMADE',
-                pretaxPrice: inputExtras[extra].pretaxPrice
+                pretaxPrice: <number>invoiceItem.price?.unit_amount / 100
             })
         }
     }
@@ -195,7 +195,7 @@ export const OrderResolvers = {
             }
 
             //retrieve the newly updated order and return that to the client.
-            return orderModel.findOne({invoiceID: invoiceID})
+            return orderModel.findOne({invoiceID: invoiceID});
         },
 
         async updateOrder(parent: any, args: any,) {
@@ -287,10 +287,6 @@ export const OrderResolvers = {
                         })
                     });
                 })
-
-                console.log("OLD PRODUCTS")
-                console.table(newMeals)
-                console.table(newExtras)
 
                 let meals = await createMeals(args.order.products.meals, args.order.customerID, invoiceID);
                 newMeals.push(
@@ -436,14 +432,17 @@ export const OrderResolvers = {
         async removeOrderLineItems(parent: any, args: any) {
             const filter = {invoiceID: args.order.invoiceID}
 
+            let intersectionMeals: any = []
+            let intersectionExtras: any = []
+
+            let removedMeals: any = [];
+            let removedExtras: any = [];
 
             //update meals in db
             try {
-                let intersectionMeals: any = []
-                let intersectionExtras: any = []
 
-                let updateMeals: any = [];
-                let updateExtras: any = [];
+
+                //Create an array of and extras remove later.
 
                 for(let meal in args.order.products.meals) {
                     let item = {
@@ -452,7 +451,7 @@ export const OrderResolvers = {
                         productID: args.order.products.meals[meal].productID,
                         pretaxPrice: args.order.products.meals[meal].pretaxPrice,
                     }
-                    updateMeals.push(item)
+                    removedMeals.push(item)
                 }
 
                 for(let extra in args.order.products.extras) {
@@ -462,27 +461,29 @@ export const OrderResolvers = {
                         invoiceItemID: args.order.products.extras[extra].invoiceItemID,
                         pretaxPrice: args.order.products.extras[extra].pretaxPrice,
                     }
-                    updateExtras.push(item)
+                    removedExtras.push(item)
                 }
 
+                //Find an order
                 const order = await orderModel.findOne(filter, (err: any, doc: any) => {
                     if (err) {
                         console.log("Error finding order: " + err);
                         throw new Error("Error finding order: " + err);
                     }
-                }).then(async (orderDoc: any) => {
+                }).then((orderDoc: any) => {
 
-                    for (let index in updateMeals) {
-                        let doc = orderDoc._doc.products.meals.filter(async (item: any) => {
-                            if (item.invoiceItemID != updateMeals[index].invoiceItemID) {
+                    //compare the items in the document and blacklist the removedItems pushed to a new array.
+                    for (let index in removedMeals) {
+                        let doc = orderDoc._doc.products.meals.filter( (item: any) => {
+                            if (item.invoiceItemID != removedMeals[index].invoiceItemID) {
                                 intersectionMeals.push( item )
                             }
                         })
                     }
 
-                    for (let index in updateExtras) {
-                        let doc = orderDoc._doc.products.extras.filter(async (item: any) => {
-                            if (item.invoiceItemID != updateExtras[index].invoiceItemID) {
+                    for (let index in removedExtras) {
+                        let doc = orderDoc._doc.products.extras.filter((item: any) => {
+                            if (item.invoiceItemID != removedExtras[index].invoiceItemID) {
                                 intersectionExtras.push( item )
                             }
                         })
@@ -491,9 +492,8 @@ export const OrderResolvers = {
                 }).then(async () => {
                     console.log( "UPDATING ORDER" )
                     let pretaxPrice = 0;
-                    console.log(intersectionMeals)
 
-
+                    //Create a price to use later.
                     for(let i in intersectionMeals) {
                         pretaxPrice += intersectionMeals[i].pretaxPrice
                     }
@@ -526,7 +526,33 @@ export const OrderResolvers = {
                 throw new Error("Error updating line items: " + err);
             }
 
+            //Update Stripe products
+            try {
+                for await (let meal of removedMeals) {
+                    await stripe.invoiceItems.del(meal.invoiceItemID)
+                }
+
+                for await (let extra of removedExtras) {
+                    await stripe.invoiceItems.del(extra.invoiceItemID)
+                }
+            }
+            catch (err) {
+                console.log("Error deleting items from stripe invoice: " + err);
+                throw new Error("Error deleting items from stripe invoice: " + err);
+            }
+
             return orderModel.findOne(filter)
+        },
+
+        async payOutOfBandOrder(parent: any, args: any) {
+            //stripe payment
+            //update database
+        },
+
+        async sendForManualPaymentOrder(parent: any, args: any) {
+            //stripe payment
+            //update database
+            //todo: webhooks for database updates?
         },
     },
 
@@ -537,17 +563,24 @@ export const OrderResolvers = {
 
             let customerId = await stripe.invoices.retrieve(parent.invoiceID).then((invoice: any) => {return invoice.customer})
             console.log("Retrieving Customer Data: " + customerId)
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            const customerStripe: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+
+           /* let orders: any = []
+            await customerModel.findOne({customerId: customerId}, (err: any, res: any) => {
+                if (err) throw new Error("Error finding customer model in order.customer chain.")
+                orders.push(res.orders)
+            });*/
 
             return {
-                customerId:  customer.id,
-                name: "name" in customer ? customer.name : undefined,
-                email: "email" in customer ? customer.email : undefined,
-                phone: "phone" in customer ? customer.email : undefined,
-                address: "address" in customer ? customer.address : undefined,
-                shipping: "shipping" in customer ? customer.shipping : undefined,
-                default_source: "default_source" in customer ? customer.default_source : undefined,
-                notes: "description" in customer ? customer.description : undefined
+                customerId:  customerStripe.id,
+                name: "name" in customerStripe ? customerStripe.name : undefined,
+                email: "email" in customerStripe ? customerStripe.email : undefined,
+                phone: "phone" in customerStripe ? customerStripe.email : undefined,
+                address: "address" in customerStripe ? customerStripe.address : undefined,
+                shipping: "shipping" in customerStripe ? customerStripe.shipping : undefined,
+                default_source: "default_source" in customerStripe ? customerStripe.default_source : undefined,
+                notes: "description" in customerStripe ? customerStripe.description : undefined,
+                // orders: orders
             }
         },
     },

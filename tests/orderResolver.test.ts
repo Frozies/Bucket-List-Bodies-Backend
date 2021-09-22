@@ -258,13 +258,10 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-
                 expect(result.data.createOrder.invoiceID).not.equal('' || undefined);
-
                 testInvoiceID = result.data.createOrder.invoiceID;
 
                 expect(result.data.createOrder.customer.customerId).to.equal(testCustomerID);
-                expect(result.data.createOrder.customer.orders[0].invoiceID).to.equal(testInvoiceID);
                 expect(result.data.createOrder.products.meals).length(1);
                 expect(result.data.createOrder.products.meals[0].productID).to.equal(testMealProductID);
                 expect(result.data.createOrder.products.meals[0].status).to.equal('UNMADE');
@@ -280,6 +277,12 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.createOrder.pretaxPrice).to.equal(11.99);
                 expect(result.data.createOrder.coupon).to.equal('GYM5');
                 expect(result.data.createOrder.notes).to.equal('Deliver before 5pm');
+
+                console.log("CUSTOMER STUFF")
+                console.log(result.data.createOrder.customer)
+                console.log(result.data.createOrder.customer.orders)
+
+                expect(result.data.createOrder.customer.orders[0].invoiceID).to.equal(testInvoiceID);
 
                 expect(result.data.createOrder.creationDate).to.closeToTime(new Date(), 10)
 
@@ -555,6 +558,7 @@ describe('Order Resolvers Unit Testing', () => {
                             }
                             invoiceID
                             status
+                            pretaxPrice
                         }
                     }
                 `;
@@ -604,14 +608,22 @@ describe('Order Resolvers Unit Testing', () => {
                 expect( result.data.removeOrderLineItems.products.extras ).length(1)
 
                 let invoice: Stripe.Invoice = await stripe.invoices.retrieve(testInvoiceID);
-                expect(invoice.subtotal/100).to.equal(result.data.removeOrderLineItems.pretaxPrice);
+                let subtotal = invoice.subtotal/100
+
+                expect(subtotal).to.equal(result.data.removeOrderLineItems.pretaxPrice);
             });
         });
 
-        describe('FinalizeOrder', () => {
-            it( 'successfully finalize an order', () => {
-                expect(0).to.equal(1); // Fail because no logic implementation
-            } );
+        describe('Order Payments', () => {
+            it( 'payOutOfBandOrder', () => {
+
+            });
+
+            it( 'sendForManualPaymentOrder', () => {
+
+            });
+
+
         })
     });
 
