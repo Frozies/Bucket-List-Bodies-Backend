@@ -54,13 +54,7 @@ jobs:
           username: root
           command_timeout: 5m
           passphrase: ${{ secrets.OPENSSH_PRIVATE_KEY_PASSPHRASE }}
-          envs: 
-          STRIPE_SECRET_KEY, 
-          CLOUDINARY_CLOUD_NAME, 
-          CLOUDINARY_API_KEY,
-          CLOUDINARY_API_SECRET,
-          MONGODB,
-          SERVER_PORT
+          envs: STRIPE_SECRET_KEY,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,MONGODB,SERVER_PORT
           script: >
             docker pull frozies/bucket_list_bodies_backend:main
 
