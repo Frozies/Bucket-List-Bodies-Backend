@@ -40,13 +40,13 @@ jobs:
       - name: Deploy api to DigitalOcean Droplet
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DO_API1_HOST }}
-          key: ${{ secrets.DO_API_KEY }}
+          host: ${{ secrets.DO_SERVER_IP }}
+          key: ${{ secrets.PUBLIC_KEY }}
           debug: true
           port: 22
           username: root
           command_timeout: 5m
-          passphrase: ${{ secrets.DO_KEY_PASSPHRASE }}
+          passphrase: ${{ secrets.PUBLIC_KEY_PASSPHRASE }}
           script: >
             doctl registry login --expiry-seconds 180
 
