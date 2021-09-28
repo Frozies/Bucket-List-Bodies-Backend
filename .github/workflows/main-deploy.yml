@@ -70,7 +70,7 @@ jobs:
 
             docker run -d \
               --restart always \
-              -p 0.0.0.0:4001:4001 \
+              -p 143.244.145.46:4001:4001 \
               -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
               -e CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME \
               -e CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY \
