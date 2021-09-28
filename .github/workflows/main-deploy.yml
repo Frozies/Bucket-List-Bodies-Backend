@@ -40,12 +40,12 @@ jobs:
       - name: Deploy api to DigitalOcean Droplet
         uses: appleboy/ssh-action@master
         env:
-          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
-          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-          MONGODB=${{ secrets.MONGODB }}
-          SERVER_PORT=${{ secrets.SERVER_PORT }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          MONGODB: ${{ secrets.MONGODB }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
         with:
           host: ${{ secrets.DO_SERVER_IP }}
           key: ${{ secrets.OPENSSH_PRIVATE_KEY }}
