@@ -6,7 +6,6 @@ import promisesAll from 'promises-all';
 const processUpload = async (upload: PromiseLike<any>) => {
     const { filename, mimetype, createReadStream } = await upload;
     const stream = createReadStream();
-    console.log("STREAM" + stream)
 
     const cloudinary = require('cloudinary');
     cloudinary.config(
@@ -46,9 +45,25 @@ const processUpload = async (upload: PromiseLike<any>) => {
     return(resultUrl)
 };
 
+export enum StatusCode {
+    UNMADE = "UNMADE",
+    MADE = "MADE",
+    DELIVERED = "DELIVERED",
+    CANCELED = "CANCELED",
+    REFUNDED = "REFUNDED",
+}
+
 export const UtilityResolvers = {
     // Date: GraphQLDateTime
     Upload: GraphQLUpload,
+
+    StatusCode: {
+        UNMADE: StatusCode.UNMADE,
+        MADE: StatusCode.MADE,
+        DELIVERED: StatusCode.DELIVERED,
+        CANCELED: StatusCode.CANCELED,
+        REFUNDED: StatusCode.REFUNDED,
+    },
 
     Mutation: {
         async singleFileUpload(parent: any, {file}: any) {
@@ -70,11 +85,5 @@ export const UtilityResolvers = {
             return resolve;
         },
     }
-
-    /*
-    * TODO: Stripe Queries
-    * TODO: Mutations
-    * TODO: Find existing customer for stripe
-    */
 }
 module.exports = UtilityResolvers;

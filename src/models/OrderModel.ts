@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-const customerSchema = require('./CustomerModel')
 
 /*
 * An orderProducts schema has: (the products included in an order)
@@ -9,13 +8,21 @@ const customerSchema = require('./CustomerModel')
 
 export const orderProductsSchema = new mongoose.Schema({
     meals: [{
-        proteinID: String,
+        productID: String,
+        priceID: String,
+        invoiceItemID: String,
         vegetable: String,
         carbohydrate: String,
         sauce: String,
+        status: String,
+        pretaxPrice: Number,
     }],
     extras: [{
-        extraID: String,
+        productID: String,
+        invoiceItemID: String,
+        priceID: String,
+        status: String,
+        pretaxPrice: Number,
     }]
 });
 
@@ -33,12 +40,11 @@ export const orderProductsModel = mongoose.model('Order Products', orderProducts
 * deliveredDate: the date and time a delivery was delivered.
 * */
 export const orderSchema = new mongoose.Schema({
-    id: String,
-    customer: customerSchema,
+    invoiceID: String,
+    customerID: String,
     products: orderProductsSchema,
     status: String,
     pretaxPrice: Number,
-    postTaxPrice: Number,
     coupon: String,
     notes: String,
     deliveredDate: Date,

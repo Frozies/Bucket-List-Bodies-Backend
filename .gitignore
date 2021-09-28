@@ -23,3 +23,7 @@
 /src/schemas/orderSchema.js
 /src/schemas/utilSchema.js
 /src/utility/envValidator.js
+/src/resolvers/productResolvers.js
+/src/schemas/productSchema.js
+/.nyc_output/
+/coverage/

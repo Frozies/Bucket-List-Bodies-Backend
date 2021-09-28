@@ -7,19 +7,14 @@ const customerSchema = gql`
             getCustomer(id: String): Customer
 
             #Retrieves all customers
-            getAllCustomers(id: String): [Customer]
+            getAllCustomers: [Customer]
             
-#            #Using an order ID, get the customer's information.
-#            getCustomerFromOrder(id: ID): Customer
-#            
 #            #Retrieves all customers that do have a current subscription or order that has yet been completed.
 #            getAllActiveCustomers: [Customer]
 #
 #            #Retrieves all customers that do not have a current subscription
 #            getAllInactiveCustomers: [Customer]
-#            
-#            #Retrieves all the orders from a specified customer
-#            getSingleCustomerOrders(id: ID): [Order]
+#
         }
 
     extend type Mutation {
@@ -27,7 +22,7 @@ const customerSchema = gql`
         createCustomer(customer: createNewCustomerInput): Customer
 
         #Deletes a customer from stripe. This is commented out as I believe it is not needed at the moment.
-        #deleteCustomer(customerID: String): Boolean
+        deleteCustomer(customerId: String): Boolean
 
         #Updates a customer in stripe.
         updateCustomer(customer: updateCustomerInput): Customer
@@ -40,20 +35,22 @@ const customerSchema = gql`
         address: AddressInput!
         shipping: ShippingInput
         notes: String
+        allergies: [String]
     }
 
     input updateCustomerInput{
-        id: String!
+        customerId: String!
         name: String
         email: String
         phone: String
         address: AddressInput
         shipping: ShippingInput
         notes: String
+        allergies: [String]
     }
 
     type Customer {
-        id: String
+        customerId: String
         name: String
         email: String
         phone: String
@@ -62,6 +59,7 @@ const customerSchema = gql`
         default_source: String
         orders: [Order]
         notes: String
+        allergies: [String]
     }
 `;
 
