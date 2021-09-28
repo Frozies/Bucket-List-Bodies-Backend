@@ -47,6 +47,13 @@ jobs:
           username: root
           command_timeout: 5m
           passphrase: ${{ secrets.OPENSSH_PRIVATE_KEY_PASSPHRASE }}
+          env:
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+            CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+            CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+            MONGODB=${{ secrets.MONGODB }}
+            SERVER_PORT=${{ secrets.SERVER_PORT }}
           script: >
             docker pull frozies/bucket_list_bodies_backend:main
 
@@ -54,7 +61,6 @@ jobs:
 
             sleep 30 # ((unhealthy + 1) * interval)
 
-            docker stop BLB-Ubuntu || true
             docker stop blb-backend || true
 
             docker rm blb-backend || true
@@ -64,12 +70,6 @@ jobs:
             docker run -d \
               --restart always \
               -p 0.0.0.0:4001:4001 \
-              -e SERVER_PORT=${{ secrets.SERVER_PORT }}\
-              -e MONGODB=${{ secrets.MONGODB }}\
-              -e STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}\
-              -e CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}\
-              -e CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}\
-              -e CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}\
               --name blb-backend \
               frozies/bucket_list_bodies_backend:main
 
