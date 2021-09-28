@@ -41,16 +41,14 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DO_SERVER_IP }}
-          key: ${{ secrets.OPENSSH_PRIVATE_KEY }}
+          key: ${{ secrets.PUBLIC_KEY }}
           debug: true
           port: 22
           username: root
           command_timeout: 5m
-          passphrase: ${{ secrets.OPENSSH_PRIVATE_KEY_PASSPHRASE }}
+          passphrase: ${{ secrets.PUBLIC_KEY_PASSPHRASE }}
           script: >
-            doctl registry login --expiry-seconds 180
-
-            docker pull frozies/bucket_list_bodies_backend
+            docker pull frozies/bucket_list_bodies_backend:main
 
             echo "giving health-check time to fail..."
 
@@ -66,7 +64,7 @@ jobs:
               --restart always \
               -p 0.0.0.0:80:4000 \
               --name BLB-Ubuntu \
-              frozies/bucket_list_bodies_backend
+              frozies/bucket_list_bodies_backend:main
 
             echo "giving healthcheck time to recover..."
 
