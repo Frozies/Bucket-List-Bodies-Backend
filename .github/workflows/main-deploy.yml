@@ -39,6 +39,13 @@ jobs:
     steps:
       - name: Deploy api to DigitalOcean Droplet
         uses: appleboy/ssh-action@master
+        env:
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          MONGODB=${{ secrets.MONGODB }}
+          SERVER_PORT=${{ secrets.SERVER_PORT }}
         with:
           host: ${{ secrets.DO_SERVER_IP }}
           key: ${{ secrets.OPENSSH_PRIVATE_KEY }}
@@ -47,13 +54,13 @@ jobs:
           username: root
           command_timeout: 5m
           passphrase: ${{ secrets.OPENSSH_PRIVATE_KEY_PASSPHRASE }}
-          env:
-            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-            CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
-            CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
-            CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-            MONGODB=${{ secrets.MONGODB }}
-            SERVER_PORT=${{ secrets.SERVER_PORT }}
+          envs: 
+          STRIPE_SECRET_KEY, 
+          CLOUDINARY_CLOUD_NAME, 
+          CLOUDINARY_API_KEY,
+          CLOUDINARY_API_SECRET,
+          MONGODB,
+          SERVER_PORT
           script: >
             docker pull frozies/bucket_list_bodies_backend:main
 
@@ -70,6 +77,12 @@ jobs:
             docker run -d \
               --restart always \
               -p 0.0.0.0:4001:4001 \
+              -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
+              -e CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME \
+              -e CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY \
+              -e CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET \
+              -e MONGODB=$MONGODB \
+              -e SERVER_PORT=$SERVER_PORT \
               --name blb-backend \
               frozies/bucket_list_bodies_backend:main
 
