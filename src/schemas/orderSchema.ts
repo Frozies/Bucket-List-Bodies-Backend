@@ -6,10 +6,9 @@ const orderSchema = gql`
         #Get every order ever
         getAllOrders: [Order]
 
+        #using the invoice ID as an input, retrieve that specific order.
         getOrder(order: String): Order
-
-        #        #Get one order by its ID
-        #        getOneOrder(id: ID): Order
+        
         #
         #        #Get all active orders that have yet to be delivered.
         #        getAllActiveOrders: [Order]

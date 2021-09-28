@@ -22,6 +22,7 @@ let apolloConfig = {
 }
 
 before(async () => {
+    //todo: cleanup
     // mongoServer = await MongoMemoryServer.create();
 
     // @ts-ignore

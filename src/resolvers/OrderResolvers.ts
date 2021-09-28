@@ -90,9 +90,8 @@ export const OrderResolvers = {
             return orderModel.find()
         },
 
-        getOrder(args: any){
-            const order = orderModel.findOne({invoiceID: args.order});
-            return order
+        getOrder(parent: any, args: any){
+            return orderModel.findOne({invoiceID: args.order});
         },
 
 
