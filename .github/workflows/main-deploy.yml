@@ -41,12 +41,12 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DO_SERVER_IP }}
-          key: ${{ secrets.PUBLIC_KEY }}
+          key: ${{ secrets.OPENSSH_PRIVATE_KEY }}
           debug: true
           port: 22
           username: root
           command_timeout: 5m
-          passphrase: ${{ secrets.PUBLIC_KEY_PASSPHRASE }}
+          passphrase: ${{ secrets.OPENSSH_PRIVATE_KEY_PASSPHRASE }}
           script: >
             docker pull frozies/bucket_list_bodies_backend:main
 
