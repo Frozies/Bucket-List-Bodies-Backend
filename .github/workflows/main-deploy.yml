@@ -34,7 +34,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy-api-1:
-    needs: build
+    needs: push_to_registry
     runs-on: ubuntu-latest
     steps:
       - name: Deploy api to DigitalOcean Droplet
