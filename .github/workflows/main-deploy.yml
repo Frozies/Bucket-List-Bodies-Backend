@@ -54,16 +54,16 @@ jobs:
 
             sleep 30 # ((unhealthy + 1) * interval)
 
-            docker stop BLB-Ubuntu || true
+            docker stop blb-backend || true
 
-            docker rm BLB-Ubuntu || true
+            docker rm blb-backend || true
 
             echo "starting server instance..."
 
             docker run -d \
               --restart always \
-              -p 0.0.0.0:80:4000 \
-              --name BLB-Ubuntu \
+              -p 0.0.0.0:4001:4000 \
+              --name blb-backend \
               frozies/bucket_list_bodies_backend:main
 
             echo "giving healthcheck time to recover..."
