@@ -89,7 +89,8 @@ export const productResolvers = {
                     fatWeight: args.meal.fatWeight,
                     carbs: args.meal.carbs,
                     calories: args.meal.calories,
-                    vegetables: args.meal.vegetables
+                    vegetables: args.meal.vegetables,
+                    allergies: args.meal.allergies
                 })
             }
             catch (err) {
@@ -160,6 +161,7 @@ export const productResolvers = {
                     carbs: args.meal.carbs ? args.meal.carbs : undefined,
                     calories: args.meal.calories ? args.meal.calories : undefined,
                     mealStatus: args.meal.mealStatus ? args.meal.mealStatus : undefined,
+                    allergies: args.meal.allergies ? args.meal.allergies : undefined
                 }
 
                 await mealModel.updateOne(filter, _.pickBy(update, (param: any) => {
@@ -297,6 +299,7 @@ export const productResolvers = {
                     fatWeight: args.extra.fatWeight,
                     carbs: args.extra.carbs,
                     calories: args.extra.calories,
+                    allergies: args.extra.allergies,
                 })
             }
             catch (err) {
@@ -367,6 +370,7 @@ export const productResolvers = {
                     carbs: args.extra.carbs ? args.extra.carbs : undefined,
                     calories: args.extra.calories ? args.extra.calories : undefined,
                     extraStatus: args.extra.extraStatus ? args.extra.extraStatus : undefined,
+                    allergies: args.extra.allergies ? args.extra.allergies : undefined,
                 }
 
                 await extraModel.updateOne(filter, _.pickBy(update, (param: any) => {

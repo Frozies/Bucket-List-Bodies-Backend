@@ -44,6 +44,17 @@ const utilitySchema = gql`
         REFUNDED
     }
     
+    enum Allergies {
+        FISH,
+        SHELLFISH,
+        NUT,
+        DAIRY,
+        EGGS,
+        SOY,
+        WHEAT,
+        OTHER,
+        NONE
+    }
 `;
 
 module.exports = utilitySchema;

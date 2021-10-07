@@ -27,6 +27,7 @@ export const mealSchema = new mongoose.Schema({
     fatWeight: Number,
     carbs: Number,
     calories: Number,
+    allergies: [String],
 });
 
 
