@@ -49,6 +49,7 @@ const productSchema = gql`
         fatWeight: Int
         carbs: Int
         calories: Int
+        allergies: [Allergies]
     },
 
     type Meal {
@@ -63,6 +64,7 @@ const productSchema = gql`
         fatWeight: Int
         carbs: Int
         calories: Int
+        allergies: [Allergies]
     },
 
     input updateMealInput {
@@ -76,6 +78,7 @@ const productSchema = gql`
         carbs: Int
         calories: Int
         active: Boolean
+        allergies: [Allergies]
     },
 
     input updatePriceInput {
@@ -95,6 +98,7 @@ const productSchema = gql`
         fatWeight: Int
         carbs: Int
         calories: Int
+        allergies: [Allergies]
     },
 
     input createExtraInput {
@@ -106,6 +110,7 @@ const productSchema = gql`
         fatWeight: Int
         carbs: Int
         calories: Int
+        allergies: [Allergies]
     },
     
     input updateExtraInput {
@@ -118,6 +123,7 @@ const productSchema = gql`
         carbs: Int
         calories: Int
         active: Boolean
+        allergies: [Allergies]
     },
 
     input deleteMealInput {

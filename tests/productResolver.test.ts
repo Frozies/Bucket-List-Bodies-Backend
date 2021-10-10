@@ -19,9 +19,8 @@ let seedExtraProductID: string;
 
 /**
  * This is the first test document written for this project. You will see error results in the form of
- * "expect(result.errors[0].message).to.equal('Variable "$createMealMeal" got invalid value {}; Field "title" of required type "String!" was not provided.')"
- * I do not believe that I am returning error data back correctly, thus my tests are 'flawed' in my eyes.
- * This needs to be fixed with some sort of codified message.
+ * "expect(result.errors[0].message).to.equal('Variable "$createMealMeal" got invalid value {}; Field "title" of
+ * required type "String!" was not provided.')"
  * */
 
 //Connect to the mock database before testing
@@ -439,7 +438,7 @@ describe('Product Resolvers Unit Testing', () => {
             }
         `;
 
-        /*it('Seed with meal', async () => {
+        it('Seed with meal', async () => {
             const result = await mockDB.executeOperation({
                 query: CREATE_MEAL,
                 variables: {
@@ -507,7 +506,7 @@ describe('Product Resolvers Unit Testing', () => {
 
             //set the productID to be used in later queries.
             seedExtraProductID = result.data.createExtra.productID
-        });*/
+        });
 
         it('Retrieve all meals', async () => {
             const RETRIEVE_ALL_MEALS = gql`
@@ -525,9 +524,7 @@ describe('Product Resolvers Unit Testing', () => {
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            console.log(result.data.retrieveAllMeals[0])
-
-            expect(result.data.retrieveAllMeals[0].productID).to.equal(seedMealProductID)
+            expect(result.data.retrieveAllMeals[result.data.retrieveAllMeals.length-1].productID).to.equal(seedMealProductID)
         });
 
         describe('Retrieve specific meal', async () => {

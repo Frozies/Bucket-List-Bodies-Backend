@@ -25,6 +25,7 @@ export const extraSchema = new mongoose.Schema({
     fatWeight: Number,
     carbs: Number,
     calories: Number,
+    allergies: [String]
 });
 
 

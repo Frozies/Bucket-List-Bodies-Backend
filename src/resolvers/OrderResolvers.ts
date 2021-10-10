@@ -598,7 +598,8 @@ export const OrderResolvers = {
                     sauce: meal.sauce,
                     priceID: meal.priceID,
                     invoiceItemID: meal.invoiceItemID,
-                    status: meal.status
+                    status: meal.status,
+                    allergies: meal.allergies
                 })
             })
             return meals
@@ -615,6 +616,7 @@ export const OrderResolvers = {
                     priceID: extra.priceID,
                     productID: extra.productID,
                     status: extra.status,
+                    allergies: extra.allergies
                 })
             })
 
