@@ -154,6 +154,7 @@ describe('Product Resolvers Unit Testing', () => {
                         fatWeight
                         carbs
                         calories
+                        allergies
                     }
                 }
             `;
@@ -172,6 +173,7 @@ describe('Product Resolvers Unit Testing', () => {
                             fatWeight: 15,
                             carbs: 20,
                             calories: 25,
+                            allergies: ["EGGS"]
                         }
                     }
                 });
@@ -186,6 +188,7 @@ describe('Product Resolvers Unit Testing', () => {
                 expect(result.data.updateMeal.fatWeight).to.equal(15);
                 expect(result.data.updateMeal.carbs).to.equal(20);
                 expect(result.data.updateMeal.calories).to.equal(25);
+                expect(result.data.updateMeal.allergies).to.include(["EGGS"]);
             });
         });
 
@@ -259,6 +262,7 @@ describe('Product Resolvers Unit Testing', () => {
                         fatWeight
                         carbs
                         calories
+                        allergies
                     }
                 }
             `;
@@ -276,6 +280,7 @@ describe('Product Resolvers Unit Testing', () => {
                             "fatWeight": 15,
                             "carbs": 20,
                             "calories": 25,
+                            "allergies": ["EGGS", "FISH"]
                         }
                     }
                 });
@@ -292,6 +297,8 @@ describe('Product Resolvers Unit Testing', () => {
                 expect(result.data.createExtra.fatWeight).to.equal(15);
                 expect(result.data.createExtra.carbs).to.equal(20);
                 expect(result.data.createExtra.calories).to.equal(25);
+                expect(result.data.createExtra.allergies).to.includes(['EGGS']);
+                expect(result.data.createExtra.allergies).to.includes(['FISH']);
 
                 //set the productID to be used in later queries.
                 testExtraProductID = result.data.createExtra.productID
