@@ -24,10 +24,12 @@ let apolloConfig = {
 before(async () => {
     //todo: cleanup
     // mongoServer = await MongoMemoryServer.create();
+    //    console.log("Created in memory database")
 
+    //Server database
     // @ts-ignore
     mongoServer = await mongoose.connect(process.env.MONGODB, mongooseOpts);
-    console.log("Created in memory database")
+    console.log("Connected to mongodb server")
 
     apolloServer = new ApolloServer(apolloConfig);
     console.log("Created Apollo server")

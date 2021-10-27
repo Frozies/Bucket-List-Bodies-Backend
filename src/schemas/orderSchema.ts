@@ -48,7 +48,7 @@ const orderSchema = gql`
         #Update the attributes of products (ie products, status, sides of meals)
         updateOrderLineItems(order: updateOrderLineItemsInput): Order
         
-        payOutOfBandOrder(order: orderUpdateInput): Order
+        payOutOfBandOrder(order: orderPaymentInput): Order
         
         sendForManualPaymentOrder(order: orderUpdateInput): Order
         
@@ -169,6 +169,11 @@ const orderSchema = gql`
         invoiceItemID: String!
         status: String
     },
+    
+    input orderPaymentInput {
+        invoiceID: String!
+        status: String!
+    }
 
 `;
 
