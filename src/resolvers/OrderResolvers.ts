@@ -203,11 +203,6 @@ export const OrderResolvers = {
             const invoiceID = args.order.invoiceID;
             let updatedOrder;
 
-            if(args.order.status == 'PAID' || args.order.status == 'PAID_DELIVERED') {
-                console.log("Error updating order: Cannot update payment status without payment!");
-                throw new Error("Error updating order: Cannot update payment status without payment!");
-            }
-
             console.log("Updating an order: " + invoiceID)
 
             //update coupon if updated in stripe
@@ -549,38 +544,8 @@ export const OrderResolvers = {
         },
 
         async payOutOfBandOrder(parent: any, args: any) {
-            const filter = {
-                invoiceID: args.order.invoiceID
-            }
-
             //stripe payment
-            try {
-                await stripe.invoices.pay(
-                    filter.invoiceID,
-                    {
-                        paid_out_of_band: true
-                    }
-                );
-            }
-            catch (err) {
-                console.log("Error paying stripe out of band: " + err);
-                throw new Error("Error paying stripe out of band: " + err);
-            }
-
             //update database
-            try {
-                const update = {
-                    status: args.order.status
-                }
-
-                await orderModel.updateOne(filter, update)
-            }
-            catch (err) {
-                console.log("Error paying database out of band: " + err);
-                throw new Error("Error paying database out of band: " + err);
-            }
-
-            return orderModel.findOne(filter)
         },
 
         async sendForManualPaymentOrder(parent: any, args: any) {

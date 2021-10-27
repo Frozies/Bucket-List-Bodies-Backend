@@ -56,8 +56,6 @@ const utilitySchema = gql`
         UNMADE
         MADE
         DELIVERED
-        PAID
-        PAID_DELIVERED
         CANCELED
         REFUNDED
     }

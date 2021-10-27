@@ -19,7 +19,7 @@ const productSchema = gql`
         #Using the ID from a meal, delete it.
         deleteMeal(meal: deleteMealInput): String
 
-        #Using the ID from a meal, update it. Changing allergy array is destructive. Someone remind me to change this later...
+        #Using the ID from a meal, update it.
         updateMeal(meal: updateMealInput): Meal
 
         #Create a new price in stripe and disable the old one.
@@ -32,7 +32,7 @@ const productSchema = gql`
         #Using the ID from a Extra, delete it.
         deleteExtra(extra: deleteExtraInput): String
 
-        #Using the ID from a Extra, update it. Changing allergy array is destructive. Someone remind me to change this later...
+        #Using the ID from a Extra, update it.
         updateExtra(extra: updateExtraInput): Extra
 
         #Create a new price in stripe and disable the old one.

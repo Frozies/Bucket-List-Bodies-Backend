@@ -627,28 +627,8 @@ describe('Order Resolvers Unit Testing', () => {
         });
 
         describe('Order Payments', () => {
-            it( 'payOutOfBandOrder', async () => {
-                let PAY_OUT_OF_BAND = gql`
-                    mutation Mutation($payOutOfBandOrderOrder: orderPaymentInput) {
-                        payOutOfBandOrder(order: $payOutOfBandOrderOrder) {
-                            status
-                            invoiceID
-                        }
-                    }
-                `
+            it( 'payOutOfBandOrder', () => {
 
-                let results = await mockDB.executeOperation({
-                    query: PAY_OUT_OF_BAND,
-                    variables: {
-                        "payOutOfBandOrderOrder": {
-                            "invoiceID": testInvoiceID,
-                            "status": 'PAID_DELIVERED'
-                        }
-                    }
-                })
-
-                expect(results.data.payOutOfBandOrder.invoiceID).to.equal(testInvoiceID)
-                expect(results.data.payOutOfBandOrder.status).to.equal('PAID_DELIVERED')
             });
 
             it( 'sendForManualPaymentOrder', () => {
