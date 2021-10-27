@@ -4,26 +4,10 @@ const {gql} = require('apollo-server-express');
 const utilitySchema = gql`
     scalar Date
     scalar Upload
-    
-    extend type Query {
-        users: [User]
-        user: User
-    }
 
     extend type Mutation {
         singleFileUpload(file: Upload!): String
         multipleFileUpload(file: [Upload!]!): String
-        login(
-            email: String!
-            password: String!
-        ): AuthenticationResult
-        signup(
-            firstName: String!
-            lastName: String!
-            email: String!
-            password: String!
-        ): AuthenticationResult
-        updateUserRole(role: String!): UserUpdateResult
     }
     
     type Shipping {
@@ -72,28 +56,6 @@ const utilitySchema = gql`
         WHEAT,
         OTHER,
         NONE
-    }
-
-    type User {
-        _id: ID!
-        firstName: String!
-        lastName: String!
-        email: String!
-        role: String!
-        avatar: String
-        bio: String
-    }
-
-    type AuthenticationResult {
-        message: String!
-        userInfo: User!
-        token: String!
-        expiresAt: String!
-    }
-
-    type UserUpdateResult {
-        message: String!
-        user: User!
     }
 `;
 
