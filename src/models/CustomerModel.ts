@@ -9,8 +9,20 @@ import mongoose from "mongoose";
 * notes: any direct notes a customer has. This could potentially become an array with its own schema later.
 * allergies: an array of strings that correspond to someones allergies.
 * * */
+export const userSchema = new mongoose.Schema({
+    userID: String,
+    name: String,
+    email: String,
+    password: String,
+    role: String, //todo: ENUM
+    tokenVersion: Number,
+})
+
+export const userModel = mongoose.model('User', userSchema);
+
+
 export const customerSchema = new mongoose.Schema({
-    customerId: String,
+    ...userSchema.obj,
     name: String,
     cards: [String],
     orders: [String],
@@ -20,4 +32,4 @@ export const customerSchema = new mongoose.Schema({
 
 export const customerModel = mongoose.model('Customer', customerSchema);
 
-module.exports = customerModel;
+module.exports = {customerModel, userModel};

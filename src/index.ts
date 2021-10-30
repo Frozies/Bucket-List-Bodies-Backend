@@ -1,16 +1,18 @@
 import {envChecker} from "./utility/envValidator";
-
 require('dotenv').config(); // Allows use of environmental variables from the .env file
-
 const express = require('express');
 const { ApolloServer} = require('apollo-server-express');
-
-
+import cors from "cors";
+import cookieParser from "cookie-parser";
 const { graphqlUploadExpress } = require("graphql-upload");
 const mongoose = require('mongoose');
 import {rootSchema} from "./schemas/rootSchema";
 import {rootResolvers} from "./resolvers/rootResolvers";
 import {mongooseOpts} from "./utility/mongooseOpts";
+import { verify } from "jsonwebtoken";
+const {createAccessToken, createRefreshToken, sendRefreshToken} = require("./utility/auth");
+const {userModel} = require('./models/CustomerModel');
+
 
 async function startExpressApolloServer() {
 
@@ -55,6 +57,50 @@ async function startExpressApolloServer() {
     console.log("Starting Express")
     const app = express();
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
+
+    app.use(
+        cors({
+            origin: "http://localhost:4000",
+            credentials: true
+        })
+    );
+
+    app.use(cookieParser());
+
+    app.post("/refresh_token", async (
+        req: { cookies: { jid: any; }; },
+        res: { send: (arg0: { ok: boolean; accessToken: any; }) => any; }) => {
+
+        const token = req.cookies.jid;
+        if (!token) {
+            return res.send({ ok: false, accessToken: "" });
+        }
+
+        let payload: any = null;
+        try {
+            payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);
+        } catch (err) {
+            console.log(err);
+            return res.send({ ok: false, accessToken: "" });
+        }
+
+        // token is valid and
+        // we can send back an access token
+        const user = await userModel.findOne({ id: payload.userId });
+
+        if (!user) {
+            return res.send({ ok: false, accessToken: "" });
+        }
+
+        if (user.tokenVersion !== payload.tokenVersion) {
+            return res.send({ ok: false, accessToken: "" });
+        }
+
+        sendRefreshToken(res, createRefreshToken(user));
+
+        return res.send({ ok: true, accessToken: createAccessToken(user) });
+    });
+
     server.applyMiddleware({ app });
     let serverPort = process.env.SERVER_PORT || 4001;
     new Promise((resolve) => app.listen({port: serverPort}, resolve));
