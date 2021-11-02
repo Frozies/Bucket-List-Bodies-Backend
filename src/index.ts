@@ -48,6 +48,7 @@ async function startExpressApolloServer() {
         uploads: false,
         typeDefs: rootSchema,
         resolvers: rootResolvers,
+        context: ( req: any, res: any ) => ({ req, res }),
     });
 
     await server.start();
@@ -58,18 +59,21 @@ async function startExpressApolloServer() {
     const app = express();
     app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
 
-    app.use(
+   /* app.use(
         cors({
-            origin: "http://localhost:4000",
+            origin: "http://localhost:3000",
             credentials: true
         })
-    );
+    );*/
 
     app.use(cookieParser());
+
+    app.get("/", (_req: any, res: { send: (arg0: string) => any; }) => res.send("hello"));
 
     app.post("/refresh_token", async (
         req: { cookies: { jid: any; }; },
         res: { send: (arg0: { ok: boolean; accessToken: any; }) => any; }) => {
+        console.log("Refresh token!");
 
         const token = req.cookies.jid;
         if (!token) {

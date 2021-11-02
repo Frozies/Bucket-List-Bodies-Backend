@@ -13,13 +13,12 @@ export const userSchema = new mongoose.Schema({
     userID: String,
     name: String,
     email: String,
-    password: String,
+    password: { type: String, select: false },
     role: String, //todo: ENUM
-    tokenVersion: Number,
+    tokenVersion: {type: Number, default: 0},
 })
 
 export const userModel = mongoose.model('User', userSchema);
-
 
 export const customerSchema = new mongoose.Schema({
     ...userSchema.obj,
