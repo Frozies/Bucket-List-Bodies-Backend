@@ -8,7 +8,7 @@ chai.use(require('chai-datetime'));
 
 const mockDB = require('./mockDB');
 
-let testCustomerID: string;
+let testStripeID: string;
 let testExtraProductID: string;
 let testExtraPriceID: string;
 let testMealProductID: string;
@@ -23,7 +23,7 @@ describe('Create test data for an order', () => {
             mutation Mutation($createCustomerCustomer: createNewCustomerInput) {
                 createCustomer(customer: $createCustomerCustomer) {
                     notes
-                    customerId
+                    stripeID
                     name
                     email
                     phone
@@ -81,7 +81,7 @@ describe('Create test data for an order', () => {
         if (result.errors != undefined) console.log(result.errors);
         expect(result.errors).to.undefined;
 
-        expect(result.data.createCustomer.customerId).not.equal('' || undefined || null);
+        expect(result.data.createCustomer.stripeID).not.equal('' || undefined || null);
 
         //Limited Testing as this should work in the main test for customers.
         expect(result.data.createCustomer.allergies).to.members(['Fish', 'Nuts']);
@@ -90,7 +90,7 @@ describe('Create test data for an order', () => {
         expect(result.data.createCustomer.email).to.equal('jeff@amazon.com');
         expect(result.data.createCustomer.name).to.equal('Jeff Bezos');
 
-        testCustomerID = result.data.createCustomer.customerId;
+        testStripeID = result.data.createCustomer.stripeID;
     });
 
     it('Successfully create extra', async () => {
@@ -199,7 +199,7 @@ describe('Order Resolvers Unit Testing', () => {
                     createOrder(order: $createOrderOrder) {
                         invoiceID
                         customer {
-                            customerId
+                            stripeID
                             orders {
                                 invoiceID
                             }
@@ -236,7 +236,7 @@ describe('Order Resolvers Unit Testing', () => {
                     query: CREATE_ORDER,
                     variables: {
                         "createOrderOrder": {
-                            "customerID": testCustomerID,
+                            "stripeID": testStripeID,
                             "products": {
                                 "extras": [
                                     {
@@ -265,7 +265,7 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.createOrder.invoiceID).not.equal('' || undefined);
                 testInvoiceID = result.data.createOrder.invoiceID;
 
-                expect(result.data.createOrder.customer.customerId).to.equal(testCustomerID);
+                expect(result.data.createOrder.customer.stripeID).to.equal(testStripeID);
                 expect(result.data.createOrder.products.meals).length(1);
                 expect(result.data.createOrder.products.meals[0].productID).to.equal(testMealProductID);
                 expect(result.data.createOrder.products.meals[0].status).to.equal('UNMADE');
@@ -304,7 +304,7 @@ describe('Order Resolvers Unit Testing', () => {
                     updateOrder(order: $updateOrderOrder) {
                         invoiceID
                         customer {
-                            customerId
+                            stripeID
                             orders {
                                 invoiceID
                             }
@@ -360,7 +360,7 @@ describe('Order Resolvers Unit Testing', () => {
                 expect(result.data.updateOrder.notes).to.equal('First time customer. Loved the order!');
                 expect(result.data.updateOrder.deliveredDate).to.closeToTime(deliveryDate, 10)
 
-                expect(result.data.updateOrder.customer.customerId).to.equal(testCustomerID);
+                expect(result.data.updateOrder.customer.stripeID).to.equal(testStripeID);
 
                 // This tests the resolver chain, but for some reason fails sometimes because the data comes in after
                 // the test starts. I am not sure why or how to fix it. It seems like an issue with apollo.
@@ -409,7 +409,7 @@ describe('Order Resolvers Unit Testing', () => {
                                 }
                             }
                             customer{
-                                customerId
+                                stripeID
                             }
                             invoiceID
                             pretaxPrice
@@ -422,7 +422,7 @@ describe('Order Resolvers Unit Testing', () => {
                     variables: {
                         "addOrderLineItemsOrder": {
                             "invoiceID": testInvoiceID,
-                            "customerID": testCustomerID,
+                            "stripeID": testStripeID,
                             "products": {
                                 "extras": [
                                     {
@@ -453,7 +453,7 @@ describe('Order Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.table(result.errors);
                 expect(result.errors).to.undefined;
 
-                expect(result.data.addOrderLineItems.customer.customerId).to.equal(testCustomerID)
+                expect(result.data.addOrderLineItems.customer.stripeID).to.equal(testStripeID)
                 expect(result.data.addOrderLineItems.invoiceID).to.equal(testInvoiceID)
 
                 expect(result.data.addOrderLineItems.pretaxPrice).to.equal(33.97)
@@ -506,7 +506,7 @@ describe('Order Resolvers Unit Testing', () => {
                     query: UPDATE_PRODUCTS,
                     variables: {
                         "updateOrderLineItemsOrder": {
-                            "customerID": testCustomerID,
+                            "stripeID": testStripeID,
                             "invoiceID": testInvoiceID,
                             "products": {
                                 "extras": [
@@ -587,7 +587,7 @@ describe('Order Resolvers Unit Testing', () => {
                     query: REMOVE_PRODUCTS,
                     variables: {
                         "removeOrderLineItemsOrder": {
-                            "customerID": testCustomerID,
+                            "stripeID": testStripeID,
                             "invoiceID": testInvoiceID,
                             "products": {
                                 "extras": [

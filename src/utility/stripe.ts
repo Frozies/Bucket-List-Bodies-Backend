@@ -8,7 +8,7 @@ export const stripe = new Stripe(secret, {
 });
 
 export const customerID = (_parent: any) => {
-    if (_parent?.customerId != undefined) return _parent.customerId;
-    else if (_parent._doc?.customerId != undefined) return _parent._doc.customerId;
-    else if (_parent._conditions?.customerId != undefined) return _parent._conditions.customerId;
+    if (_parent?.stripeID != undefined) return _parent.stripeID;
+    else if (_parent._doc?.stripeID != undefined) return _parent._doc.stripeID;
+    else if (_parent._conditions?.stripeID != undefined) return _parent._conditions.stripeID;
 }

@@ -22,6 +22,7 @@ export const userModel = mongoose.model('User', userSchema);
 
 export const customerSchema = new mongoose.Schema({
     ...userSchema.obj,
+    stripeID: String,
     name: String,
     cards: [String],
     orders: [String],

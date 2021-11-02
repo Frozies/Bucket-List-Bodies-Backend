@@ -22,7 +22,7 @@ const customerSchema = gql`
         createCustomer(customer: createNewCustomerInput): Customer
 
         #Deletes a customer from stripe. This is commented out as I believe it is not needed at the moment.
-        deleteCustomer(customerId: String): Boolean
+        deleteCustomer(stripeID: String): Boolean
 
         #Updates a customer in stripe.
         updateCustomer(customer: updateCustomerInput): Customer
@@ -39,7 +39,7 @@ const customerSchema = gql`
     }
 
     input updateCustomerInput{
-        customerId: String!
+        stripeID: String!
         name: String
         email: String
         phone: String
@@ -50,7 +50,7 @@ const customerSchema = gql`
     }
 
     type Customer {
-        customerId: String
+        stripeID: String!
         name: String
         email: String
         phone: String

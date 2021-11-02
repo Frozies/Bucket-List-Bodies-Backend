@@ -101,7 +101,7 @@ const orderSchema = gql`
     },
 
     input createOrderInput {
-        customerID: String!
+        stripeID: String!
         products: orderedProductsInput!
         coupon: String
         notes: String
@@ -109,7 +109,7 @@ const orderSchema = gql`
     
     input updateOrderLineItemsInput {
         invoiceID: String!
-        customerID: String!
+        stripeID: String!
         products: orderedProductsInput
     }
 

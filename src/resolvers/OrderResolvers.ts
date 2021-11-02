@@ -2,21 +2,21 @@ import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
 import _ from "lodash";
 const orderModel = require('../models/OrderModel');
-const customerModel = require('../models/CustomerModel')
+const {customerModel} = require('../models/CustomerModel')
 
 
 /**Add each line item to the invoice
  * For each item in products (meals or extras) create a stripe parameter, push to stripe, and add the
  * invoiceItemIDs that are returned from stripe to an array. then calculate the price out for later.
  */
-let createMeals = async (inputMeals: any, inputCustomerID: string, invoiceID: string | undefined = undefined) => {
+let createMeals = async (inputMeals: any, inputStripeID: string, invoiceID: string | undefined = undefined) => {
     let meals: any = [];
     let total: number = 0;
 
     try {
         for await (let meal of inputMeals) {
             const params: Stripe.InvoiceItemCreateParams = {
-                customer: inputCustomerID,
+                customer: inputStripeID,
                 price: meal.priceID,
                 quantity: 1,
                 invoice: invoiceID ? invoiceID : undefined
@@ -49,14 +49,14 @@ let createMeals = async (inputMeals: any, inputCustomerID: string, invoiceID: st
     return {meals, total};
 }
 
-let createExtras = async (inputExtras: any, inputCustomerID: string, invoiceID: string | undefined = undefined) => {
+let createExtras = async (inputExtras: any, inputStripeID: string, invoiceID: string | undefined = undefined) => {
     let extras: any = [];
     let total: number = 0;
 
     try {
         for await (let extra of inputExtras) {
             const params: Stripe.InvoiceItemCreateParams = {
-                customer: inputCustomerID,
+                customer: inputStripeID,
                 price: extra.priceID,
                 quantity: 1,
                 invoice: invoiceID ? invoiceID : undefined
@@ -119,8 +119,8 @@ export const OrderResolvers = {
             let totalUnitAmount = 0;
             let invoiceID: any;
 
-            let meals = await createMeals(args.order.products.meals, args.order.customerID);
-            let extras = await createExtras(args.order.products.extras, args.order.customerID);
+            let meals = await createMeals(args.order.products.meals, args.order.stripeID);
+            let extras = await createExtras(args.order.products.extras, args.order.stripeID);
 
             totalUnitAmount = meals.total + extras.total;
 
@@ -130,7 +130,7 @@ export const OrderResolvers = {
 
             try {
                 const params: Stripe.InvoiceCreateParams = {
-                    customer: args.order.customerID,
+                    customer: args.order.stripeID,
                 }
 
                 const invoice: Stripe.Invoice = await stripe.invoices.create(params)
@@ -153,7 +153,7 @@ export const OrderResolvers = {
 
                 const order = await orderModel.create({
                     invoiceID: invoiceID,
-                    customerId: args.order.customerID,
+                    stripeID: args.order.stripeID,
 
                     products: {
                         meals: meals.meals,
@@ -181,7 +181,7 @@ export const OrderResolvers = {
             try {
                 console.log("Adding order to Customer's order ledger.")
                 await customerModel.findOneAndUpdate(
-                    {customerId: args.order.customerID},
+                    {stripeID: args.order.stripeID},
                     {
                         $push: {
                             orders: invoiceID
@@ -292,13 +292,13 @@ export const OrderResolvers = {
                     });
                 })
 
-                let meals = await createMeals(args.order.products.meals, args.order.customerID, invoiceID);
+                let meals = await createMeals(args.order.products.meals, args.order.stripeID, invoiceID);
                 newMeals.push(
                     ...meals.meals
                 )
                 pretaxPrice += meals.total / 100
 
-                let extras = await createExtras(args.order.products.extras, args.order.customerID, invoiceID);
+                let extras = await createExtras(args.order.products.extras, args.order.stripeID, invoiceID);
                 newExtras.push(
                     ...extras.extras
                 )
@@ -595,18 +595,18 @@ export const OrderResolvers = {
     Order: {
         async customer(parent: any, args: any, context: any, info: any) {
 
-            let customerId = await stripe.invoices.retrieve(parent.invoiceID).then((invoice: any) => {return invoice.customer})
-            console.log("Retrieving Customer Data: " + customerId)
-            const customerStripe: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            let stripeID = await stripe.invoices.retrieve(parent.invoiceID).then((invoice: any) => {return invoice.customer})
+            console.log("Retrieving Customer Data: " + stripeID)
+            const customerStripe: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
 
            /* let orders: any = []
-            await customerModel.findOne({customerId: customerId}, (err: any, res: any) => {
+            await customerModel.findOne({stripeID: stripeID}, (err: any, res: any) => {
                 if (err) throw new Error("Error finding customer model in order.customer chain.")
                 orders.push(res.orders)
             });*/
 
             return {
-                customerId:  customerStripe.id,
+                stripeID:  customerStripe.id,
                 name: "name" in customerStripe ? customerStripe.name : undefined,
                 email: "email" in customerStripe ? customerStripe.email : undefined,
                 phone: "phone" in customerStripe ? customerStripe.email : undefined,

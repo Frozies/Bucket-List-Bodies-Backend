@@ -2,7 +2,7 @@ import {stripe} from "../utility/stripe";
 import {Stripe} from "stripe";
 import _ from "lodash";
 
-const customerModel = require('../models/CustomerModel')
+const {customerModel} = require('../models/CustomerModel')
 const orderModel = require("../models/OrderModel");
 const {customerID} = require('../utility/stripe');
 
@@ -10,7 +10,7 @@ const {customerID} = require('../utility/stripe');
 export const CustomerResolvers = {
     Query: {
         getCustomer(parent: any, args: any, context: any, info: any) {
-            return customerModel.findOne({customerId: args.id})
+            return customerModel.findOne({stripeID: args.id})
         },
 
         getAllCustomers(parent: any, args: any, context: any, info: any) {
@@ -33,7 +33,7 @@ export const CustomerResolvers = {
          * a new customer with ID.
          * */
         async createCustomer(parent: any, args: any, context: any, info: any) {
-            let customerID = '';
+            let stripeID = '';
             let newCustomer;
 
             //todo: Commented out for testing reasons :) note: make a failcase for this.
@@ -90,7 +90,7 @@ export const CustomerResolvers = {
 
                     const customer: Stripe.Customer = await stripe.customers.create(params);
 
-                    customerID = customer.id
+                    stripeID = customer.id
                     console.log("Created a new customer: " + customer.id)
                 };
                 await createCustomer()
@@ -104,7 +104,7 @@ export const CustomerResolvers = {
                 console.log("Adding new customer to DB.")
                 //Send customer data to DB.
                 newCustomer = await customerModel.create({
-                    customerId: customerID,
+                    stripeID: stripeID,
                     name: args.customer.name,
                     notes: args.customer.notes,
                     allergies: args.customer.allergies,
@@ -125,10 +125,10 @@ export const CustomerResolvers = {
             let updatedCustomer;
 
             try {
-                console.log("customerId: " + args.customer.customerId)
+                console.log("stripeID: " + args.customer.stripeID)
                 const updateCustomer = async () => {
                     let oldCustomer: any;
-                    await stripe.customers.retrieve(args.customer.customerId).then((doc: any) => {
+                    await stripe.customers.retrieve(args.customer.stripeID).then((doc: any) => {
                         oldCustomer = doc;
                     })
 
@@ -145,7 +145,7 @@ export const CustomerResolvers = {
                         }
                     }
 
-                    const customer: Stripe.Customer = await stripe.customers.update(args.customer.customerId, params);
+                    const customer: Stripe.Customer = await stripe.customers.update(args.customer.stripeID, params);
 
                     console.log("Updated customer: " + customer.id)
                 };
@@ -159,7 +159,7 @@ export const CustomerResolvers = {
 
             try {
                 const filter = {
-                    customerId: args.customer.customerId
+                    stripeID: args.customer.stripeID
                 }
 
                 const update = {
@@ -187,8 +187,8 @@ export const CustomerResolvers = {
          * */
         async deleteCustomer(parent: any, args: any, context: any, info: any) {
             try {
-                await stripe.customers.del(args.customerId);
-                console.log("Deleted customer: " + args.customerId)
+                await stripe.customers.del(args.stripeID);
+                console.log("Deleted customer: " + args.stripeID)
             }
             catch (err) {
                 console.log("Error deleteCustomer: " + err)
@@ -206,7 +206,7 @@ export const CustomerResolvers = {
             try {
                 console.log("Retrieving orders from customer information.")
                 const orders = await stripe.invoices.list({
-                    customer: parent.customerId
+                    customer: parent.stripeID
                 });
 
                 retrievedOrders = orders.data
@@ -234,42 +234,44 @@ export const CustomerResolvers = {
         },
 
         async email(parent: any, context: any) {
-            let customerId = customerID(parent)
-            console.log("Retrieving Customer email: " + customerId)
+            console.log("PARENT")
+            console.log(parent)
+            let stripeID = customerID(parent)
+            console.log("Retrieving Customer email: " + stripeID)
 
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
             return "email" in customer ? customer.email : undefined
         },
 
         async phone(parent: any) {
-            let customerId = customerID(parent)
-            console.log("Retrieving Customer phone: " + customerId)
+            let stripeID = customerID(parent)
+            console.log("Retrieving Customer phone: " + stripeID)
 
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
             return "phone" in customer ? customer.phone : undefined
         },
 
         async address(parent: any) {
-            let customerId = customerID(parent)
-            console.log("Retrieving Customer address: " + customerId)
+            let stripeID = customerID(parent)
+            console.log("Retrieving Customer address: " + stripeID)
 
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
             return "address" in customer ? customer.address : undefined
         },
 
         async shipping(parent: any) {
-            let customerId = customerID(parent)
-            console.log("Retrieving Customer shipping: " + customerId)
+            let stripeID = customerID(parent)
+            console.log("Retrieving Customer shipping: " + stripeID)
 
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
             return "shipping" in customer ? customer.shipping : undefined
         },
 
         async default_source(parent: any) {
-            let customerId = customerID(parent)
-            console.log("Retrieving Customer default_source: " + customerId)
+            let stripeID = customerID(parent)
+            console.log("Retrieving Customer default_source: " + stripeID)
 
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(customerId)
+            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
             return "default_source" in customer ? customer.default_source : undefined
         },
     },

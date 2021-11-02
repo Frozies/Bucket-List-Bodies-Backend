@@ -5,7 +5,7 @@ import {before} from "mocha";
 const mockDB = require('./mockDB');
 
 
-let testCustomerID: string;
+let testStripeID: string;
 
 //Connect to the mock database before testing
 before(async () => {
@@ -21,7 +21,7 @@ describe('Customer Resolvers Unit Testing', () => {
                 mutation Mutation($createCustomerCustomer: createNewCustomerInput) {
                     createCustomer(customer: $createCustomerCustomer) {
                         notes
-                        customerId
+                        stripeID
                         name
                         email
                         phone
@@ -80,7 +80,7 @@ describe('Customer Resolvers Unit Testing', () => {
                 if (result.errors != undefined) console.log(result.errors);
                 expect(result.errors).to.undefined;
 
-                expect(result.data.createCustomer.customerId).not.equal('' || undefined || null);
+                expect(result.data.createCustomer.stripeID).not.equal('' || undefined || null);
 
                 expect(result.data.createCustomer.allergies).to.members(['Nuts', 'Tomatoes']);
                 expect(result.data.createCustomer.notes).to.equal('This is a simple note');
@@ -101,7 +101,7 @@ describe('Customer Resolvers Unit Testing', () => {
                 expect(result.data.createCustomer.shipping.address.state).to.equal('DC');
                 expect(result.data.createCustomer.shipping.name).to.equal('Joe Biden');
 
-                testCustomerID = result.data.createCustomer.customerId;
+                testStripeID = result.data.createCustomer.stripeID;
             });
         });
 
@@ -110,7 +110,7 @@ describe('Customer Resolvers Unit Testing', () => {
             const UPDATE_CUSTOMER = gql`
                 mutation Mutation($updateCustomerCustomer: updateCustomerInput) {
                     updateCustomer(customer: $updateCustomerCustomer) {
-                        customerId
+                        stripeID
                         name
                         email
                         phone
@@ -145,7 +145,7 @@ describe('Customer Resolvers Unit Testing', () => {
                     query: UPDATE_CUSTOMER,
                     variables: {
                         "updateCustomerCustomer": {
-                            "customerId": testCustomerID,
+                            "stripeID": testStripeID,
                             "name": 'Kamala Harris',
                             "email": 'KamalaHarrise@whitehouse.gov',
                             "phone": '202-111-2292',
@@ -188,7 +188,7 @@ describe('Customer Resolvers Unit Testing', () => {
             const GET_ALL_CUSTOMERS = gql`
                 query Query {
                     getAllCustomers {
-                        customerId
+                        stripeID
                     }
                 }
             `
@@ -200,14 +200,14 @@ describe('Customer Resolvers Unit Testing', () => {
             expect(result.errors).to.undefined;
 
 
-            expect(result.data.getAllCustomers[result.data.getAllCustomers.length-1].customerId).to.equal(testCustomerID)
+            expect(result.data.getAllCustomers[result.data.getAllCustomers.length-1].stripeID).to.equal(testStripeID)
         });
 
         it('Retrieve specific customer', async () => {
             const RETRIEVE_CUSTOMER = gql`
-                query Query($getCustomerId: String) {
-                    getCustomer(id: $getCustomerId) {
-                        customerId
+                query Query($getstripeID: String) {
+                    getCustomer(id: $getstripeID) {
+                        stripeID
                     }
                 }
             `;
@@ -215,21 +215,21 @@ describe('Customer Resolvers Unit Testing', () => {
             const result = await mockDB.executeOperation({
                 query: RETRIEVE_CUSTOMER,
                 variables: {
-                    "getCustomerId": testCustomerID
+                    "getstripeID": testStripeID
                 }
             });
             if (result.errors != undefined) console.log(result.errors);
             expect(result.errors).to.undefined;
 
-            expect(result.data.getCustomer.customerId).to.equal(testCustomerID)
+            expect(result.data.getCustomer.stripeID).to.equal(testStripeID)
         });
     });
 
     describe('deleteCustomer', () => {
 
         const DELETE_CUSTOMER = gql`
-            mutation Mutation($deleteCustomerCustomerId: String) {
-                deleteCustomer(customerId: $deleteCustomerCustomerId)
+            mutation Mutation($deleteCustomerstripeID: String) {
+                deleteCustomer(stripeID: $deleteCustomerstripeID)
             }
         `;
 
@@ -237,7 +237,7 @@ describe('Customer Resolvers Unit Testing', () => {
             const result = await mockDB.executeOperation({
                 query: DELETE_CUSTOMER,
                 variables: {
-                    "deleteCustomerCustomerId": testCustomerID
+                    "deleteCustomerstripeID": testStripeID
                 }
             });
             if (result.errors != undefined) console.log(result.errors);
