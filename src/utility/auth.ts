@@ -5,14 +5,16 @@ import { verify } from "jsonwebtoken";
 import { Response } from "express";
 
 export const createAccessToken = (user: typeof userModel) => {
-    return sign({ userID: user.id }, process.env.ACCESS_TOKEN_SECRET!, {
-        expiresIn: "15m"
+    return sign({ userID: user.id, tokenVersion: user.tokenVersion, roles: user.roles },
+        process.env.JWT_SECRET!,
+        {
+        expiresIn: "15m",
     });
 };
 
 export const createRefreshToken = (user: typeof userModel) => {
     return sign(
-        { userID: user.id, tokenVersion: user.tokenVersion },
+        { userID: user.id, tokenVersion: user.tokenVersion, roles: user.roles },
         process.env.REFRESH_TOKEN_SECRET!,
         {
             expiresIn: "7d"
@@ -29,7 +31,7 @@ export const isAuth = (context: any, next: any) => {
 
     try {
         const token = authorization.split(" ")[1];
-        const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+        const payload = verify(token, process.env.JWT_SECRET!);
         context.req.req.payload = payload as any;
 
     } catch (err) {

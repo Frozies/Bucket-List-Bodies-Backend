@@ -2,15 +2,25 @@
 const {gql} = require('apollo-server-express');
 
 const authSchema = gql`
+    directive @hasScope(scopes: [String]) on OBJECT | FIELD_DEFINITION
+    directive @hasRole(roles: [Role]) on OBJECT | FIELD_DEFINITION
+    directive @isAuthenticated on OBJECT | FIELD_DEFINITION
+
+    enum Role {
+        reader
+        user
+        admin
+    }
+    
     extend type Query {
 #        hello: String
 #        bye: String
-        users: [User]
-        me: User
+        users: [Customer] @hasRole(roles: admin)
+        me: Customer @isAuthenticated
     }
 
     extend type Mutation {
-        logout: Boolean
+        logout: Boolean @isAuthenticated
         revokeRefreshTokenForUser(userID: String): Boolean
         login(email: String, password: String): LoginResponse
         register(email: String, password: String): Boolean
@@ -18,14 +28,7 @@ const authSchema = gql`
     
     type LoginResponse {
         accessToken: String
-        user: User
-    }
-    
-    type User {
-        id: String
-        email: String
-        password: String
-        tokenVersion: Int
+        user: Customer
     }
 `;
 

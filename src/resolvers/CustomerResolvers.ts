@@ -57,6 +57,8 @@ export const CustomerResolvers = {
             // Create a customer in stripe
             try {
                 const createCustomer = async () => {
+                    //TODO: Find by email and is authed to update an existing user
+
                     //Check if the shipping address has been supplied. if false => use billing address
                     if (!args.customer.shipping.address) {
                         args.customer.shipping.address = args.customer.address;
@@ -101,6 +103,7 @@ export const CustomerResolvers = {
             }
 
             try {
+                //todo: add auth information
                 console.log("Adding new customer to DB.")
                 //Send customer data to DB.
                 newCustomer = await customerModel.create({
@@ -123,6 +126,8 @@ export const CustomerResolvers = {
          * */
         async updateCustomer(parent: any, args: any, context: any, info: any) {
             let updatedCustomer;
+
+            //todo: Find based on email and is authed
 
             try {
                 console.log("stripeID: " + args.customer.stripeID)
@@ -186,6 +191,7 @@ export const CustomerResolvers = {
          * Delete a customer in stripe using it's ID.
          * */
         async deleteCustomer(parent: any, args: any, context: any, info: any) {
+            //TODO: is authed and find by userID not stripeID
             try {
                 await stripe.customers.del(args.stripeID);
                 console.log("Deleted customer: " + args.stripeID)
@@ -231,16 +237,6 @@ export const CustomerResolvers = {
             }
 
             return await invoices;
-        },
-
-        async email(parent: any, context: any) {
-            console.log("PARENT")
-            console.log(parent)
-            let stripeID = customerID(parent)
-            console.log("Retrieving Customer email: " + stripeID)
-
-            const customer: Stripe.Customer | Stripe.DeletedCustomer  = await stripe.customers.retrieve(stripeID)
-            return "email" in customer ? customer.email : undefined
         },
 
         async phone(parent: any) {

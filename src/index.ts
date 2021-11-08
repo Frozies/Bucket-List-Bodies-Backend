@@ -13,6 +13,9 @@ import { verify } from "jsonwebtoken";
 const {createAccessToken, createRefreshToken, sendRefreshToken} = require("./utility/auth");
 const {userModel} = require('./models/CustomerModel');
 
+// @ts-ignore
+import { IsAuthenticatedDirective, HasRoleDirective, HasScopeDirective } from "graphql-auth-directives";
+import {makeExecutableSchema} from "graphql-tools";
 
 async function startExpressApolloServer() {
 
@@ -43,12 +46,24 @@ async function startExpressApolloServer() {
 
     /*Spin up an apollo server instance*/
     console.log("Starting Apollo")
+
+    let schema = makeExecutableSchema({
+        typeDefs: rootSchema,
+        schemaDirectives: {
+            isAuthenticated: IsAuthenticatedDirective,
+            hasRole: HasRoleDirective,
+            hasScope: HasScopeDirective
+        },
+        resolvers: rootResolvers,
+    })
+
     let server = new ApolloServer({
         // @ts-ignore
         uploads: false,
-        typeDefs: rootSchema,
-        resolvers: rootResolvers,
-        context: ( req: any, res: any ) => ({ req, res }),
+        schema,
+        context: ( req: any ) => {
+            return req;
+        }
     });
 
     await server.start();

@@ -3,44 +3,44 @@ const {gql} = require('apollo-server-express');
 
 const productSchema = gql`
     extend type Query {
-        retrieveAllMeals: [Meal]
+        retrieveAllMeals: [Meal] @hasRole(roles: user)
 
-        retrieveMeal(meal: String): Meal
+        retrieveMeal(meal: String): Meal @hasRole(roles: user)
 
-        retrieveExtra(extra: String): Extra
+        retrieveExtra(extra: String): Extra @hasRole(roles: user)
 
-        retrieveAllExtras: [Extra]
+        retrieveAllExtras: [Extra] @hasRole(roles: user)
     },
 
     extend type Mutation {
         #Creates a new meal and adds it to the database
-        createMeal(meal: createMealInput): Meal
+        createMeal(meal: createMealInput): Meal @hasRole(roles: admin)
 
         #Using the ID from a meal, delete it.
-        deleteMeal(meal: deleteMealInput): String
+        deleteMeal(meal: deleteMealInput): String @hasRole(roles: admin)
 
         #Using the ID from a meal, update it. Changing allergy array is destructive. Someone remind me to change this later...
-        updateMeal(meal: updateMealInput): Meal
+        updateMeal(meal: updateMealInput): Meal @hasRole(roles: admin)
 
         #Create a new price in stripe and disable the old one.
-        updateMealPrice(meal: updatePriceInput): Meal
+        updateMealPrice(meal: updatePriceInput): Meal @hasRole(roles: admin)
 
 
         #Creates a new Extra and adds it to the database
-        createExtra(extra: createExtraInput): Extra
+        createExtra(extra: createExtraInput): Extra @hasRole(roles: admin)
 
         #Using the ID from a Extra, delete it.
-        deleteExtra(extra: deleteExtraInput): String
+        deleteExtra(extra: deleteExtraInput): String @hasRole(roles: admin)
 
         #Using the ID from a Extra, update it. Changing allergy array is destructive. Someone remind me to change this later...
-        updateExtra(extra: updateExtraInput): Extra
+        updateExtra(extra: updateExtraInput): Extra @hasRole(roles: admin)
 
         #Create a new price in stripe and disable the old one.
-        updateExtraPrice(extra: updatePriceInput): Extra
+        updateExtraPrice(extra: updatePriceInput): Extra @hasRole(roles: admin)
     },
 
     input createMealInput {
-        title: String!
+        title: String! 
         vegetables: [String]
         description: String
         photoURL: String!

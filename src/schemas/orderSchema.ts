@@ -4,63 +4,63 @@ const {gql} = require('apollo-server-express');
 const orderSchema = gql`
     extend type Query {
         #Get every order ever
-        getAllOrders: [Order]
+        getAllOrders: [Order] @hasRole(roles: admin)
 
         #using the invoice ID as an input, retrieve that specific order.
-        getOrder(order: String): Order
+        getOrder(order: String): Order @hasRole(roles: admin)
         
         #
         #        #Get all active orders that have yet to be delivered.
-        #        getAllActiveOrders: [Order]
+        #        getAllActiveOrders: [Order] @hasRole(roles: admin)
         #
         #        #Retrieve the orders by a specified date.
-        #        getAllActiveOrdersByDate(date: Date): [Order]
+        #        getAllActiveOrdersByDate(date: Date): [Order] @hasRole(roles: admin)
         #
         #        #Finds an ORDER by its status of whether or not its been seen, prepped, or delivered.
-        #        getOrdersByStatus(status: String): [Order]
+        #        getOrdersByStatus(status: String): [Order] @hasRole(roles: admin)
         #
         #        #finds orders by their listed Food Type
-        ##        getOrdersByFood(food: FoodInput): [Order] //TODO: By Meal
+        ##        getOrdersByFood(food: FoodInput): [Order] @hasRole(roles: admin) //TODO: By Meal
         #        
         #        #Finds orders that have specified delivery dates
-        #        getOrdersByDelDate(date: Date): [Order]
+        #        getOrdersByDelDate(date: Date): [Order] @hasRole(roles: admin)
         #
         #        #Iterates through each meal in each order to search for the designated meal status
-        #        getOrdersByMealStatus(status: String): [Order]     
+        #        getOrdersByMealStatus(status: String): [Order] @hasRole(roles: admin)   
         #        
         #        #Finds orders based on the Customer
-        #        getAllSingleCustomerOrders(customer: ID): [Order]
+        #        getAllSingleCustomerOrders(customer: ID): [Order] @hasRole(roles: admin)
     },
 
     extend type Mutation {
         #On the administration dashboard, create a new order manually.
-        createOrder(order: createOrderInput): Order
+        createOrder(order: createOrderInput): Order @hasRole(roles: admin)
         
         #Update an order's basic information. This does not affect pricing or invoice items.
-        updateOrder(order: orderUpdateInput): Order
+        updateOrder(order: orderUpdateInput): Order @hasRole(roles: admin)
         
         #Add the line items and pricing for an invoice.
-        addOrderLineItems(order: updateOrderLineItemsInput): Order
+        addOrderLineItems(order: updateOrderLineItemsInput): Order @hasRole(roles: admin)
         
         #Remove the line items from an order.
-        removeOrderLineItems(order: updateOrderLineItemsInput): Order
+        removeOrderLineItems(order: updateOrderLineItemsInput): Order @hasRole(roles: admin)
 
         #Update the attributes of products (ie products, status, sides of meals)
-        updateOrderLineItems(order: updateOrderLineItemsInput): Order
+        updateOrderLineItems(order: updateOrderLineItemsInput): Order @hasRole(roles: admin)
         
-        payOutOfBandOrder(order: orderPaymentInput): Order
+        payOutOfBandOrder(order: orderPaymentInput): Order @hasRole(roles: admin)
         
-        sendForManualPaymentOrder(order: orderUpdateInput): Order
+        sendForManualPaymentOrder(order: orderUpdateInput): Order @hasRole(roles: admin)
         
 
         #Update an order's information.
         #        
 
         #        #Updates a specific meal if it has been made
-        #        updateMealStatus(status: String): Boolean
+        #        updateMealStatus(status: String): Boolean @hasRole(roles: admin)
         #        
         #        #Updates an entire order to if it has been finished being made or if it has been delivered.
-        #        updateOrderStatus(status: String): Boolean
+        #        updateOrderStatus(status: String): Boolean @hasRole(roles: admin)
     },
 
     # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.

@@ -6,8 +6,8 @@ const utilitySchema = gql`
     scalar Upload
 
     extend type Mutation {
-        singleFileUpload(file: Upload!): String
-        multipleFileUpload(file: [Upload!]!): String
+        singleFileUpload(file: Upload!): String @hasRole(roles: admin)
+        multipleFileUpload(file: [Upload!]!): String @hasRole(roles: admin)
     }
     
     type Shipping {

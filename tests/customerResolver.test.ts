@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import { gql } from "apollo-server-express";
 import {before} from "mocha";
+import exp = require("constants");
 
 const mockDB = require('./mockDB');
 
@@ -24,6 +25,8 @@ describe('Customer Resolvers Unit Testing', () => {
                         stripeID
                         name
                         email
+                        password
+                        tokenVersion
                         phone
                         address {
                             line1
@@ -100,6 +103,8 @@ describe('Customer Resolvers Unit Testing', () => {
                 expect(result.data.createCustomer.shipping.address.postal_code).to.equal('20500');
                 expect(result.data.createCustomer.shipping.address.state).to.equal('DC');
                 expect(result.data.createCustomer.shipping.name).to.equal('Joe Biden');
+                expect(result.data.createCustomer.password).to.not.null;
+                expect(result.data.createCustomer.tokenVersion).to.equal(0);
 
                 testStripeID = result.data.createCustomer.stripeID;
             });

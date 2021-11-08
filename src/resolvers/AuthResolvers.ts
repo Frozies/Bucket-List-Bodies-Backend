@@ -1,30 +1,16 @@
 import { hash, compare } from "bcryptjs";
 import {createAccessToken, createRefreshToken, isAuth, sendRefreshToken} from "../utility/auth";
 import {verify} from "jsonwebtoken";
-const {userModel} = require('../models/CustomerModel')
+const {customerModel} = require('../models/CustomerModel')
 
 export const AuthResolvers = {
     Query: {
         async me(parent: any, args: any, context: any) {
-            const authorization = context.req.req.headers['authorization'];
-
-            if (!authorization) {
-                console.log("No auth")
-                return null;
-            }
-
-            try {
-                const token = authorization.split(" ")[1];
-                const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
-                return userModel.findOne(payload.userID);
-            } catch (err) {
-                console.log("Error @me: " + err);
-                throw new Error("Error @me: " + err);
-            }
+            return customerModel.findOne({_id: context.user.userID});
         },
 
         async users() {
-            return userModel.find();
+            return customerModel.find();
         },
 /*
         async bye(parent: any, args: any, context: any) {
@@ -43,10 +29,10 @@ export const AuthResolvers = {
             const hashedPassword = await hash(args.password, 12)
 
             try {
-                await userModel.create({
+                await customerModel.create({
                     email: args.email,
                     password: hashedPassword,
-                })
+                });
             }
             catch (err) {
                 console.log("Error registering new user: " + err);
@@ -57,7 +43,7 @@ export const AuthResolvers = {
         },
 
         async login(parent: any, args: any, context: any) {
-          const user = await userModel.findOne({email: args.email}).select('+password');
+          const user = await customerModel.findOne({email: args.email}).select('+password');
 
           if (!user) {
               throw new Error('Could not find user!');
@@ -78,7 +64,7 @@ export const AuthResolvers = {
         },
 
         async revokeRefreshTokenForUser(parent: any, args: any) {
-            await userModel.findOneAndUpdate(args.userID,{
+            await customerModel.findOneAndUpdate(args.userID,{
                 $inc: {
                     tokenVersion: 1
                 }
