@@ -14,7 +14,7 @@ module.exports = {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.css']
     },
     entry: {
-        'DIG': rootModulePath + "Index.tsx"
+        'DIG': rootModulePath + "Admin.tsx"
     },
     externals: {
         jQuery: 'jQuery'
